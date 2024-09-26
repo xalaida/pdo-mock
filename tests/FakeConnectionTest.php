@@ -5,6 +5,7 @@ namespace Tests\Xala\EloquentMock;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Xala\EloquentMock\FakeConnection;
 
 class FakeConnectionTest extends TestCase
@@ -49,6 +50,22 @@ class FakeConnectionTest extends TestCase
             ->get();
 
         static::assertEmpty($users);
+    }
+
+    #[Test]
+    public function itThrowsExceptionOnUnexpectedSelectQuery(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $builder = new Builder($connection);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unexpected select query: [select * from "users"]');
+
+        $builder
+            ->select('*')
+            ->from('users')
+            ->get();
     }
 
     protected function getFakeConnection(): FakeConnection
