@@ -34,6 +34,23 @@ class FakeConnectionTest extends TestCase
         static::assertEquals('ryan', $users[2]['name']);
     }
 
+    #[Test]
+    public function itReturnsNoRowsForSelectQueryByDefault(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldPrepare('select * from "users"');
+
+        $builder = new Builder($connection);
+
+        $users = $builder
+            ->select('*')
+            ->from('users')
+            ->get();
+
+        static::assertEmpty($users);
+    }
+
     protected function getFakeConnection(): FakeConnection
     {
         return new FakeConnection();
