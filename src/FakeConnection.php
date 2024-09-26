@@ -3,9 +3,14 @@
 namespace Xala\EloquentMock;
 
 use Illuminate\Database\Connection;
+use Override;
+use RuntimeException;
 
 class FakeConnection extends Connection
 {
+    /**
+     * @var array<int, QueryExpectation>
+     */
     protected array $queryExpectations = [];
 
     public function __construct()
@@ -15,23 +20,33 @@ class FakeConnection extends Connection
         parent::__construct(new FakePdo(), 'dbname', []);
     }
 
-    public function shouldPrepare(string $query): QueryExpectation
+    public function shouldQuery(string $sql): QueryExpectation
     {
-        $queryExpectation = new QueryExpectation($query);
+        $queryExpectation = new QueryExpectation($sql);
 
         $this->queryExpectations[] = $queryExpectation;
 
         return $queryExpectation;
     }
 
+    #[Override]
     public function select($query, $bindings = [], $useReadPdo = true)
     {
         foreach ($this->queryExpectations as $queryExpectation) {
             if ($queryExpectation->sql === $query) {
-                return $queryExpectation->rows;
+                if ($this->compareBindings($queryExpectation, $bindings)) {
+                    return $queryExpectation->rows;
+                }
+
+                throw new RuntimeException(sprintf('Unexpected select query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
             }
         }
 
-        throw new \RuntimeException(sprintf('Unexpected select query: [%s]', $query));
+        throw new RuntimeException(sprintf('Unexpected select query: [%s]', $query));
+    }
+
+    protected function compareBindings(array $queryExpectation, array $bindings): bool
+    {
+        return $queryExpectation->bindings == $bindings;
     }
 }
