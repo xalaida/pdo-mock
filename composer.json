@@ -1,0 +1,29 @@
+{
+    "name": "xalaida/eloquent-mock",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Xala\\EloquentMock\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.3",
+        "illuminate/database": "^11.25"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Xala\\EloquentMock\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.3",
+        "symfony/var-dumper": "^7.1"
+    },
+    "authors": [
+        {
+            "name": "xalaida",
+            "email": "nevadskiy@gmail.com"
+        }
+    ]
+}
