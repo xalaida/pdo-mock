@@ -10,7 +10,7 @@ use Xala\EloquentMock\FakeConnection;
 class FakeConnectionTest extends TestCase
 {
     #[Test]
-    public function itShouldDatabaseQuery(): void
+    public function itShouldVerifyBaseSelectQuery(): void
     {
         $connection = $this->getFakeConnection();
 
