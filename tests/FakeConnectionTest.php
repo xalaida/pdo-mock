@@ -152,6 +152,43 @@ class FakeConnectionTest extends TestCase
                 ['id' => 1, 'name' => 'John'],
             ]);
 
+        $connection->shouldQuery('select * from "posts" where ("user_id" = ?)')
+            ->withBindings([1])
+            ->andReturnRows([
+                ['id' => 1, 'user_id' => 1, 'title' => 'PHP'],
+                ['id' => 2, 'user_id' => 1, 'title' => 'Laravel'],
+                ['id' => 3, 'user_id' => 1, 'title' => 'Eloquent'],
+            ]);
+
+        $user = (new Builder($connection))
+            ->select('*')
+            ->from('users')
+            ->find(1);
+
+        $posts = (new Builder($connection))
+            ->select('*')
+            ->from('posts')
+            ->where(['user_id' => 1])
+            ->get();
+
+        static::assertEquals('John', $user['name']);
+        static::assertCount(3, $posts);
+        static::assertEquals('PHP', $posts[0]['title']);
+        static::assertEquals('Laravel', $posts[1]['title']);
+        static::assertEquals('Eloquent', $posts[2]['title']);
+    }
+
+    #[Test]
+    public function itShouldValidateMultipleSameSelectQueriesWithDifferentBindings(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->withBindings([1])
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'John'],
+            ]);
+
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([2])
             ->andReturnRows([
@@ -170,12 +207,6 @@ class FakeConnectionTest extends TestCase
 
         static::assertEquals('John', $john['name']);
         static::assertEquals('Jane', $jane['name']);
-    }
-
-    #[Test]
-    public function itShouldValidateMultipleSameSelectQueriesWithDifferentBindings(): void
-    {
-        $this->markTestSkipped('TODO');
     }
 
     #[Test]
