@@ -8,6 +8,8 @@ class QueryExpectation
 
     public array | null $bindings = [];
 
+    public string | false $lastInsertId = false;
+
     public array $rows = [];
 
     public bool $successfulStatement = true;
@@ -29,6 +31,13 @@ class QueryExpectation
     public function withAnyBindings(): static
     {
         $this->bindings = null;
+
+        return $this;
+    }
+
+    public function withLastInsertId(string $id): static
+    {
+        $this->lastInsertId = $id;
 
         return $this;
     }
