@@ -2,6 +2,9 @@
     "name": "xalaida/eloquent-mock",
     "type": "library",
     "license": "MIT",
+    "scripts": {
+        "phpunit": "phpunit"
+    },
     "autoload": {
         "psr-4": {
             "Xala\\EloquentMock\\": "src/"
