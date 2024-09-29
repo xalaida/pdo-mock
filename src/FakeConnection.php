@@ -62,6 +62,22 @@ class FakeConnection extends Connection
         throw new RuntimeException(sprintf('Unexpected insert query: [%s] [%s]', $query, implode(', ', $bindings)));
     }
 
+    #[Override]
+    public function update($query, $bindings = [])
+    {
+        $queryExpectation = array_shift($this->queryExpectations);
+
+        if ($queryExpectation && $queryExpectation->sql === $query) {
+            if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
+                return 1;
+            }
+
+            throw new RuntimeException(sprintf('Unexpected update query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
+        }
+
+        throw new RuntimeException(sprintf('Unexpected update query: [%s] [%s]', $query, implode(', ', $bindings)));
+    }
+
     protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool
     {
         if (is_null($expectedBindings)) {
