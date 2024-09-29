@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\EloquentMock;
+namespace Tests\Xala\EloquentMock\Support;
 
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;

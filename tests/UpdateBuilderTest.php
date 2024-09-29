@@ -4,25 +4,24 @@ namespace Tests\Xala\EloquentMock;
 
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Xala\EloquentMock\FakeConnection;
 
-class FakeDeleteTest extends TestCase
+class UpdateBuilderTest extends TestCase
 {
     #[Test]
     public function itShouldVerifyQuery(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "users" where ("id" = ?)')
+        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)')
             ->withAnyBindings();
 
         $result = (new Builder($connection))
             ->from('users')
-            ->where(['id' => 7])
-            ->delete();
+            ->where(['id' => 1])
+            ->update(['name' => 'xala']);
 
         static::assertEquals(1, $result);
     }
@@ -34,12 +33,12 @@ class FakeDeleteTest extends TestCase
 
         $builder = (new Builder($connection))
             ->from('users')
-            ->where(['id' => 7]);
+            ->where(['id' => 1]);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected delete query: [delete from "users" where ("id" = ?)] [7]');
+        $this->expectExceptionMessage('Unexpected update query: [update "users" set "name" = ? where ("id" = ?)] [xala, 1]');
 
-        $builder->delete();
+        $builder->update(['name' => 'xala']);
     }
 
     #[Test]
@@ -47,13 +46,13 @@ class FakeDeleteTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "users" where ("id" = ?)')
-            ->withBindings([7]);
+        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)')
+            ->withBindings(['xala', 1]);
 
         $result = (new Builder($connection))
             ->from('users')
-            ->where(['id' => 7])
-            ->delete();
+            ->where(['id' => 1])
+            ->update(['name' => 'xala']);
 
         static::assertEquals(1, $result);
     }
@@ -63,17 +62,17 @@ class FakeDeleteTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "users" where ("id" = ?)')
-            ->withBindings([1]);
+        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)')
+            ->withBindings(['John', 1]);
 
         $builder = (new Builder($connection))
             ->from('users')
-            ->where(['id' => 7]);
+            ->where(['id' => 1]);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected delete query bindings: [delete from "users" where ("id" = ?)] [7]');
+        $this->expectExceptionMessage('Unexpected update query bindings: [update "users" set "name" = ? where ("id" = ?)] [xala, 1]');
 
-        $builder->delete();
+        $builder->update(['name' => 'xala']);
     }
 
     #[Test]
@@ -81,28 +80,15 @@ class FakeDeleteTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "products"')
+        $connection->shouldQuery('update "products" set "status" = ?')
+            ->withBindings(['processed'])
             ->andAffectRows(3);
 
         $result = (new Builder($connection))
             ->from('products')
-            ->delete();
+            ->update(['status' => 'processed']);
 
         static::assertEquals(3, $result);
-    }
-
-    #[Test]
-    public function itShouldThrowExceptionWhenQueryWasntExecuted(): void
-    {
-        $connection = $this->getFakeConnection();
-
-        $connection->shouldQuery('delete from "users" where "id" = ?')
-            ->withBindings([1]);
-
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage("Some queries were not executed: 1\nFailed asserting that an array is empty.");
-
-        $connection->assertExpectedQueriesExecuted();
     }
 
     protected function getFakeConnection(): FakeConnection

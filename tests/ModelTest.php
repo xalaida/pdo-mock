@@ -4,9 +4,11 @@ namespace Tests\Xala\EloquentMock;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Tests\Xala\EloquentMock\Support\FakeConnectionResolver;
+use Tests\Xala\EloquentMock\Support\User;
 use Xala\EloquentMock\FakeConnection;
 
-class FakeModelTest extends TestCase
+class ModelTest extends TestCase
 {
     #[Test]
     public function itShouldSaveModelCorrectly(): void

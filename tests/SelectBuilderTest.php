@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Xala\EloquentMock\FakeConnection;
 
-class FakeSelectTest extends TestCase
+class SelectBuilderTest extends TestCase
 {
     #[Test]
     public function itShouldVerifySelectQuery(): void

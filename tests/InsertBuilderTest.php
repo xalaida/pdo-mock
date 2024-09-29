@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Xala\EloquentMock\FakeConnection;
 
-class FakeInsertTest extends TestCase
+class InsertBuilderTest extends TestCase
 {
     #[Test]
     public function itShouldValidateQuery(): void
