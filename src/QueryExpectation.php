@@ -12,6 +12,8 @@ class QueryExpectation
 
     public bool $successfulStatement = true;
 
+    public int $affectedRows = 1;
+
     public function __construct(string $sql)
     {
         $this->sql = $sql;
@@ -48,6 +50,13 @@ class QueryExpectation
     public function asFailedStatement(): static
     {
         $this->successfulStatement = false;
+
+        return $this;
+    }
+
+    public function andAffectRows(int $rows): static
+    {
+        $this->affectedRows = $rows;
 
         return $this;
     }

@@ -75,6 +75,22 @@ class FakeUpdateTest extends TestCase
         $builder->update(['name' => 'xala']);
     }
 
+    #[Test]
+    public function itShouldReturnAffectedRows(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('update "products" set "status" = ?')
+            ->withBindings(['processed'])
+            ->andAffectRows(3);
+
+        $result = (new Builder($connection))
+            ->from('products')
+            ->update(['status' => 'processed']);
+
+        static::assertEquals(3, $result);
+    }
+
     protected function getFakeConnection(): FakeConnection
     {
         return new FakeConnection();

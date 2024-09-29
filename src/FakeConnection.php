@@ -69,7 +69,7 @@ class FakeConnection extends Connection
 
         if ($queryExpectation && $queryExpectation->sql === $query) {
             if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
-                return 1;
+                return $queryExpectation->affectedRows;
             }
 
             throw new RuntimeException(sprintf('Unexpected update query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
