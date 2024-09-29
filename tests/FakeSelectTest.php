@@ -269,7 +269,6 @@ class FakeSelectTest extends TestCase
             ]);
 
         $this->expectException(ExpectationFailedException::class);
-        // TODO: format this to display all queries and bindings, each on new line
         $this->expectExceptionMessage("Some queries were not executed: 1\nFailed asserting that an array is empty.");
 
         $connection->assertExpectedQueriesExecuted();
