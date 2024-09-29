@@ -210,7 +210,34 @@ class FakeConnectionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenMultipleSameSelectQueriesWithDifferentBindingsAreCalledInIncorrectOrder(): void
+    public function itShouldThrowExceptionWhenMultipleSameSelectQueriesWithDifferentBindingsAreExecutedInIncorrectOrder(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->withBindings([1])
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'John'],
+            ]);
+
+        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->withBindings([2])
+            ->andReturnRows([
+                ['id' => 2, 'name' => 'Jane'],
+            ]);
+
+        $builder = (new Builder($connection))
+            ->select('*')
+            ->from('users');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unexpected select query bindings: [select * from "users" where "id" = ? limit 1] [2]');
+
+        $builder->find(2);
+    }
+
+    #[Test]
+    public function itShouldThrowExceptionWhenQueryWasntExecuted(): void
     {
         $this->markTestSkipped('TODO');
     }
