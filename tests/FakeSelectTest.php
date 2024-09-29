@@ -37,7 +37,21 @@ class FakeSelectTest extends TestCase
     #[Test]
     public function itShouldThrowExceptionWhenQueryDoesNotMatch(): void
     {
-        $this->markTestIncomplete('TODO');
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('select * from "users"')
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'xala'],
+            ]);
+
+        $builder = (new Builder($connection))
+            ->select('*')
+            ->from('posts');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unexpected select query: [select * from "posts"]');
+
+        $builder->get();
     }
 
     #[Test]
