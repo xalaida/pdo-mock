@@ -34,7 +34,7 @@ class FakeConnection extends Connection
     {
         $queryExpectation = array_shift($this->queryExpectations);
 
-        if ($queryExpectation->sql === $query) {
+        if ($queryExpectation && $queryExpectation->sql === $query) {
             if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
                 return $queryExpectation->rows;
             }
@@ -45,8 +45,12 @@ class FakeConnection extends Connection
         throw new RuntimeException(sprintf('Unexpected select query: [%s]', $query));
     }
 
-    protected function compareBindings(array $expectedBindings, array $actualBindings): bool
+    protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool
     {
+        if (is_null($expectedBindings)) {
+            return true;
+        }
+
         return $expectedBindings == $actualBindings;
     }
 }

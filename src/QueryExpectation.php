@@ -6,7 +6,7 @@ class QueryExpectation
 {
     public string $sql;
 
-    public array $bindings = [];
+    public array | null $bindings = [];
 
     public array $rows = [];
 
@@ -18,6 +18,13 @@ class QueryExpectation
     public function withBindings(array $bindings): static
     {
         $this->bindings = $bindings;
+
+        return $this;
+    }
+
+    public function withAnyBindings(): static
+    {
+        $this->bindings = null;
 
         return $this;
     }

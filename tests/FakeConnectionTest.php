@@ -84,6 +84,26 @@ class FakeConnectionTest extends TestCase
     }
 
     #[Test]
+    public function itShouldThrowExceptionWhenExpectedBindingsAreMissing(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->andReturnRows([
+                ['id' => 7, 'name' => 'xala'],
+            ]);
+
+        $builder = (new Builder($connection))
+            ->select('*')
+            ->from('users');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unexpected select query bindings: [select * from "users" where "id" = ? limit 1] [7]');
+
+        $builder->find(7);
+    }
+
+    #[Test]
     public function itShouldThrowExceptionOnSelectQueryWithUnexpectedBindings(): void
     {
         $connection = $this->getFakeConnection();
@@ -99,6 +119,26 @@ class FakeConnectionTest extends TestCase
         $this->expectExceptionMessage('Unexpected select query bindings: [select * from "users" where "id" = ? limit 1] [7]');
 
         $builder->find(7);
+    }
+
+    #[Test]
+    public function itShouldValidateSelectQueryWithAnyBindings(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->withAnyBindings()
+            ->andReturnRows([
+                ['id' => 7, 'name' => 'xala'],
+            ]);
+
+        $user = (new Builder($connection))
+            ->select('*')
+            ->from('users')
+            ->find(7);
+
+        static::assertEquals(7, $user['id']);
+        static::assertEquals('xala', $user['name']);
     }
 
     #[Test]
@@ -130,12 +170,6 @@ class FakeConnectionTest extends TestCase
 
         static::assertEquals('John', $john['name']);
         static::assertEquals('Jane', $jane['name']);
-    }
-
-    #[Test]
-    public function itShouldValidateSelectQueryWithAnyBindings(): void
-    {
-        $this->markTestSkipped('TODO');
     }
 
     #[Test]
