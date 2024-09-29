@@ -4,6 +4,7 @@ namespace Tests\Xala\EloquentMock;
 
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Xala\EloquentMock\FakeConnection;
@@ -239,7 +240,18 @@ class FakeConnectionTest extends TestCase
     #[Test]
     public function itShouldThrowExceptionWhenQueryWasntExecuted(): void
     {
-        $this->markTestSkipped('TODO');
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->withBindings([1])
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'John'],
+            ]);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage("Some queries were not executed: 1\nFailed asserting that an array is empty.");
+
+        $connection->assertExpectedQueriesExecuted();
     }
 
     #[Test]

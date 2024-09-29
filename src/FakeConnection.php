@@ -4,6 +4,7 @@ namespace Xala\EloquentMock;
 
 use Illuminate\Database\Connection;
 use Override;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class FakeConnection extends Connection
@@ -52,5 +53,14 @@ class FakeConnection extends Connection
         }
 
         return $expectedBindings == $actualBindings;
+    }
+
+    public function assertExpectedQueriesExecuted(): void
+    {
+        TestCase::assertEmpty(
+            $this->queryExpectations, vsprintf("Some queries were not executed: %d", [
+                count($this->queryExpectations),
+            ])
+        );
     }
 }
