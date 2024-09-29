@@ -22,9 +22,7 @@ class FakeConnectionTest extends TestCase
                 ['id' => 3, 'name' => 'ryan'],
             ]);
 
-        $builder = new Builder($connection);
-
-        $users = $builder
+        $users = (new Builder($connection))
             ->select('*')
             ->from('users')
             ->get();
@@ -42,9 +40,7 @@ class FakeConnectionTest extends TestCase
 
         $connection->shouldQuery('select * from "users"');
 
-        $builder = new Builder($connection);
-
-        $users = $builder
+        $users = (new Builder($connection))
             ->select('*')
             ->from('users')
             ->get();
@@ -57,9 +53,7 @@ class FakeConnectionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $builder = new Builder($connection);
-
-        $builder
+        $builder = (new Builder($connection))
             ->select('*')
             ->from('users');
 
@@ -80,9 +74,7 @@ class FakeConnectionTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        $builder = new Builder($connection);
-
-        $user = $builder
+        $user = (new Builder($connection))
             ->select('*')
             ->from('users')
             ->find(7);
@@ -99,9 +91,7 @@ class FakeConnectionTest extends TestCase
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1]);
 
-        $builder = new Builder($connection);
-
-        $builder
+        $builder = (new Builder($connection))
             ->select('*')
             ->from('users');
 
@@ -114,7 +104,32 @@ class FakeConnectionTest extends TestCase
     #[Test]
     public function itShouldValidateMultipleSelectQueries(): void
     {
-        $this->markTestSkipped('TODO');
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->withBindings([1])
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'John'],
+            ]);
+
+        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->withBindings([2])
+            ->andReturnRows([
+                ['id' => 2, 'name' => 'Jane'],
+            ]);
+
+        $john = (new Builder($connection))
+            ->select('*')
+            ->from('users')
+            ->find(1);
+
+        $jane = (new Builder($connection))
+            ->select('*')
+            ->from('users')
+            ->find(2);
+
+        static::assertEquals('John', $john['name']);
+        static::assertEquals('Jane', $jane['name']);
     }
 
     #[Test]

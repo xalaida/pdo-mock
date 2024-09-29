@@ -32,21 +32,21 @@ class FakeConnection extends Connection
     #[Override]
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-        foreach ($this->queryExpectations as $queryExpectation) {
-            if ($queryExpectation->sql === $query) {
-                if ($this->compareBindings($queryExpectation, $bindings)) {
-                    return $queryExpectation->rows;
-                }
+        $queryExpectation = array_shift($this->queryExpectations);
 
-                throw new RuntimeException(sprintf('Unexpected select query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
+        if ($queryExpectation->sql === $query) {
+            if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
+                return $queryExpectation->rows;
             }
+
+            throw new RuntimeException(sprintf('Unexpected select query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
         }
 
         throw new RuntimeException(sprintf('Unexpected select query: [%s]', $query));
     }
 
-    protected function compareBindings(array $queryExpectation, array $bindings): bool
+    protected function compareBindings(array $expectedBindings, array $actualBindings): bool
     {
-        return $queryExpectation->bindings == $bindings;
+        return $expectedBindings == $actualBindings;
     }
 }
