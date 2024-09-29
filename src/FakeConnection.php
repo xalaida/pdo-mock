@@ -78,6 +78,22 @@ class FakeConnection extends Connection
         throw new RuntimeException(sprintf('Unexpected update query: [%s] [%s]', $query, implode(', ', $bindings)));
     }
 
+    #[Override]
+    public function delete($query, $bindings = [])
+    {
+        $queryExpectation = array_shift($this->queryExpectations);
+
+        if ($queryExpectation && $queryExpectation->sql === $query) {
+            if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
+                return $queryExpectation->affectedRows;
+            }
+
+            throw new RuntimeException(sprintf('Unexpected delete query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
+        }
+
+        throw new RuntimeException(sprintf('Unexpected delete query: [%s] [%s]', $query, implode(', ', $bindings)));
+    }
+
     protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool
     {
         if (is_null($expectedBindings)) {
@@ -89,6 +105,7 @@ class FakeConnection extends Connection
 
     public function assertExpectedQueriesExecuted(): void
     {
+        // TODO: format this to display all queries and bindings, each on new line
         TestCase::assertEmpty(
             $this->queryExpectations, vsprintf("Some queries were not executed: %d", [
                 count($this->queryExpectations),
