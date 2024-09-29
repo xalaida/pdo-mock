@@ -10,6 +10,8 @@ class QueryExpectation
 
     public array $rows = [];
 
+    public bool $successfulStatement = true;
+
     public function __construct(string $sql)
     {
         $this->sql = $sql;
@@ -32,6 +34,20 @@ class QueryExpectation
     public function andReturnRows(array $rows): static
     {
         $this->rows = $rows;
+
+        return $this;
+    }
+
+    public function asSuccessfulStatement(): static
+    {
+        $this->successfulStatement = true;
+
+        return $this;
+    }
+
+    public function asFailedStatement(): static
+    {
+        $this->successfulStatement = false;
 
         return $this;
     }
