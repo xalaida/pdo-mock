@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Xala\EloquentMock\FakeConnection;
 
-class FakeConnectionTest extends TestCase
+class FakeSelectTest extends TestCase
 {
     #[Test]
     public function itShouldVerifySelectQuery(): void
@@ -32,6 +32,12 @@ class FakeConnectionTest extends TestCase
         static::assertEquals('xala', $users[0]['name']);
         static::assertEquals('john', $users[1]['name']);
         static::assertEquals('ryan', $users[2]['name']);
+    }
+
+    #[Test]
+    public function itShouldThrowExceptionWhenQueryDoesNotMatch(): void
+    {
+        $this->markTestIncomplete('TODO');
     }
 
     #[Test]
@@ -249,6 +255,7 @@ class FakeConnectionTest extends TestCase
             ]);
 
         $this->expectException(ExpectationFailedException::class);
+        // TODO: format this to display all queries and bindings, each on new line
         $this->expectExceptionMessage("Some queries were not executed: 1\nFailed asserting that an array is empty.");
 
         $connection->assertExpectedQueriesExecuted();
