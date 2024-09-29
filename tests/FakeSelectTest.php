@@ -274,12 +274,6 @@ class FakeSelectTest extends TestCase
         $connection->assertExpectedQueriesExecuted();
     }
 
-    #[Test]
-    public function itShouldValidateSelectUpdateSelectQueries(): void
-    {
-        $this->markTestSkipped('TODO');
-    }
-
     protected function getFakeConnection(): FakeConnection
     {
         return new FakeConnection();
