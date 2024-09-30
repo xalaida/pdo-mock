@@ -4,9 +4,7 @@ namespace Tests\Xala\EloquentMock;
 
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Xala\EloquentMock\FakeConnection;
 
 class UpdateBuilderTest extends TestCase
 {
@@ -89,10 +87,5 @@ class UpdateBuilderTest extends TestCase
             ->update(['status' => 'processed']);
 
         static::assertEquals(3, $result);
-    }
-
-    protected function getFakeConnection(): FakeConnection
-    {
-        return new FakeConnection();
     }
 }
