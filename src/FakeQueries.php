@@ -2,6 +2,7 @@
 
 namespace Xala\EloquentMock;
 
+use Closure;
 use Illuminate\Database\Connection;
 use Override;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +18,12 @@ trait FakeQueries
      */
     protected array $queryExpectations = [];
 
+    protected array $queryExecuted = [];
+
+    protected Closure | null $onUpdateCallback = null;
+
+    protected Closure | null $onDeleteCallback = null;
+
     public function __construct()
     {
         // TODO: configure connection properly
@@ -31,6 +38,20 @@ trait FakeQueries
         $this->queryExpectations[] = $queryExpectation;
 
         return $queryExpectation;
+    }
+
+    public function onUpdateQuery(Closure $callback): static
+    {
+        $this->onUpdateCallback = $callback;
+
+        return $this;
+    }
+
+    public function onDeleteQuery(Closure $callback): static
+    {
+        $this->onDeleteCallback = $callback;
+
+        return $this;
     }
 
     #[Override]
@@ -70,6 +91,15 @@ trait FakeQueries
     #[Override]
     public function update($query, $bindings = [])
     {
+        $this->queryExecuted[] = [
+            'sql' => $query,
+            'bindings' => $bindings,
+        ];
+
+        if ($this->onUpdateCallback) {
+            return call_user_func($this->onUpdateCallback, $query, $bindings);
+        }
+
         $queryExpectation = array_shift($this->queryExpectations);
 
         if ($queryExpectation && $queryExpectation->sql === $query) {
@@ -86,6 +116,15 @@ trait FakeQueries
     #[Override]
     public function delete($query, $bindings = [])
     {
+        $this->queryExecuted[] = [
+            'sql' => $query,
+            'bindings' => $bindings,
+        ];
+
+        if ($this->onDeleteCallback) {
+            return call_user_func($this->onDeleteCallback, $query, $bindings);
+        }
+
         $queryExpectation = array_shift($this->queryExpectations);
 
         if ($queryExpectation && $queryExpectation->sql === $query) {
@@ -116,5 +155,15 @@ trait FakeQueries
                 count($this->queryExpectations),
             ])
         );
+    }
+
+    public function assertQueried(string $sql, array | null $bindings = []): void
+    {
+        TestCase::assertNotEmpty($this->queryExecuted, 'No queries were executed');
+
+        $queryExecuted = array_shift($this->queryExecuted);
+
+        TestCase::assertEquals($sql, $queryExecuted['sql'], 'Query does not match');
+        TestCase::assertEquals($bindings, $queryExecuted['bindings'], 'Bindings do not match');
     }
 }
