@@ -68,13 +68,13 @@ class InsertBuilderTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->shouldQuery('insert into "users" ("name") values (?), (?)')
-            ->withBindings(['John', 'Jane']);
+            ->withBindings(['john', 'jane']);
 
         $result = (new Builder($connection))
             ->from('users')
             ->insert([
-                ['name' => 'John'],
-                ['name' => 'Jane'],
+                ['name' => 'john'],
+                ['name' => 'jane'],
             ]);
 
         static::assertTrue($result);
@@ -103,7 +103,7 @@ class InsertBuilderTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->shouldQuery('insert into "users" ("name") values (?)')
-            ->withBindings(['John']);
+            ->withBindings(['john']);
 
         $builder = (new Builder($connection))
             ->from('users');

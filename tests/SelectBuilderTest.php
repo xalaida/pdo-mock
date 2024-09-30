@@ -170,7 +170,7 @@ class SelectBuilderTest extends TestCase
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1])
             ->andReturnRows([
-                ['id' => 1, 'name' => 'John'],
+                ['id' => 1, 'name' => 'john'],
             ]);
 
         $connection->shouldQuery('select * from "posts" where ("user_id" = ?)')
@@ -192,7 +192,7 @@ class SelectBuilderTest extends TestCase
             ->where(['user_id' => 1])
             ->get();
 
-        static::assertEquals('John', $user['name']);
+        static::assertEquals('john', $user['name']);
         static::assertCount(3, $posts);
         static::assertEquals('PHP', $posts[0]['title']);
         static::assertEquals('Laravel', $posts[1]['title']);
@@ -207,13 +207,13 @@ class SelectBuilderTest extends TestCase
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1])
             ->andReturnRows([
-                ['id' => 1, 'name' => 'John'],
+                ['id' => 1, 'name' => 'john'],
             ]);
 
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([2])
             ->andReturnRows([
-                ['id' => 2, 'name' => 'Jane'],
+                ['id' => 2, 'name' => 'jane'],
             ]);
 
         $john = (new Builder($connection))
@@ -226,8 +226,8 @@ class SelectBuilderTest extends TestCase
             ->from('users')
             ->find(2);
 
-        static::assertEquals('John', $john['name']);
-        static::assertEquals('Jane', $jane['name']);
+        static::assertEquals('john', $john['name']);
+        static::assertEquals('jane', $jane['name']);
     }
 
     #[Test]
@@ -238,13 +238,13 @@ class SelectBuilderTest extends TestCase
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1])
             ->andReturnRows([
-                ['id' => 1, 'name' => 'John'],
+                ['id' => 1, 'name' => 'john'],
             ]);
 
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([2])
             ->andReturnRows([
-                ['id' => 2, 'name' => 'Jane'],
+                ['id' => 2, 'name' => 'jane'],
             ]);
 
         $builder = (new Builder($connection))
@@ -265,7 +265,7 @@ class SelectBuilderTest extends TestCase
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1])
             ->andReturnRows([
-                ['id' => 1, 'name' => 'John'],
+                ['id' => 1, 'name' => 'john'],
             ]);
 
         $this->expectException(ExpectationFailedException::class);

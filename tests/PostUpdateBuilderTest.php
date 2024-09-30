@@ -20,14 +20,14 @@ class PostUpdateBuilderTest extends TestCase
         $result = (new Builder($connection))
             ->from('users')
             ->where(['id' => 5])
-            ->update(['name' => 'John']);
+            ->update(['name' => 'john']);
 
         static::assertEquals(5, $result);
 
         $result = (new Builder($connection))
             ->from('posts')
             ->where(['id' => 6])
-            ->update(['name' => 'Jane']);
+            ->update(['name' => 'jane']);
 
         static::assertEquals(5, $result);
     }

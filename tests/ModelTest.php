@@ -54,21 +54,21 @@ class ModelTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->shouldQuery('insert into "users" ("name") values (?)')
-            ->withBindings(['John'])
+            ->withBindings(['john'])
             ->withLastInsertId(10);
 
         $connection->shouldQuery('insert into "users" ("name") values (?)')
-            ->withBindings(['Jane'])
+            ->withBindings(['jane'])
             ->withLastInsertId(11);
 
         $resolver = new FakeConnectionResolver($connection);
 
         User::setConnectionResolver($resolver);
 
-        $john = new User(['name' => 'John']);
+        $john = new User(['name' => 'john']);
         $john->save(['touch' => false]);
 
-        $jane = new User(['name' => 'Jane']);
+        $jane = new User(['name' => 'jane']);
         $jane->save(['touch' => false]);
 
         static::assertEquals(10, $john->getKey());

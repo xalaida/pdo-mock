@@ -19,7 +19,7 @@ class PostInsertBuilderTest extends TestCase
 
         $result = (new Builder($connection))
             ->from('users')
-            ->insert(['name' => 'John']);
+            ->insert(['name' => 'john']);
 
         static::assertTrue($result);
     }
