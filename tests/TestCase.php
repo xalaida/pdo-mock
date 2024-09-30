@@ -11,10 +11,6 @@ class TestCase extends BaseTestCase
 {
     protected function getFakeConnection(): FakeConnection
     {
-        // TODO: configure connection properly
-        // TODO: support expending specific connection types (pgsql, mysql)
-//        parent::__construct(new FakePdo(), 'dbname', []);
-
         return new FakeConnection(new FakePdo(new FakeLastInsertIdGenerator()));
     }
 }
