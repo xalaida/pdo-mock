@@ -20,6 +20,8 @@ trait FakeQueries
 
     protected array $queryExecuted = [];
 
+    protected Closure | null $onInsertCallback = null;
+
     protected Closure | null $onUpdateCallback = null;
 
     protected Closure | null $onDeleteCallback = null;
@@ -38,6 +40,13 @@ trait FakeQueries
         $this->queryExpectations[] = $queryExpectation;
 
         return $queryExpectation;
+    }
+
+    public function onInsertQuery(Closure $callback): static
+    {
+        $this->onInsertCallback = $callback;
+
+        return $this;
     }
 
     public function onUpdateQuery(Closure $callback): static
@@ -73,6 +82,15 @@ trait FakeQueries
     #[Override]
     public function insert($query, $bindings = [])
     {
+        $this->queryExecuted[] = [
+            'sql' => $query,
+            'bindings' => $bindings,
+        ];
+
+        if ($this->onInsertCallback) {
+            return call_user_func($this->onInsertCallback, $query, $bindings);
+        }
+
         $queryExpectation = array_shift($this->queryExpectations);
 
         if ($queryExpectation && $queryExpectation->sql === $query) {
