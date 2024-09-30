@@ -26,13 +26,6 @@ trait FakeQueries
 
     protected Closure | null $onDeleteCallback = null;
 
-    public function __construct()
-    {
-        // TODO: configure connection properly
-        // TODO: support expending specific connection types (pgsql, mysql)
-        parent::__construct(new FakePdo(), 'dbname', []);
-    }
-
     public function shouldQuery(string $sql): QueryExpectation
     {
         $queryExpectation = new QueryExpectation($sql);
