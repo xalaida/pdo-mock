@@ -5,8 +5,6 @@ namespace Tests\Xala\EloquentMock;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
-use Xala\EloquentMock\FakeConnection;
 
 class PostInsertBuilderTest extends TestCase
 {
@@ -87,12 +85,5 @@ class PostInsertBuilderTest extends TestCase
         $this->expectExceptionMessage('Bindings do not match');
 
         $connection->assertQueried('insert into "users" ("name") values (?)', ['john']);
-    }
-
-    // TODO: provide last insert id somehow during execution
-
-    protected function getFakeConnection(): FakeConnection
-    {
-        return new FakeConnection();
     }
 }

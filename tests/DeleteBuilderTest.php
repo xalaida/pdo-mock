@@ -5,9 +5,7 @@ namespace Tests\Xala\EloquentMock;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Xala\EloquentMock\FakeConnection;
 
 class DeleteBuilderTest extends TestCase
 {
@@ -103,10 +101,5 @@ class DeleteBuilderTest extends TestCase
         $this->expectExceptionMessage("Some queries were not executed: 1\nFailed asserting that an array is empty.");
 
         $connection->assertExpectedQueriesExecuted();
-    }
-
-    protected function getFakeConnection(): FakeConnection
-    {
-        return new FakeConnection();
     }
 }

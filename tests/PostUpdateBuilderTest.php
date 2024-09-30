@@ -5,8 +5,6 @@ namespace Tests\Xala\EloquentMock;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
-use Xala\EloquentMock\FakeConnection;
 
 class PostUpdateBuilderTest extends TestCase
 {
@@ -98,10 +96,5 @@ class PostUpdateBuilderTest extends TestCase
         $this->expectExceptionMessage('Bindings do not match');
 
         $connection->assertQueried('update "users" set "name" = ? where ("id" = ?)', ['xala', 5]);
-    }
-
-    protected function getFakeConnection(): FakeConnection
-    {
-        return new FakeConnection();
     }
 }

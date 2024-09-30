@@ -3,10 +3,8 @@
 namespace Tests\Xala\EloquentMock;
 
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Tests\Xala\EloquentMock\Support\FakeConnectionResolver;
 use Tests\Xala\EloquentMock\Support\User;
-use Xala\EloquentMock\FakeConnection;
 
 class ModelTest extends TestCase
 {
@@ -73,10 +71,5 @@ class ModelTest extends TestCase
 
         static::assertEquals(10, $john->getKey());
         static::assertEquals(11, $jane->getKey());
-    }
-
-    protected function getFakeConnection(): FakeConnection
-    {
-        return new FakeConnection();
     }
 }

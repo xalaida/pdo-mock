@@ -4,9 +4,7 @@ namespace Tests\Xala\EloquentMock;
 
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Xala\EloquentMock\FakeConnection;
 
 class InsertBuilderTest extends TestCase
 {
@@ -130,10 +128,5 @@ class InsertBuilderTest extends TestCase
             ->insert(['name' => 'xala']);
 
         static::assertFalse($result);
-    }
-
-    protected function getFakeConnection(): FakeConnection
-    {
-        return new FakeConnection();
     }
 }

@@ -4,8 +4,6 @@ namespace Tests\Xala\EloquentMock;
 
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Xala\EloquentMock\FakeConnection;
 
 class FakeConnectionTest extends TestCase
 {
@@ -51,10 +49,5 @@ class FakeConnectionTest extends TestCase
             ->first();
 
         static::assertEquals('xala', $user['name']);
-    }
-
-    protected function getFakeConnection(): FakeConnection
-    {
-        return new FakeConnection();
     }
 }
