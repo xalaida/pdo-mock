@@ -45,6 +45,15 @@ trait FakeQueries
         $this->queryExpectations[] = new QueryExpectation('PDO::commit()');
     }
 
+    public function expectTransaction(callable $callback): void
+    {
+        $this->shouldBeginTransaction();
+
+        $callback($this);
+
+        $this->shouldCommit();
+    }
+
     public function onInsertQuery(Closure $callback): static
     {
         $this->onInsertCallback = $callback;
@@ -175,6 +184,16 @@ trait FakeQueries
         $queryExpectation = array_shift($this->queryExpectations);
 
         TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected COMMIT');
+    }
+
+    // TODO: remove this method and proxy calls to original functions
+    public function transaction(Closure $callback, $attempts = 1): void
+    {
+        $this->beginTransaction();
+
+        $callback($this);
+
+        $this->commit();
     }
 
     protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool

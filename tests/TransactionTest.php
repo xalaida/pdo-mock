@@ -51,4 +51,51 @@ class TransactionTest extends TestCase
 
         $builder->insert(['name' => 'john']);
     }
+
+    #[Test]
+    public function itShouldVerifyTransactionUsingCallableSyntax(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->expectTransaction(function ($connection) {
+            $connection->shouldQuery('insert into "users" ("name") values (?)')
+                ->withAnyBindings();
+
+            $connection->shouldQuery('insert into "posts" ("title") values (?)')
+                ->withAnyBindings();
+        });
+
+        $connection->transaction(function () use ($connection) {
+            (new Builder($connection))
+                ->from('users')
+                ->insert(['name' => 'john']);
+
+            (new Builder($connection))
+                ->from('posts')
+                ->insert(['title' => 'john']);
+        });
+    }
+
+    #[Test]
+    public function itShouldThrowExceptionWhenTransactionalQueryWasntExecuted(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->expectTransaction(function ($connection) {
+            $connection->shouldQuery('insert into "users" ("name") values (?)')
+                ->withAnyBindings();
+
+            $connection->shouldQuery('insert into "posts" ("title") values (?)')
+                ->withAnyBindings();
+        });
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected COMMIT');
+
+        $connection->transaction(function () use ($connection) {
+            (new Builder($connection))
+                ->from('users')
+                ->insert(['name' => 'john']);
+        });
+    }
 }
