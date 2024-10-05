@@ -4,6 +4,9 @@ namespace Xala\EloquentMock;
 
 use RuntimeException;
 
+/**
+ * @mixin \PDO
+ */
 class FakePdo
 {
     public string | false $lastInsertId = false;

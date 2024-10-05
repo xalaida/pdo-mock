@@ -37,12 +37,12 @@ trait FakeQueries
 
     public function shouldBeginTransaction(): void
     {
-        //
+        $this->queryExpectations[] = new QueryExpectation('PDO::beginTransaction()');
     }
 
     public function shouldCommit(): void
     {
-        //
+        $this->queryExpectations[] = new QueryExpectation('PDO::commit()');
     }
 
     public function onInsertQuery(Closure $callback): static
@@ -159,9 +159,22 @@ trait FakeQueries
         throw new RuntimeException(sprintf('Unexpected delete query: [%s] [%s]', $query, implode(', ', $bindings)));
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
-         //
+        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected BEGIN TRANSACTION');
+
+        $queryExpectation = array_shift($this->queryExpectations);
+
+        TestCase::assertEquals($queryExpectation->sql, 'PDO::beginTransaction()', 'Unexpected BEGIN TRANSACTION');
+    }
+
+    public function commit(): void
+    {
+        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected COMMIT');
+
+        $queryExpectation = array_shift($this->queryExpectations);
+
+        TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected COMMIT');
     }
 
     protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool
