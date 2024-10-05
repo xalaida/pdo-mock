@@ -5,6 +5,7 @@ namespace Tests\Xala\EloquentMock;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
+use RuntimeException;
 
 class TransactionTest extends TestCase
 {
@@ -74,6 +75,8 @@ class TransactionTest extends TestCase
                 ->from('posts')
                 ->insert(['title' => 'john']);
         });
+
+        $connection->assertExpectedQueriesExecuted();
     }
 
     #[Test]
@@ -90,12 +93,37 @@ class TransactionTest extends TestCase
         });
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Unexpected COMMIT');
+        $this->expectExceptionMessage('Unexpected PDO::commit()');
 
         $connection->transaction(function () use ($connection) {
             (new Builder($connection))
                 ->from('users')
                 ->insert(['name' => 'john']);
         });
+    }
+
+    #[Test]
+    public function itShouldRollbackTransaction(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldBeginTransaction();
+
+        $connection->shouldQuery('insert into "users" ("name") values (?)')
+            ->withAnyBindings();
+
+        $connection->shouldRollback();
+
+        try {
+            $connection->transaction(function () use ($connection) {
+                (new Builder($connection))
+                    ->from('users')
+                    ->insert(['name' => 'john']);
+
+                throw new RuntimeException('Something went wrong');
+            });
+        } catch (RuntimeException $e) {
+            $connection->assertExpectedQueriesExecuted();
+        }
     }
 }

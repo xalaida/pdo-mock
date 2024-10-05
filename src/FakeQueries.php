@@ -7,6 +7,7 @@ use Illuminate\Database\Connection;
 use Override;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Throwable;
 
 /**
  * @mixin Connection
@@ -16,9 +17,9 @@ trait FakeQueries
     /**
      * @var array<int, QueryExpectation>
      */
-    protected array $queryExpectations = [];
+    public array $queryExpectations = [];
 
-    protected array $queryExecuted = [];
+    public array $queryExecuted = [];
 
     protected Closure | null $onInsertCallback = null;
 
@@ -43,6 +44,11 @@ trait FakeQueries
     public function shouldCommit(): void
     {
         $this->queryExpectations[] = new QueryExpectation('PDO::commit()');
+    }
+
+    public function shouldRollback(): void
+    {
+        $this->queryExpectations[] = new QueryExpectation('PDO::rollback()');
     }
 
     public function expectTransaction(callable $callback): void
@@ -170,20 +176,29 @@ trait FakeQueries
 
     public function beginTransaction(): void
     {
-        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected BEGIN TRANSACTION');
+        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected BEGIN PDO::beginTransaction()');
 
         $queryExpectation = array_shift($this->queryExpectations);
 
-        TestCase::assertEquals($queryExpectation->sql, 'PDO::beginTransaction()', 'Unexpected BEGIN TRANSACTION');
+        TestCase::assertEquals($queryExpectation->sql, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
     }
 
     public function commit(): void
     {
-        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected COMMIT');
+        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::commit()');
 
         $queryExpectation = array_shift($this->queryExpectations);
 
-        TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected COMMIT');
+        TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected PDO::commit()');
+    }
+
+    public function rollback($toLevel = null): void
+    {
+        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::rollback()');
+
+        $queryExpectation = array_shift($this->queryExpectations);
+
+        TestCase::assertEquals($queryExpectation->sql, 'PDO::rollback()', 'Unexpected PDO::rollback()');
     }
 
     // TODO: remove this method and proxy calls to original functions
@@ -191,7 +206,11 @@ trait FakeQueries
     {
         $this->beginTransaction();
 
-        $callback($this);
+        try {
+            $callback($this);
+        } catch (Throwable $e) {
+            $this->rollback();
+        }
 
         $this->commit();
     }
