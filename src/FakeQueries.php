@@ -35,6 +35,16 @@ trait FakeQueries
         return $queryExpectation;
     }
 
+    public function shouldBeginTransaction(): void
+    {
+        //
+    }
+
+    public function shouldCommit(): void
+    {
+        //
+    }
+
     public function onInsertQuery(Closure $callback): static
     {
         $this->onInsertCallback = $callback;
@@ -84,19 +94,19 @@ trait FakeQueries
             return call_user_func($this->onInsertCallback, $query, $bindings);
         }
 
+        TestCase::assertNotEmpty($this->queryExpectations, sprintf('Unexpected insert query: [%s] [%s]', $query, implode(', ', $bindings)));
+
         $queryExpectation = array_shift($this->queryExpectations);
 
-        if ($queryExpectation && $queryExpectation->sql === $query) {
-            if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
-                $this->pdo->lastInsertId = $queryExpectation->lastInsertId;
+        TestCase::assertEquals($queryExpectation->sql, $query, sprintf('Unexpected insert query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-                return $queryExpectation->successfulStatement;
-            }
-
-            throw new RuntimeException(sprintf('Unexpected insert query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
+        if (! is_null($queryExpectation->bindings)) {
+            TestCase::assertEquals($queryExpectation->bindings, $bindings, sprintf("Unexpected insert query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
         }
 
-        throw new RuntimeException(sprintf('Unexpected insert query: [%s] [%s]', $query, implode(', ', $bindings)));
+        $this->pdo->lastInsertId = $queryExpectation->lastInsertId;
+
+        return $queryExpectation->successfulStatement;
     }
 
     #[Override]
@@ -147,6 +157,11 @@ trait FakeQueries
         }
 
         throw new RuntimeException(sprintf('Unexpected delete query: [%s] [%s]', $query, implode(', ', $bindings)));
+    }
+
+    public function beginTransaction()
+    {
+         //
     }
 
     protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool

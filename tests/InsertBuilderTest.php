@@ -4,6 +4,7 @@ namespace Tests\Xala\EloquentMock;
 
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\ExpectationFailedException;
 use RuntimeException;
 
 class InsertBuilderTest extends TestCase
@@ -33,7 +34,7 @@ class InsertBuilderTest extends TestCase
         $builder = (new Builder($connection))
             ->from('users');
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected insert query: [insert into "users" ("name") values (?)] [xala]');
 
         $builder->insert([
@@ -52,7 +53,7 @@ class InsertBuilderTest extends TestCase
         $builder = (new Builder($connection))
             ->from('posts');
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected insert query: [insert into "posts" ("title") values (?)] [PHP]');
 
         $builder->insert([
@@ -106,7 +107,7 @@ class InsertBuilderTest extends TestCase
         $builder = (new Builder($connection))
             ->from('users');
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected insert query bindings: [insert into "users" ("name") values (?)] [xala]');
 
         $builder->insert([
