@@ -53,10 +53,16 @@ class QueryExpectation
         return $this;
     }
 
-    // TODO: consider removing asFailedStatement() method
-    public function andThrow(Exception $exception): static
+    public function andThrow(string $message = ''): static
     {
-        $this->exception = $exception;
+        $this->exception = new FakePdoException($message);
+
+        return $this;
+    }
+
+    public function andThrowUniqueConstraint(): static
+    {
+        $this->exception = new FakePdoException('Unique constraint error');
 
         return $this;
     }
@@ -68,6 +74,7 @@ class QueryExpectation
         return $this;
     }
 
+    // TODO: consider removing this method and use andThrow() instead
     public function asFailedStatement(): static
     {
         $this->successfulStatement = false;

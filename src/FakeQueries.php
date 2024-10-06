@@ -3,6 +3,7 @@
 namespace Xala\EloquentMock;
 
 use Closure;
+use Exception;
 use Illuminate\Database\Connection;
 use Override;
 use PHPUnit\Framework\TestCase;
@@ -130,9 +131,10 @@ trait FakeQueries
 
         $this->pdo->lastInsertId = $queryExpectation->lastInsertId;
 
-        // TODO: handle unique constraint violations
         if ($queryExpectation->exception) {
-            throw $queryExpectation->exception;
+            $this->runQueryCallback($query, $bindings, function () use ($queryExpectation) {
+                throw $queryExpectation->exception;
+            });
         }
 
         return $queryExpectation->successfulStatement;
@@ -195,6 +197,11 @@ trait FakeQueries
         }
 
         return $expectedBindings == $actualBindings;
+    }
+
+    protected function isUniqueConstraintError(Exception $exception): bool
+    {
+        return $exception->getMessage() === 'Unique constraint error';
     }
 
     public function assertExpectationsFulfilled(): void
