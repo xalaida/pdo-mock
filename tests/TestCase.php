@@ -11,6 +11,12 @@ class TestCase extends BaseTestCase
 {
     protected function getFakeConnection(): FakeConnection
     {
-        return new FakeConnection(new FakePdo(new FakeLastInsertIdGenerator()));
+        $pdo = new FakePdo(new FakeLastInsertIdGenerator());
+
+        $connection = new FakeConnection($pdo);
+
+        $pdo->setConnection($connection);
+
+        return $connection;
     }
 }

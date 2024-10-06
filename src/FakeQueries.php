@@ -7,7 +7,6 @@ use Illuminate\Database\Connection;
 use Override;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Throwable;
 
 /**
  * @mixin Connection
@@ -38,17 +37,17 @@ trait FakeQueries
 
     public function shouldBeginTransaction(): void
     {
-        $this->queryExpectations[] = new QueryExpectation('PDO::beginTransaction()');
+        $this->pdo->expectBeginTransaction();
     }
 
     public function shouldCommit(): void
     {
-        $this->queryExpectations[] = new QueryExpectation('PDO::commit()');
+        $this->pdo->expectCommit();
     }
 
     public function shouldRollback(): void
     {
-        $this->queryExpectations[] = new QueryExpectation('PDO::rollback()');
+        $this->pdo->expectRollback();
     }
 
     public function expectTransaction(callable $callback): void
@@ -172,47 +171,6 @@ trait FakeQueries
         }
 
         throw new RuntimeException(sprintf('Unexpected delete query: [%s] [%s]', $query, implode(', ', $bindings)));
-    }
-
-    public function beginTransaction(): void
-    {
-        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected BEGIN PDO::beginTransaction()');
-
-        $queryExpectation = array_shift($this->queryExpectations);
-
-        TestCase::assertEquals($queryExpectation->sql, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
-    }
-
-    public function commit(): void
-    {
-        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::commit()');
-
-        $queryExpectation = array_shift($this->queryExpectations);
-
-        TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected PDO::commit()');
-    }
-
-    public function rollback($toLevel = null): void
-    {
-        TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::rollback()');
-
-        $queryExpectation = array_shift($this->queryExpectations);
-
-        TestCase::assertEquals($queryExpectation->sql, 'PDO::rollback()', 'Unexpected PDO::rollback()');
-    }
-
-    // TODO: remove this method and proxy calls to original functions
-    public function transaction(Closure $callback, $attempts = 1): void
-    {
-        $this->beginTransaction();
-
-        try {
-            $callback($this);
-        } catch (Throwable $e) {
-            $this->rollback();
-        }
-
-        $this->commit();
     }
 
     protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool

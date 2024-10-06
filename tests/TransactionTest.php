@@ -2,6 +2,7 @@
 
 namespace Tests\Xala\EloquentMock;
 
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -125,5 +126,53 @@ class TransactionTest extends TestCase
         } catch (RuntimeException $e) {
             $connection->assertExpectationsFulfilled();
         }
+    }
+
+    #[Test]
+    public function itShouldExecuteCallbackAfterCommit(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->setTransactionManager(new DatabaseTransactionsManager());
+
+        $connection->shouldBeginTransaction();
+
+        $connection->shouldCommit();
+
+        $connection->beginTransaction();
+
+        $wasChangedAfterCommit = false;
+
+        $connection->afterCommit(function () use (&$wasChangedAfterCommit) {
+            $wasChangedAfterCommit = true;
+        });
+
+        $connection->commit();
+
+        $this->assertTrue($wasChangedAfterCommit);
+    }
+
+    #[Test]
+    public function itShouldntExecuteAfterCommitCallbackWhenTransactionFails(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->setTransactionManager(new DatabaseTransactionsManager());
+
+        $connection->shouldBeginTransaction();
+
+        $connection->shouldRollback();
+
+        $connection->beginTransaction();
+
+        $wasChangedAfterCommit = false;
+
+        $connection->afterCommit(function () use (&$wasChangedAfterCommit) {
+            $wasChangedAfterCommit = true;
+        });
+
+        $connection->rollback();
+
+        $this->assertFalse($wasChangedAfterCommit);
     }
 }
