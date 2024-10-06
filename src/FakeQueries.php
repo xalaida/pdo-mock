@@ -55,6 +55,11 @@ trait FakeQueries
         $this->pdo->ignoreTransactions();
     }
 
+    public function recordTransactions(): void
+    {
+        $this->pdo->recordTransactions();
+    }
+
     public function expectTransaction(callable $callback): void
     {
         $this->shouldBeginTransaction();
@@ -205,5 +210,29 @@ trait FakeQueries
 
         TestCase::assertEquals($sql, $queryExecuted['sql'], 'Query does not match');
         TestCase::assertEquals($bindings, $queryExecuted['bindings'], 'Bindings do not match');
+    }
+
+    public function assertBeganTransaction(): void
+    {
+        $this->assertQueried('PDO::beginTransaction()');
+    }
+
+    public function assertCommitted(): void
+    {
+        $this->assertQueried('PDO::commit()');
+    }
+
+    public function assertRolledBack(): void
+    {
+        $this->assertQueried('PDO::rollback()');
+    }
+
+    public function assertTransaction(Closure $callback)
+    {
+        $this->assertBeganTransaction();
+
+        $callback($this);
+
+        $this->assertCommitted();
     }
 }

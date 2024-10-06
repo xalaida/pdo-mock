@@ -14,6 +14,8 @@ class FakePdo
 
     public bool $ignoreTransactions = false;
 
+    public bool $recordTransaction = false;
+
     public bool $inTransaction = false;
 
     public string | false $lastInsertId = false;
@@ -70,11 +72,22 @@ class FakePdo
         $this->ignoreTransactions = false;
     }
 
+    public function recordTransactions(): void
+    {
+        $this->recordTransaction = true;
+    }
+
     public function beginTransaction(): bool
     {
+        $this->connection->queryExecuted[] = [
+            'sql' => 'PDO::beginTransaction()',
+            'bindings' => [],
+        ];
+
         $this->inTransaction = true;
 
-        if (! $this->ignoreTransactions) {
+        // TODO: refactor condition
+        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
             TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::beginTransaction()');
 
             $queryExpectation = array_shift($this->connection->queryExpectations);
@@ -87,9 +100,15 @@ class FakePdo
 
     public function commit(): bool
     {
+        $this->connection->queryExecuted[] = [
+            'sql' => 'PDO::commit()',
+            'bindings' => [],
+        ];
+
         $this->inTransaction = false;
 
-        if (! $this->ignoreTransactions) {
+        // TODO: refactor condition
+        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
             TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::commit()');
 
             $queryExpectation = array_shift($this->connection->queryExpectations);
@@ -102,9 +121,15 @@ class FakePdo
 
     public function rollback(): bool
     {
+        $this->connection->queryExecuted[] = [
+            'sql' => 'PDO::rollback()',
+            'bindings' => [],
+        ];
+
         $this->inTransaction = false;
 
-        if (! $this->ignoreTransactions) {
+        // TODO: refactor condition
+        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
             TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::rollback()');
 
             $queryExpectation = array_shift($this->connection->queryExpectations);
