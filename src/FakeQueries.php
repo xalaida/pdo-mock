@@ -130,6 +130,11 @@ trait FakeQueries
 
         $this->pdo->lastInsertId = $queryExpectation->lastInsertId;
 
+        // TODO: handle unique constraint violations
+        if ($queryExpectation->exception) {
+            throw $queryExpectation->exception;
+        }
+
         return $queryExpectation->successfulStatement;
     }
 

@@ -16,6 +16,8 @@ class QueryExpectation
 
     public int $affectedRows = 1;
 
+    public ?FakePdoException $exception = null;
+
     public function __construct(string $sql)
     {
         $this->sql = $sql;
@@ -45,6 +47,14 @@ class QueryExpectation
     public function andReturnRows(array $rows): static
     {
         $this->rows = $rows;
+
+        return $this;
+    }
+
+    // TODO: consider removing asFailedStatement() method
+    public function andThrow(string $message): static
+    {
+        $this->exception = new FakePdoException($message);
 
         return $this;
     }

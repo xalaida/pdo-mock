@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 /**
- * @mixin \PDO
+ * @extends \PDO
  */
 class FakePdo
 {
