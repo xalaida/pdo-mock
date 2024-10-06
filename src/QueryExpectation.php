@@ -2,6 +2,8 @@
 
 namespace Xala\EloquentMock;
 
+use Exception;
+
 class QueryExpectation
 {
     public string $sql;
@@ -16,7 +18,7 @@ class QueryExpectation
 
     public int $affectedRows = 1;
 
-    public ?FakePdoException $exception = null;
+    public ?Exception $exception = null;
 
     public function __construct(string $sql)
     {
@@ -52,9 +54,9 @@ class QueryExpectation
     }
 
     // TODO: consider removing asFailedStatement() method
-    public function andThrow(string $message): static
+    public function andThrow(Exception $exception): static
     {
-        $this->exception = new FakePdoException($message);
+        $this->exception = $exception;
 
         return $this;
     }

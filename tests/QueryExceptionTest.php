@@ -4,7 +4,7 @@ namespace Tests\Xala\EloquentMock;
 
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
-use Xala\EloquentMock\FakePdoException;
+use RuntimeException;
 
 class QueryExceptionTest extends TestCase
 {
@@ -15,12 +15,12 @@ class QueryExceptionTest extends TestCase
 
         $connection->shouldQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala'])
-            ->andThrow('Integrity constraint violation');
+            ->andThrow(new RuntimeException('Integrity constraint violation'));
 
         $builder = (new Builder($connection))
             ->from('users');
 
-        $this->expectException(FakePdoException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Integrity constraint violation');
 
         $builder->insert([
