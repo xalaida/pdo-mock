@@ -224,7 +224,7 @@ trait FakeQueries
         return $expectedBindings == $actualBindings;
     }
 
-    public function assertExpectedQueriesExecuted(): void
+    public function assertExpectationsFulfilled(): void
     {
         // TODO: format this to display all queries and bindings, each on new line
         TestCase::assertEmpty(

@@ -29,7 +29,7 @@ class TransactionTest extends TestCase
 
         $connection->commit();
 
-        $connection->assertExpectedQueriesExecuted();
+        $connection->assertExpectationsFulfilled();
     }
 
     #[Test]
@@ -76,7 +76,7 @@ class TransactionTest extends TestCase
                 ->insert(['title' => 'john']);
         });
 
-        $connection->assertExpectedQueriesExecuted();
+        $connection->assertExpectationsFulfilled();
     }
 
     #[Test]
@@ -123,7 +123,7 @@ class TransactionTest extends TestCase
                 throw new RuntimeException('Something went wrong');
             });
         } catch (RuntimeException $e) {
-            $connection->assertExpectedQueriesExecuted();
+            $connection->assertExpectationsFulfilled();
         }
     }
 }

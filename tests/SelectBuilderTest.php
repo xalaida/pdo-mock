@@ -269,6 +269,6 @@ class SelectBuilderTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage("Some queries were not executed: 1\nFailed asserting that an array is empty.");
 
-        $connection->assertExpectedQueriesExecuted();
+        $connection->assertExpectationsFulfilled();
     }
 }
