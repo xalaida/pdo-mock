@@ -17,7 +17,7 @@ class PostgresFakeConnection extends TestCase
 
         $connection = new FakeConnection($pdo);
 
-        // TODO: use proper grammar
+        // TODO: use proper grammar (add ability to provide custom grammar in case when using some libraries)
         $connection->setQueryGrammar(new PostgresGrammar());
 
         // TODO: fake Query Processor for
