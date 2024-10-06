@@ -50,6 +50,11 @@ trait FakeQueries
         $this->pdo->expectRollback();
     }
 
+    public function ignoreTransactions(): void
+    {
+        $this->pdo->ignoreTransactions();
+    }
+
     public function expectTransaction(callable $callback): void
     {
         $this->shouldBeginTransaction();

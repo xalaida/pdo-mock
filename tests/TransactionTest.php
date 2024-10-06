@@ -175,4 +175,25 @@ class TransactionTest extends TestCase
 
         $this->assertFalse($wasChangedAfterCommit);
     }
+
+    #[Test]
+    public function itShouldIgnoreTransactions(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->ignoreTransactions();
+
+        $connection->shouldQuery('insert into "users" ("name") values (?)')
+            ->withAnyBindings();
+
+        $connection->beginTransaction();
+
+        (new Builder($connection))
+            ->from('users')
+            ->insert(['name' => 'john']);
+
+        $connection->commit();
+
+        $connection->assertExpectationsFulfilled();
+    }
 }

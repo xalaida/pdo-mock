@@ -12,6 +12,8 @@ class FakePdo
 {
     public FakeConnection $connection;
 
+    public bool $ignoreTransactions = false;
+
     public bool $inTransaction = false;
 
     public string | false $lastInsertId = false;
@@ -33,28 +35,52 @@ class FakePdo
 
     public function expectBeginTransaction(): void
     {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
+        }
+
         $this->connection->queryExpectations[] = new QueryExpectation('PDO::beginTransaction()');
     }
 
     public function expectCommit(): void
     {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
+        }
+
         $this->connection->queryExpectations[] = new QueryExpectation('PDO::commit()');
     }
 
     public function expectRollback(): void
     {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
+        }
+
         $this->connection->queryExpectations[] = new QueryExpectation('PDO::rollback()');
+    }
+
+    public function ignoreTransactions(): void
+    {
+        $this->ignoreTransactions = true;
+    }
+
+    public function handleTransactions(): void
+    {
+        $this->ignoreTransactions = false;
     }
 
     public function beginTransaction(): bool
     {
         $this->inTransaction = true;
 
-        TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::beginTransaction()');
+        if (! $this->ignoreTransactions) {
+            TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::beginTransaction()');
 
-        $queryExpectation = array_shift($this->connection->queryExpectations);
+            $queryExpectation = array_shift($this->connection->queryExpectations);
 
-        TestCase::assertEquals($queryExpectation->sql, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
+            TestCase::assertEquals($queryExpectation->sql, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
+        }
 
         return true;
     }
@@ -63,11 +89,13 @@ class FakePdo
     {
         $this->inTransaction = false;
 
-        TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::commit()');
+        if (! $this->ignoreTransactions) {
+            TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::commit()');
 
-        $queryExpectation = array_shift($this->connection->queryExpectations);
+            $queryExpectation = array_shift($this->connection->queryExpectations);
 
-        TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected PDO::commit()');
+            TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected PDO::commit()');
+        }
 
         return true;
     }
@@ -76,11 +104,13 @@ class FakePdo
     {
         $this->inTransaction = false;
 
-        TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::rollback()');
+        if (! $this->ignoreTransactions) {
+            TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::rollback()');
 
-        $queryExpectation = array_shift($this->connection->queryExpectations);
+            $queryExpectation = array_shift($this->connection->queryExpectations);
 
-        TestCase::assertEquals($queryExpectation->sql, 'PDO::rollback()', 'Unexpected PDO::rollback()');
+            TestCase::assertEquals($queryExpectation->sql, 'PDO::rollback()', 'Unexpected PDO::rollback()');
+        }
 
         return true;
     }
