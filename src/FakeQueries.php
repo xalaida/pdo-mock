@@ -5,11 +5,15 @@ namespace Xala\EloquentMock;
 use Closure;
 use Exception;
 use Illuminate\Database\Connection;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Override;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 /**
+ * @property FakePdo pdo
  * @mixin Connection
  */
 trait FakeQueries
@@ -92,6 +96,7 @@ trait FakeQueries
     }
 
     #[Override]
+    // TODO: rewrite
     public function select($query, $bindings = [], $useReadPdo = true)
     {
         $queryExpectation = array_shift($this->queryExpectations);
@@ -108,39 +113,89 @@ trait FakeQueries
     }
 
     #[Override]
-    public function insert($query, $bindings = [])
+    public function statement($query, $bindings = [])
     {
-        $this->queryExecuted[] = [
-            'sql' => $query,
-            'bindings' => $bindings,
-        ];
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
+                return true;
+            }
 
-        if ($this->onInsertCallback) {
-            return call_user_func($this->onInsertCallback, $query, $bindings);
-        }
+            // TODO: use built-in query recorder
+            $this->queryExecuted[] = [
+                'sql' => $query,
+                'bindings' => $bindings,
+            ];
 
-        TestCase::assertNotEmpty($this->queryExpectations, sprintf('Unexpected insert query: [%s] [%s]', $query, implode(', ', $bindings)));
+            // TODO: do not use callbacks for write, simplify this
+             if ($this->onInsertCallback) {
+                 return call_user_func($this->onInsertCallback, $query, $bindings);
+             }
 
-        $queryExpectation = array_shift($this->queryExpectations);
+            TestCase::assertNotEmpty($this->queryExpectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-        TestCase::assertEquals($queryExpectation->sql, $query, sprintf('Unexpected insert query: [%s] [%s]', $query, implode(', ', $bindings)));
+            $queryExpectation = array_shift($this->queryExpectations);
 
-        if (! is_null($queryExpectation->bindings)) {
-            TestCase::assertEquals($queryExpectation->bindings, $bindings, sprintf("Unexpected insert query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
-        }
+            TestCase::assertEquals($queryExpectation->sql, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-        $this->pdo->lastInsertId = $queryExpectation->lastInsertId;
+            if (! is_null($queryExpectation->bindings)) {
+                TestCase::assertEquals($queryExpectation->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
+            }
 
-        if ($queryExpectation->exception) {
-            $this->runQueryCallback($query, $bindings, function () use ($queryExpectation) {
+            $this->pdo->lastInsertId = $queryExpectation->lastInsertId;
+
+            if ($queryExpectation->exception) {
                 throw $queryExpectation->exception;
-            });
-        }
+            }
 
-        return $queryExpectation->successfulStatement;
+            $this->recordsHaveBeenModified();
+
+            return $queryExpectation->successfulStatement;
+        });
     }
 
     #[Override]
+    public function affectingStatement($query, $bindings = [])
+    {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
+                return 0;
+            }
+
+            // TODO: use built-in query recorder
+            $this->queryExecuted[] = [
+                'sql' => $query,
+                'bindings' => $bindings,
+            ];
+
+            // TODO: do not use callbacks for write
+             if ($this->onInsertCallback) {
+                 return call_user_func($this->onInsertCallback, $query, $bindings);
+             }
+
+            TestCase::assertNotEmpty($this->queryExpectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
+
+            $queryExpectation = array_shift($this->queryExpectations);
+
+            TestCase::assertEquals($queryExpectation->sql, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
+
+            if (! is_null($queryExpectation->bindings)) {
+                TestCase::assertEquals($queryExpectation->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
+            }
+
+            if ($queryExpectation->exception) {
+                throw $queryExpectation->exception;
+            }
+
+            $this->recordsHaveBeenModified(
+                $queryExpectation->affectedRows > 0
+            );
+
+            return $queryExpectation->affectedRows;
+        });
+    }
+
+    #[Override]
+    // TODO: use affectingStatement instead
     public function update($query, $bindings = [])
     {
         $this->queryExecuted[] = [
@@ -166,6 +221,7 @@ trait FakeQueries
     }
 
     #[Override]
+    // TODO: use affectingStatement instead
     public function delete($query, $bindings = [])
     {
         $this->queryExecuted[] = [
@@ -188,6 +244,30 @@ trait FakeQueries
         }
 
         throw new RuntimeException(sprintf('Unexpected delete query: [%s] [%s]', $query, implode(', ', $bindings)));
+    }
+
+    #[Override]
+    protected function runQueryCallback($query, $bindings, Closure $callback)
+    {
+        try {
+            return $callback($query, $bindings);
+        } catch (Exception $e) {
+            // Rethrow PHPUnit assertion exception
+            if ($e instanceof ExpectationFailedException) {
+                throw $e;
+            }
+
+            // Default behavior
+            if ($this->isUniqueConstraintError($e)) {
+                throw new UniqueConstraintViolationException(
+                    $this->getName(), $query, $this->prepareBindings($bindings), $e
+                );
+            }
+
+            throw new QueryException(
+                $this->getName(), $query, $this->prepareBindings($bindings), $e
+            );
+        }
     }
 
     protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool

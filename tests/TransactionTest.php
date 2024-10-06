@@ -49,7 +49,7 @@ class TransactionTest extends TestCase
             ->from('users');
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Unexpected insert query: [insert into "users" ("name") values (?)] [john]');
+        $this->expectExceptionMessage('Unexpected query: [insert into "users" ("name") values (?)] [john]');
 
         $builder->insert(['name' => 'john']);
     }
