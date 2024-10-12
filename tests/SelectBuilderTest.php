@@ -256,6 +256,23 @@ class SelectBuilderTest extends TestCase
     }
 
     #[Test]
+    public function itShouldReturnNothing(): void
+    {
+         $connection = $this->getFakeConnection();
+
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
+            ->withBindings([7])
+            ->andReturnNothing();
+
+        $result = (new Builder($connection))
+            ->select('*')
+            ->from('users')
+            ->find(7);
+
+        static::assertNull($result);
+    }
+
+    #[Test]
     public function itShouldThrowExceptionWhenQueryWasntExecuted(): void
     {
         $connection = $this->getFakeConnection();

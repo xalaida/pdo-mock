@@ -3,6 +3,7 @@
 namespace Xala\Elomock;
 
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 
 class Expectation
 {
@@ -50,6 +51,24 @@ class Expectation
     public function andReturnRows(array $rows): static
     {
         $this->rows = $rows;
+
+        return $this;
+    }
+
+    public function andReturnRow(array|Model $row): static
+    {
+        if ($row instanceof Model) {
+            $row = $row->getAttributes();
+        }
+
+        $this->rows = [$row];
+
+        return $this;
+    }
+
+    public function andReturnNothing(): static
+    {
+        $this->rows = [];
 
         return $this;
     }
