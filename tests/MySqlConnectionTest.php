@@ -4,12 +4,9 @@ namespace Tests\Xala\Elomock;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
-use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\FakeConnection;
-use Xala\Elomock\FakeLastInsertIdGenerator;
-use Xala\Elomock\FakePdo;
 
 class MySqlConnectionTest extends TestCase
 {
@@ -36,7 +33,7 @@ class MySqlConnectionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldUseMySqlProcessor(): void
+    public function itShouldUseLastInsertIdCorrectly(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -55,10 +52,8 @@ class MySqlConnectionTest extends TestCase
 
     protected function getFakeConnection(): FakeConnection
     {
-        $pdo = new FakePdo(new FakeLastInsertIdGenerator());
-        $connection = new FakeConnection($pdo);
+        $connection = new FakeConnection();
         $connection->setQueryGrammar(new MySqlGrammar());
-        $connection->setPostProcessor(new MySqlProcessor());
 
         return $connection;
     }

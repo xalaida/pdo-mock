@@ -2,7 +2,7 @@
 
 namespace Xala\Elomock;
 
-class FakeLastInsertIdGenerator
+class InsertIdGenerator
 {
     public int $lastInsertId = 1;
 

@@ -14,7 +14,6 @@ use RuntimeException;
 use Throwable;
 
 /**
- * @property FakePdo pdo
  * @mixin Connection
  */
 trait FakeQueries
@@ -35,6 +34,8 @@ trait FakeQueries
     protected Closure | null $onUpdateCallback = null;
 
     protected Closure | null $onDeleteCallback = null;
+
+    public int | string | null $lastInsertId = null;
 
     public function shouldQuery(string $sql, ?array $bindings = null): QueryExpectation
     {
@@ -158,7 +159,7 @@ trait FakeQueries
                 TestCase::assertEquals($queryExpectation->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
             }
 
-            $this->pdo->lastInsertId = $queryExpectation->lastInsertId;
+            $this->lastInsertId = $queryExpectation->lastInsertId;
 
             if ($queryExpectation->exception) {
                 throw $queryExpectation->exception;
@@ -265,7 +266,15 @@ trait FakeQueries
 
     public function getLastInsertId()
     {
-        return $this->pdo->lastInsertId;
+        if ($this->lastInsertId) {
+            $lastInsertId = $this->lastInsertId;
+
+            $this->lastInsertId = null;
+
+            return $lastInsertId;
+        }
+
+        return $this->insertIdGenerator->generate();
     }
 
     #[Override]

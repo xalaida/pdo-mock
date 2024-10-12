@@ -4,12 +4,9 @@ namespace Tests\Xala\Elomock;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
-use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\FakeConnection;
-use Xala\Elomock\FakeLastInsertIdGenerator;
-use Xala\Elomock\FakePdo;
 
 class SqlServerConnectionTest extends TestCase
 {
@@ -36,7 +33,7 @@ class SqlServerConnectionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldUseSqlServerProcessor(): void
+    public function itShouldUseLastInsertIdCorrectly(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -55,10 +52,8 @@ class SqlServerConnectionTest extends TestCase
 
     protected function getFakeConnection(): FakeConnection
     {
-        $pdo = new FakePdo(new FakeLastInsertIdGenerator());
-        $connection = new FakeConnection($pdo);
+        $connection = new FakeConnection();
         $connection->setQueryGrammar(new SqlServerGrammar());
-        $connection->setPostProcessor(new SqlServerProcessor());
 
         return $connection;
     }

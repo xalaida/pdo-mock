@@ -4,12 +4,9 @@ namespace Tests\Xala\Elomock;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
-use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\FakeConnection;
-use Xala\Elomock\FakeLastInsertIdGenerator;
-use Xala\Elomock\FakePdo;
 
 class PostgresConnectionTest extends TestCase
 {
@@ -36,15 +33,13 @@ class PostgresConnectionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldUsePostgresProcessor(): void
+    public function itShouldUseLastInsertIdCorrectly(): void
     {
         $connection = $this->getFakeConnection();
 
         $connection->shouldQuery('insert into "users" ("name") values (?) returning "id"')
             ->withBindings(['John'])
-            ->andReturnRows([
-                ['id' => 777],
-            ]);
+            ->withLastInsertId(777);
 
         $id = (new Builder($connection))
             ->from('users')
@@ -57,10 +52,8 @@ class PostgresConnectionTest extends TestCase
 
     protected function getFakeConnection(): FakeConnection
     {
-        $pdo = new FakePdo(new FakeLastInsertIdGenerator());
-        $connection = new FakeConnection($pdo);
+        $connection = new FakeConnection();
         $connection->setQueryGrammar(new PostgresGrammar());
-        $connection->setPostProcessor(new PostgresProcessor());
 
         return $connection;
     }
