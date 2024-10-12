@@ -25,6 +25,10 @@ trait FakeQueries
 
     public array $queryExecuted = [];
 
+    public bool $ignoreTransactions = false;
+
+    public bool $recordTransaction = false;
+
     protected Closure | null $onInsertCallback = null;
 
     protected Closure | null $onUpdateCallback = null;
@@ -42,27 +46,39 @@ trait FakeQueries
 
     public function shouldBeginTransaction(): void
     {
-        $this->pdo->expectBeginTransaction();
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
+        }
+
+        $this->queryExpectations[] = new QueryExpectation('PDO::beginTransaction()');
     }
 
     public function shouldCommit(): void
     {
-        $this->pdo->expectCommit();
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
+        }
+
+        $this->queryExpectations[] = new QueryExpectation('PDO::commit()');
     }
 
     public function shouldRollback(): void
     {
-        $this->pdo->expectRollback();
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
+        }
+
+        $this->queryExpectations[] = new QueryExpectation('PDO::rollback()');
     }
 
-    public function ignoreTransactions(): void
+    public function ignoreTransactions(bool $ignoreTransactions = true): void
     {
-        $this->pdo->ignoreTransactions();
+        $this->ignoreTransactions = $ignoreTransactions;
     }
 
-    public function recordTransactions(): void
+    public function recordTransactions(bool $recordTransactions = true): void
     {
-        $this->pdo->recordTransactions();
+        $this->recordTransaction = $recordTransactions;
     }
 
     public function expectTransaction(callable $callback): void

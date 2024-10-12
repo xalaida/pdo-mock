@@ -12,10 +12,6 @@ class FakePdo
 {
     public FakeConnection $connection;
 
-    public bool $ignoreTransactions = false;
-
-    public bool $recordTransaction = false;
-
     public bool $inTransaction = false;
 
     public string | false $lastInsertId = false;
@@ -35,48 +31,6 @@ class FakePdo
         throw new RuntimeException("Unexpected PDO method call: {$name}");
     }
 
-    public function expectBeginTransaction(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
-        }
-
-        $this->connection->queryExpectations[] = new QueryExpectation('PDO::beginTransaction()');
-    }
-
-    public function expectCommit(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
-        }
-
-        $this->connection->queryExpectations[] = new QueryExpectation('PDO::commit()');
-    }
-
-    public function expectRollback(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
-        }
-
-        $this->connection->queryExpectations[] = new QueryExpectation('PDO::rollback()');
-    }
-
-    public function ignoreTransactions(): void
-    {
-        $this->ignoreTransactions = true;
-    }
-
-    public function handleTransactions(): void
-    {
-        $this->ignoreTransactions = false;
-    }
-
-    public function recordTransactions(): void
-    {
-        $this->recordTransaction = true;
-    }
-
     public function beginTransaction(): bool
     {
         $this->connection->queryExecuted[] = [
@@ -87,7 +41,7 @@ class FakePdo
         $this->inTransaction = true;
 
         // TODO: refactor condition
-        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
+        if (! $this->connection->ignoreTransactions && ! $this->connection->recordTransaction) {
             TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::beginTransaction()');
 
             $queryExpectation = array_shift($this->connection->queryExpectations);
@@ -108,7 +62,7 @@ class FakePdo
         $this->inTransaction = false;
 
         // TODO: refactor condition
-        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
+        if (! $this->connection->ignoreTransactions && ! $this->connection->recordTransaction) {
             TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::commit()');
 
             $queryExpectation = array_shift($this->connection->queryExpectations);
@@ -129,7 +83,7 @@ class FakePdo
         $this->inTransaction = false;
 
         // TODO: refactor condition
-        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
+        if (! $this->connection->ignoreTransactions && ! $this->connection->recordTransaction) {
             TestCase::assertNotEmpty($this->connection->queryExpectations, 'Unexpected PDO::rollback()');
 
             $queryExpectation = array_shift($this->connection->queryExpectations);
