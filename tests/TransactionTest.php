@@ -19,7 +19,7 @@ class TransactionTest extends TestCase
 
         $connection->shouldBeginTransaction();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)');
+        $connection->expectQuery('insert into "users" ("name") values (?)');
 
         $connection->shouldCommit();
 
@@ -41,7 +41,7 @@ class TransactionTest extends TestCase
 
         $connection->shouldBeginTransaction();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)');
+        $connection->expectQuery('insert into "users" ("name") values (?)');
 
         $connection->shouldCommit();
 
@@ -60,8 +60,8 @@ class TransactionTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->expectTransaction(function ($connection) {
-            $connection->shouldQuery('insert into "users" ("name") values (?)');
-            $connection->shouldQuery('insert into "posts" ("title") values (?)');
+            $connection->expectQuery('insert into "users" ("name") values (?)');
+            $connection->expectQuery('insert into "posts" ("title") values (?)');
         });
 
         $connection->transaction(function () use ($connection) {
@@ -83,8 +83,8 @@ class TransactionTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->expectTransaction(function ($connection) {
-            $connection->shouldQuery('insert into "users" ("name") values (?)');
-            $connection->shouldQuery('insert into "posts" ("title") values (?)');
+            $connection->expectQuery('insert into "users" ("name") values (?)');
+            $connection->expectQuery('insert into "posts" ("title") values (?)');
         });
 
         $this->expectException(ExpectationFailedException::class);
@@ -104,7 +104,7 @@ class TransactionTest extends TestCase
 
         $connection->shouldBeginTransaction();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)');
+        $connection->expectQuery('insert into "users" ("name") values (?)');
 
         $connection->shouldRollback();
 
@@ -176,7 +176,7 @@ class TransactionTest extends TestCase
 
         $connection->ignoreTransactions();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)');
+        $connection->expectQuery('insert into "users" ("name") values (?)');
 
         $connection->beginTransaction();
 

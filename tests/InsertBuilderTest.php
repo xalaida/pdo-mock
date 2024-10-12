@@ -13,7 +13,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)');
+        $connection->expectQuery('insert into "users" ("name") values (?)');
 
         $result = (new Builder($connection))
             ->from('users')
@@ -45,7 +45,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala']);
 
         $builder = (new Builder($connection))
@@ -64,7 +64,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?), (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?), (?)')
             ->withBindings(['john', 'jane']);
 
         $result = (new Builder($connection))
@@ -82,7 +82,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)', ['xala']);
+        $connection->expectQuery('insert into "users" ("name") values (?)', ['xala']);
 
         $result = (new Builder($connection))
             ->from('users')
@@ -98,7 +98,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala']);
 
         $result = (new Builder($connection))
@@ -115,7 +115,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)', ['john']);
+        $connection->expectQuery('insert into "users" ("name") values (?)', ['john']);
 
         $builder = (new Builder($connection))
             ->from('users');
@@ -133,7 +133,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala'])
             ->asFailedStatement();
 
@@ -149,7 +149,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name", "email") values (:name, :email)')
+        $connection->expectQuery('insert into "users" ("name", "email") values (:name, :email)')
             ->withBindings([
                 'name' => 'xala',
                 'email' => 'xala@mail.com',

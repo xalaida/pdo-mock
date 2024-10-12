@@ -12,15 +12,15 @@ class FakeConnectionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users"')
+        $connection->expectQuery('select * from "users"')
             ->andReturnRows([
                 ['id' => 7, 'name' => 'test'],
             ]);
 
-        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)')
+        $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)')
             ->withBindings(['xala', 7]);
 
-        $connection->shouldQuery('select * from "users" where ("id" = ?) limit 1')
+        $connection->expectQuery('select * from "users" where ("id" = ?) limit 1')
             ->withBindings([7])
             ->andReturnRows([
                 ['id' => 7, 'name' => 'xala'],

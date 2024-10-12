@@ -4,9 +4,9 @@ namespace Xala\Elomock;
 
 use Exception;
 
-class QueryExpectation
+class Expectation
 {
-    public string $sql;
+    public string $query;
 
     public array | null $bindings = [];
 
@@ -20,9 +20,9 @@ class QueryExpectation
 
     public ?Exception $exception = null;
 
-    public function __construct(string $sql, ?array $bindings = null)
+    public function __construct(string $query, ?array $bindings = null)
     {
-        $this->sql = $sql;
+        $this->query = $query;
         $this->bindings = $bindings;
     }
 

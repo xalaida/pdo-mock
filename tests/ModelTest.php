@@ -13,7 +13,7 @@ class ModelTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala']);
 
         $resolver = new FakeConnectionResolver($connection);
@@ -32,7 +32,7 @@ class ModelTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala'])
             ->withLastInsertId(7);
 
@@ -51,11 +51,11 @@ class ModelTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['john'])
             ->withLastInsertId(10);
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['jane'])
             ->withLastInsertId(11);
 

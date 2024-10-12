@@ -15,7 +15,7 @@ class SqlServerConnectionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from [users] where [name] like ?')
+        $connection->expectQuery('select * from [users] where [name] like ?')
             ->withBindings(['%john%'])
             ->andReturnRows([
                 ['id' => 777, 'name' => 'John'],
@@ -37,7 +37,7 @@ class SqlServerConnectionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into [users] ([name]) values (?)')
+        $connection->expectQuery('insert into [users] ([name]) values (?)')
             ->withBindings(['John'])
             ->withLastInsertId(777);
 

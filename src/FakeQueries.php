@@ -19,9 +19,9 @@ use Throwable;
 trait FakeQueries
 {
     /**
-     * @var array<int, QueryExpectation>
+     * @var array<int, Expectation>
      */
-    public array $queryExpectations = [];
+    public array $expectations = [];
 
     public array $queryExecuted = [];
 
@@ -37,13 +37,13 @@ trait FakeQueries
 
     public int | string | null $lastInsertId = null;
 
-    public function shouldQuery(string $sql, ?array $bindings = null): QueryExpectation
+    public function expectQuery(string $sql, ?array $bindings = null): Expectation
     {
-        $queryExpectation = new QueryExpectation($sql, $bindings);
+        $expectations = new Expectation($sql, $bindings);
 
-        $this->queryExpectations[] = $queryExpectation;
+        $this->expectations[] = $expectations;
 
-        return $queryExpectation;
+        return $expectations;
     }
 
     public function shouldBeginTransaction(): void
@@ -52,7 +52,7 @@ trait FakeQueries
             throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
         }
 
-        $this->queryExpectations[] = new QueryExpectation('PDO::beginTransaction()');
+        $this->expectations[] = new Expectation('PDO::beginTransaction()');
     }
 
     public function shouldCommit(): void
@@ -61,7 +61,7 @@ trait FakeQueries
             throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
         }
 
-        $this->queryExpectations[] = new QueryExpectation('PDO::commit()');
+        $this->expectations[] = new Expectation('PDO::commit()');
     }
 
     public function shouldRollback(): void
@@ -70,7 +70,7 @@ trait FakeQueries
             throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
         }
 
-        $this->queryExpectations[] = new QueryExpectation('PDO::rollback()');
+        $this->expectations[] = new Expectation('PDO::rollback()');
     }
 
     public function ignoreTransactions(bool $ignoreTransactions = true): void
@@ -117,11 +117,11 @@ trait FakeQueries
     // TODO: rewrite
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-        $queryExpectation = array_shift($this->queryExpectations);
+        $expectations = array_shift($this->expectations);
 
-        if ($queryExpectation && $queryExpectation->sql === $query) {
-            if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
-                return $queryExpectation->rows;
+        if ($expectations && $expectations->query === $query) {
+            if ($this->compareBindings($expectations->bindings, $bindings)) {
+                return $expectations->rows;
             }
 
             throw new RuntimeException(sprintf('Unexpected select query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
@@ -149,25 +149,25 @@ trait FakeQueries
                  return call_user_func($this->onInsertCallback, $query, $bindings);
              }
 
-            TestCase::assertNotEmpty($this->queryExpectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
+            TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            $queryExpectation = array_shift($this->queryExpectations);
+            $expectations = array_shift($this->expectations);
 
-            TestCase::assertEquals($queryExpectation->sql, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
+            TestCase::assertEquals($expectations->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            if (! is_null($queryExpectation->bindings)) {
-                TestCase::assertEquals($queryExpectation->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
+            if (! is_null($expectations->bindings)) {
+                TestCase::assertEquals($expectations->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
             }
 
-            $this->lastInsertId = $queryExpectation->lastInsertId;
+            $this->lastInsertId = $expectations->lastInsertId;
 
-            if ($queryExpectation->exception) {
-                throw $queryExpectation->exception;
+            if ($expectations->exception) {
+                throw $expectations->exception;
             }
 
             $this->recordsHaveBeenModified();
 
-            return $queryExpectation->successfulStatement;
+            return $expectations->successfulStatement;
         });
     }
 
@@ -190,25 +190,25 @@ trait FakeQueries
                  return call_user_func($this->onInsertCallback, $query, $bindings);
              }
 
-            TestCase::assertNotEmpty($this->queryExpectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
+            TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            $queryExpectation = array_shift($this->queryExpectations);
+            $expectations = array_shift($this->expectations);
 
-            TestCase::assertEquals($queryExpectation->sql, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
+            TestCase::assertEquals($expectations->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            if (! is_null($queryExpectation->bindings)) {
-                TestCase::assertEquals($queryExpectation->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
+            if (! is_null($expectations->bindings)) {
+                TestCase::assertEquals($expectations->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
             }
 
-            if ($queryExpectation->exception) {
-                throw $queryExpectation->exception;
+            if ($expectations->exception) {
+                throw $expectations->exception;
             }
 
             $this->recordsHaveBeenModified(
-                $queryExpectation->affectedRows > 0
+                $expectations->affectedRows > 0
             );
 
-            return $queryExpectation->affectedRows;
+            return $expectations->affectedRows;
         });
     }
 
@@ -225,11 +225,11 @@ trait FakeQueries
             return call_user_func($this->onUpdateCallback, $query, $bindings);
         }
 
-        $queryExpectation = array_shift($this->queryExpectations);
+        $expectations = array_shift($this->expectations);
 
-        if ($queryExpectation && $queryExpectation->sql === $query) {
-            if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
-                return $queryExpectation->affectedRows;
+        if ($expectations && $expectations->query === $query) {
+            if ($this->compareBindings($expectations->bindings, $bindings)) {
+                return $expectations->affectedRows;
             }
 
             throw new RuntimeException(sprintf('Unexpected update query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
@@ -251,11 +251,11 @@ trait FakeQueries
             return call_user_func($this->onDeleteCallback, $query, $bindings);
         }
 
-        $queryExpectation = array_shift($this->queryExpectations);
+        $expectations = array_shift($this->expectations);
 
-        if ($queryExpectation && $queryExpectation->sql === $query) {
-            if ($this->compareBindings($queryExpectation->bindings, $bindings)) {
-                return $queryExpectation->affectedRows;
+        if ($expectations && $expectations->query === $query) {
+            if ($this->compareBindings($expectations->bindings, $bindings)) {
+                return $expectations->affectedRows;
             }
 
             throw new RuntimeException(sprintf('Unexpected delete query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
@@ -340,11 +340,11 @@ trait FakeQueries
 
         // TODO: refactor condition
         if (! $this->ignoreTransactions && ! $this->recordTransaction) {
-            TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::beginTransaction()');
+            TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::beginTransaction()');
 
-            $queryExpectation = array_shift($this->queryExpectations);
+            $expectations = array_shift($this->expectations);
 
-            TestCase::assertEquals($queryExpectation->sql, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
+            TestCase::assertEquals($expectations->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
         }
     }
 
@@ -378,11 +378,11 @@ trait FakeQueries
 
         // TODO: refactor condition
         if (! $this->ignoreTransactions && ! $this->recordTransaction) {
-            TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::commit()');
+            TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::commit()');
 
-            $queryExpectation = array_shift($this->queryExpectations);
+            $expectations = array_shift($this->expectations);
 
-            TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected PDO::commit()');
+            TestCase::assertEquals($expectations->query, 'PDO::commit()', 'Unexpected PDO::commit()');
         }
     }
 
@@ -429,11 +429,11 @@ trait FakeQueries
 
         // TODO: refactor condition
         if (! $this->ignoreTransactions && ! $this->recordTransaction) {
-            TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::rollback()');
+            TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::rollback()');
 
-            $queryExpectation = array_shift($this->queryExpectations);
+            $expectations = array_shift($this->expectations);
 
-            TestCase::assertEquals($queryExpectation->sql, 'PDO::rollback()', 'Unexpected PDO::rollback()');
+            TestCase::assertEquals($expectations->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
         }
     }
 
@@ -479,8 +479,8 @@ trait FakeQueries
     {
         // TODO: format this to display all queries and bindings, each on new line
         TestCase::assertEmpty(
-            $this->queryExpectations, vsprintf("Some queries were not executed: %d", [
-                count($this->queryExpectations),
+            $this->expectations, vsprintf("Some queries were not executed: %d", [
+                count($this->expectations),
             ])
         );
     }

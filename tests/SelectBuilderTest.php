@@ -14,7 +14,7 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users"')
+        $connection->expectQuery('select * from "users"')
             ->andReturnRows([
                 ['id' => 1, 'name' => 'xala'],
                 ['id' => 2, 'name' => 'john'],
@@ -37,7 +37,7 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users"')
+        $connection->expectQuery('select * from "users"')
             ->andReturnRows([
                 ['id' => 1, 'name' => 'xala'],
             ]);
@@ -57,7 +57,7 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users"');
+        $connection->expectQuery('select * from "users"');
 
         $users = (new Builder($connection))
             ->select('*')
@@ -87,7 +87,7 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([7])
             ->andReturnRows([
                 ['id' => 7, 'name' => 'xala'],
@@ -107,7 +107,7 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([])
             ->andReturnRows([
                 ['id' => 7, 'name' => 'xala'],
@@ -128,7 +128,7 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1]);
 
         $builder = (new Builder($connection))
@@ -146,7 +146,7 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->andReturnRows([
                 ['id' => 7, 'name' => 'xala'],
             ]);
@@ -165,13 +165,13 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1])
             ->andReturnRows([
                 ['id' => 1, 'name' => 'john'],
             ]);
 
-        $connection->shouldQuery('select * from "posts" where ("user_id" = ?)')
+        $connection->expectQuery('select * from "posts" where ("user_id" = ?)')
             ->withBindings([1])
             ->andReturnRows([
                 ['id' => 1, 'user_id' => 1, 'title' => 'PHP'],
@@ -202,13 +202,13 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1])
             ->andReturnRows([
                 ['id' => 1, 'name' => 'john'],
             ]);
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([2])
             ->andReturnRows([
                 ['id' => 2, 'name' => 'jane'],
@@ -233,13 +233,13 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1])
             ->andReturnRows([
                 ['id' => 1, 'name' => 'john'],
             ]);
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([2])
             ->andReturnRows([
                 ['id' => 2, 'name' => 'jane'],
@@ -260,7 +260,7 @@ class SelectBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+        $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1])
             ->andReturnRows([
                 ['id' => 1, 'name' => 'john'],

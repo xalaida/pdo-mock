@@ -13,7 +13,7 @@ class UpdateBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)');
+        $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)');
 
         $result = (new Builder($connection))
             ->from('users')
@@ -43,7 +43,7 @@ class UpdateBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)')
+        $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)')
             ->withBindings(['xala', 1]);
 
         $result = (new Builder($connection))
@@ -59,7 +59,7 @@ class UpdateBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)')
+        $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)')
             ->withBindings(['john', 1]);
 
         $builder = (new Builder($connection))
@@ -77,7 +77,7 @@ class UpdateBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('update "products" set "status" = ?')
+        $connection->expectQuery('update "products" set "status" = ?')
             ->withBindings(['processed'])
             ->andAffectRows(3);
 

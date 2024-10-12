@@ -14,7 +14,7 @@ class DeleteBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "users" where ("id" = ?)');
+        $connection->expectQuery('delete from "users" where ("id" = ?)');
 
         $result = (new Builder($connection))
             ->from('users')
@@ -44,7 +44,7 @@ class DeleteBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "users" where ("id" = ?)')
+        $connection->expectQuery('delete from "users" where ("id" = ?)')
             ->withBindings([7]);
 
         $result = (new Builder($connection))
@@ -60,7 +60,7 @@ class DeleteBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "users" where ("id" = ?)')
+        $connection->expectQuery('delete from "users" where ("id" = ?)')
             ->withBindings([1]);
 
         $builder = (new Builder($connection))
@@ -78,7 +78,7 @@ class DeleteBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "products"')
+        $connection->expectQuery('delete from "products"')
             ->andAffectRows(3);
 
         $result = (new Builder($connection))
@@ -93,7 +93,7 @@ class DeleteBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "users" where "id" = ?')
+        $connection->expectQuery('delete from "users" where "id" = ?')
             ->withBindings([1]);
 
         $this->expectException(ExpectationFailedException::class);

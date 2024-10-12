@@ -15,7 +15,7 @@ class PostgresConnectionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "name"::text ilike ?')
+        $connection->expectQuery('select * from "users" where "name"::text ilike ?')
             ->withBindings(['%john%'])
             ->andReturnRows([
                 ['id' => 1, 'name' => 'John'],
@@ -37,7 +37,7 @@ class PostgresConnectionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?) returning "id"')
+        $connection->expectQuery('insert into "users" ("name") values (?) returning "id"')
             ->withBindings(['John'])
             ->withLastInsertId(777);
 

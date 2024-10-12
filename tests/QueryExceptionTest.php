@@ -14,7 +14,7 @@ class QueryExceptionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala'])
             ->andThrow('Integrity constraint violation');
 
@@ -33,7 +33,7 @@ class QueryExceptionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
+        $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala'])
             ->andThrowUniqueConstraint();
 
