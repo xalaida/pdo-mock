@@ -3,27 +3,25 @@
 namespace Tests\Xala\EloquentMock;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\Grammars\PostgresGrammar;
-use Illuminate\Database\Query\Processors\PostgresProcessor;
+use Illuminate\Database\Query\Grammars\SqlServerGrammar;
+use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\EloquentMock\FakeConnection;
 use Xala\EloquentMock\FakeLastInsertIdGenerator;
 use Xala\EloquentMock\FakePdo;
 
-class PostgresFakeConnectionTest extends TestCase
+class SqlServerConnectionTest extends TestCase
 {
-    // TODO: test integration with other libraries that provides enhanced postgres support
-
     #[Test]
-    public function itShouldUsePostgresGrammar(): void
+    public function itShouldUseSqlServerGrammar(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('select * from "users" where "name"::text ilike ?')
+        $connection->shouldQuery('select * from [users] where [name] like ?')
             ->withBindings(['%john%'])
             ->andReturnRows([
-                ['id' => 1, 'name' => 'John'],
+                ['id' => 777, 'name' => 'John'],
             ]);
 
         $result = (new Builder($connection))
@@ -33,20 +31,18 @@ class PostgresFakeConnectionTest extends TestCase
 
         static::assertInstanceOf(Collection::class, $result);
         static::assertCount(1, $result);
-        static::assertEquals(1, $result[0]['id']);
+        static::assertEquals(777, $result[0]['id']);
         static::assertEquals('John', $result[0]['name']);
     }
 
     #[Test]
-    public function itShouldUsePostgresProcessor(): void
+    public function itShouldUseSqlServerProcessor(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?) returning "id"')
+        $connection->shouldQuery('insert into [users] ([name]) values (?)')
             ->withBindings(['John'])
-            ->andReturnRows([
-                ['id' => 777],
-            ]);
+            ->withLastInsertId(777);
 
         $id = (new Builder($connection))
             ->from('users')
@@ -61,8 +57,8 @@ class PostgresFakeConnectionTest extends TestCase
     {
         $pdo = new FakePdo(new FakeLastInsertIdGenerator());
         $connection = new FakeConnection($pdo);
-        $connection->setQueryGrammar(new PostgresGrammar());
-        $connection->setPostProcessor(new PostgresProcessor());
+        $connection->setQueryGrammar(new SqlServerGrammar());
+        $connection->setPostProcessor(new SqlServerProcessor());
 
         return $connection;
     }
