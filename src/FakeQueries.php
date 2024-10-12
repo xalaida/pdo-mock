@@ -246,6 +246,11 @@ trait FakeQueries
         throw new RuntimeException(sprintf('Unexpected delete query: [%s] [%s]', $query, implode(', ', $bindings)));
     }
 
+    public function getLastInsertId()
+    {
+        return $this->pdo->lastInsertId;
+    }
+
     #[Override]
     protected function runQueryCallback($query, $bindings, Closure $callback)
     {
