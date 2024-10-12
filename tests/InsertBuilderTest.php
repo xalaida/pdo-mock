@@ -13,8 +13,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
-            ->withAnyBindings();
+        $connection->shouldQuery('insert into "users" ("name") values (?)');
 
         $result = (new Builder($connection))
             ->from('users')

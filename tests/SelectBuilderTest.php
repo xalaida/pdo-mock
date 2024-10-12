@@ -108,6 +108,7 @@ class SelectBuilderTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
+            ->withBindings([])
             ->andReturnRows([
                 ['id' => 7, 'name' => 'xala'],
             ]);
@@ -146,7 +147,6 @@ class SelectBuilderTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->shouldQuery('select * from "users" where "id" = ? limit 1')
-            ->withAnyBindings()
             ->andReturnRows([
                 ['id' => 7, 'name' => 'xala'],
             ]);

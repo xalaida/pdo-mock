@@ -20,9 +20,10 @@ class QueryExpectation
 
     public ?Exception $exception = null;
 
-    public function __construct(string $sql)
+    public function __construct(string $sql, ?array $bindings = null)
     {
         $this->sql = $sql;
+        $this->bindings = $bindings;
     }
 
     public function withBindings(array $bindings): static

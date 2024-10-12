@@ -31,9 +31,9 @@ trait FakeQueries
 
     protected Closure | null $onDeleteCallback = null;
 
-    public function shouldQuery(string $sql): QueryExpectation
+    public function shouldQuery(string $sql, ?array $bindings = null): QueryExpectation
     {
-        $queryExpectation = new QueryExpectation($sql);
+        $queryExpectation = new QueryExpectation($sql, $bindings);
 
         $this->queryExpectations[] = $queryExpectation;
 

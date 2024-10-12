@@ -13,8 +13,7 @@ class UpdateBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)')
-            ->withAnyBindings();
+        $connection->shouldQuery('update "users" set "name" = ? where ("id" = ?)');
 
         $result = (new Builder($connection))
             ->from('users')

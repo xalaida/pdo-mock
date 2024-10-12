@@ -14,8 +14,7 @@ class DeleteBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('delete from "users" where ("id" = ?)')
-            ->withAnyBindings();
+        $connection->shouldQuery('delete from "users" where ("id" = ?)');
 
         $result = (new Builder($connection))
             ->from('users')
