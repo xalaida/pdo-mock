@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\EloquentMock;
+namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
 

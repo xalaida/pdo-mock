@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\EloquentMock;
+namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Xala\EloquentMock\Support\FakeConnectionResolver;
-use Tests\Xala\EloquentMock\Support\User;
+use Tests\Xala\Elomock\Support\FakeConnectionResolver;
+use Tests\Xala\Elomock\Support\User;
 
 class ModelTest extends TestCase
 {

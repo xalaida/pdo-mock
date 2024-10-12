@@ -1,15 +1,15 @@
 <?php
 
-namespace Tests\Xala\EloquentMock;
+namespace Tests\Xala\Elomock;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
-use Xala\EloquentMock\FakeConnection;
-use Xala\EloquentMock\FakeLastInsertIdGenerator;
-use Xala\EloquentMock\FakePdo;
+use Xala\Elomock\FakeConnection;
+use Xala\Elomock\FakeLastInsertIdGenerator;
+use Xala\Elomock\FakePdo;
 
 class SqlServerConnectionTest extends TestCase
 {

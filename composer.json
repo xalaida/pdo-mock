@@ -1,5 +1,5 @@
 {
-    "name": "xalaida/eloquent-mock",
+    "name": "xalaida/elomock",
     "type": "library",
     "license": "MIT",
     "scripts": {
@@ -7,7 +7,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Xala\\EloquentMock\\": "src/"
+            "Xala\\Elomock\\": "src/"
         }
     },
     "require": {
@@ -16,7 +16,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Xala\\EloquentMock\\": "tests/"
+            "Tests\\Xala\\Elomock\\": "tests/"
         }
     },
     "require-dev": {

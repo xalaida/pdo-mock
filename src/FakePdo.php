@@ -1,6 +1,6 @@
 <?php
 
-namespace Xala\EloquentMock;
+namespace Xala\Elomock;
 
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

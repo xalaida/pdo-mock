@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Xala\EloquentMock;
+namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Xala\EloquentMock\FakeConnection;
-use Xala\EloquentMock\FakeLastInsertIdGenerator;
-use Xala\EloquentMock\FakePdo;
+use Xala\Elomock\FakeConnection;
+use Xala\Elomock\FakeLastInsertIdGenerator;
+use Xala\Elomock\FakePdo;
 
 class TestCase extends BaseTestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\EloquentMock;
+namespace Tests\Xala\Elomock;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
