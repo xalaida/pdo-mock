@@ -129,4 +129,23 @@ class InsertBuilderTest extends TestCase
 
         static::assertFalse($result);
     }
+
+    #[Test]
+    public function itShouldVerifyNamedBindings(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->shouldQuery('insert into "users" ("name", "email") values (:name, :email)')
+            ->withBindings([
+                'name' => 'xala',
+                'email' => 'xala@mail.com',
+            ]);
+
+        $connection->insert('insert into "users" ("name", "email") values (:name, :email)', [
+            'name' => 'xala',
+            'email' => 'xala@mail.com',
+        ]);
+
+        $connection->assertExpectationsFulfilled();
+    }
 }
