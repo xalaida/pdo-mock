@@ -11,6 +11,7 @@ use Override;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Throwable;
 
 /**
  * @property FakePdo pdo
@@ -265,6 +266,166 @@ trait FakeQueries
     public function getLastInsertId()
     {
         return $this->pdo->lastInsertId;
+    }
+
+    #[Override]
+    public function transaction(Closure $callback, $attempts = 1)
+    {
+        for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
+            $this->beginTransaction();
+
+            try {
+                $callbackResult = $callback($this);
+            } catch (Throwable $e) {
+                $this->verifyRollback();
+
+                throw $e;
+            }
+
+            $levelBeingCommitted = $this->transactions;
+
+            try {
+                if ($this->transactions == 1) {
+                    $this->fireConnectionEvent('committing');
+
+                    $this->verifyCommit();
+                }
+
+                $this->transactions = max(0, $this->transactions - 1);
+            } catch (Throwable $e) {
+                $this->handleCommitTransactionException(
+                    $e, $currentAttempt, $attempts
+                );
+
+                continue;
+            }
+
+            $this->transactionsManager?->commit(
+                $this->getName(),
+                $levelBeingCommitted,
+                $this->transactions
+            );
+
+            $this->fireConnectionEvent('committed');
+
+            return $callbackResult;
+        }
+    }
+
+    #[Override]
+    protected function createTransaction(): void
+    {
+        if ($this->transactions == 0) {
+            $this->verifyBeginTransaction();
+        } elseif ($this->transactions >= 1 && $this->queryGrammar->supportsSavepoints()) {
+            $this->createSavepoint();
+        }
+    }
+
+    protected function verifyBeginTransaction(): void
+    {
+        $this->queryExecuted[] = [
+            'sql' => 'PDO::beginTransaction()',
+            'bindings' => [],
+        ];
+
+        // TODO: refactor condition
+        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
+            TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::beginTransaction()');
+
+            $queryExpectation = array_shift($this->queryExpectations);
+
+            TestCase::assertEquals($queryExpectation->sql, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
+        }
+    }
+
+    #[Override]
+    public function commit(): void
+    {
+        if ($this->transactions == 1) {
+            $this->fireConnectionEvent('committing');
+
+            $this->verifyCommit();
+        }
+
+        [$levelBeingCommitted, $this->transactions] = [
+            $this->transactions,
+            max(0, $this->transactions - 1),
+        ];
+
+        $this->transactionsManager?->commit(
+            $this->getName(), $levelBeingCommitted, $this->transactions
+        );
+
+        $this->fireConnectionEvent('committed');
+    }
+
+    protected function verifyCommit(): void
+    {
+        $this->queryExecuted[] = [
+            'sql' => 'PDO::commit()',
+            'bindings' => [],
+        ];
+
+        // TODO: refactor condition
+        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
+            TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::commit()');
+
+            $queryExpectation = array_shift($this->queryExpectations);
+
+            TestCase::assertEquals($queryExpectation->sql, 'PDO::commit()', 'Unexpected PDO::commit()');
+        }
+    }
+
+    #[Override]
+    public function rollBack($toLevel = null)
+    {
+        $toLevel = is_null($toLevel)
+            ? $this->transactions - 1
+            : $toLevel;
+
+        if ($toLevel < 0 || $toLevel >= $this->transactions) {
+            return;
+        }
+
+        $this->performRollBack($toLevel);
+
+        $this->transactions = $toLevel;
+
+        $this->transactionsManager?->rollback(
+            $this->getName(), $this->transactions
+        );
+
+        $this->fireConnectionEvent('rollingBack');
+    }
+
+    #[Override]
+    protected function performRollBack($toLevel)
+    {
+        if ($toLevel == 0) {
+            $this->verifyRollback();
+        } elseif ($this->queryGrammar->supportsSavepoints()) {
+            $this->getPdo()->exec(
+                $this->queryGrammar->compileSavepointRollBack('trans'.($toLevel + 1))
+            );
+        }
+    }
+
+    protected function verifyRollback(): void
+    {
+        $this->queryExecuted[] = [
+            'sql' => 'PDO::rollback()',
+            'bindings' => [],
+        ];
+
+        // TODO: refactor condition
+        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
+            TestCase::assertNotEmpty($this->queryExpectations, 'Unexpected PDO::rollback()');
+
+            $queryExpectation = array_shift($this->queryExpectations);
+
+            TestCase::assertEquals($queryExpectation->sql, 'PDO::rollback()', 'Unexpected PDO::rollback()');
+        }
     }
 
     #[Override]

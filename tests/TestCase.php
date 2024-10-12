@@ -15,8 +15,6 @@ class TestCase extends BaseTestCase
 
         $connection = new FakeConnection($pdo);
 
-        $pdo->setConnection($connection);
-
         return $connection;
     }
 }

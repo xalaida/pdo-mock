@@ -10,6 +10,8 @@ use RuntimeException;
 
 class TransactionTest extends TestCase
 {
+    // TODO: verify savepoints
+
     #[Test]
     public function itShouldVerifyTransaction(): void
     {
