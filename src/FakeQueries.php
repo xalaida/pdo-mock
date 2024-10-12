@@ -6,7 +6,6 @@ use Closure;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
-use Illuminate\Database\UniqueConstraintViolationException;
 use Override;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -446,13 +445,6 @@ trait FakeQueries
             // Rethrow PHPUnit assertion exception
             if ($e instanceof ExpectationFailedException) {
                 throw $e;
-            }
-
-            // Default behavior
-            if ($this->isUniqueConstraintError($e)) {
-                throw new UniqueConstraintViolationException(
-                    $this->getName(), $query, $this->prepareBindings($bindings), $e
-                );
             }
 
             throw new QueryException(

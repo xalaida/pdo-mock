@@ -23,7 +23,7 @@ class PostgresConnectionTest extends TestCase
 
         $result = (new Builder($connection))
             ->from('users')
-            ->whereLike('name', '%john%')
+            ->where('name', 'ilike', '%john%')
             ->get();
 
         static::assertInstanceOf(Collection::class, $result);

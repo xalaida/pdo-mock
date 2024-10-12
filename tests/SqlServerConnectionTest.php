@@ -23,7 +23,7 @@ class SqlServerConnectionTest extends TestCase
 
         $result = (new Builder($connection))
             ->from('users')
-            ->whereLike('name', '%john%')
+            ->where('name', 'like', '%john%')
             ->get();
 
         static::assertInstanceOf(Collection::class, $result);

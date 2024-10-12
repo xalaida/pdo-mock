@@ -61,13 +61,6 @@ class Expectation
         return $this;
     }
 
-    public function andThrowUniqueConstraint(): static
-    {
-        $this->exception = new FakePdoException('Unique constraint error');
-
-        return $this;
-    }
-
     public function asSuccessfulStatement(): static
     {
         $this->successfulStatement = true;
