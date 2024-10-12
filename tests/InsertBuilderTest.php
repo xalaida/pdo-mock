@@ -82,6 +82,22 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
+        $connection->shouldQuery('insert into "users" ("name") values (?)', ['xala']);
+
+        $result = (new Builder($connection))
+            ->from('users')
+            ->insert([
+                ['name' => 'xala'],
+            ]);
+
+        static::assertTrue($result);
+    }
+
+    #[Test]
+    public function itShouldProvideBindingsUsingHelper(): void
+    {
+        $connection = $this->getFakeConnection();
+
         $connection->shouldQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala']);
 
@@ -99,8 +115,7 @@ class InsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldQuery('insert into "users" ("name") values (?)')
-            ->withBindings(['john']);
+        $connection->shouldQuery('insert into "users" ("name") values (?)', ['john']);
 
         $builder = (new Builder($connection))
             ->from('users');
