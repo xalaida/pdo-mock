@@ -7,7 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use RuntimeException;
 
-class DeleteBuilderTest extends TestCase
+class DeleteQueryTest extends TestCase
 {
     #[Test]
     public function itShouldVerifyQuery(): void
@@ -33,8 +33,8 @@ class DeleteBuilderTest extends TestCase
             ->from('users')
             ->where(['id' => 7]);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected delete query: [delete from "users" where ("id" = ?)] [7]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query: [delete from "users" where ("id" = ?)] [7]');
 
         $builder->delete();
     }
@@ -67,8 +67,8 @@ class DeleteBuilderTest extends TestCase
             ->from('users')
             ->where(['id' => 7]);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected delete query bindings: [delete from "users" where ("id" = ?)] [7]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query bindings: [delete from "users" where ("id" = ?)] [7]');
 
         $builder->delete();
     }
@@ -97,7 +97,7 @@ class DeleteBuilderTest extends TestCase
             ->withBindings([1]);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage("Some queries were not executed: 1\nFailed asserting that an array is empty.");
+        $this->expectExceptionMessage('Some expectations were not fulfilled.');
 
         $connection->assertExpectationsFulfilled();
     }

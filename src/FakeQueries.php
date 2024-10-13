@@ -22,17 +22,17 @@ trait FakeQueries
      */
     public array $expectations = [];
 
-    public array $queryExecuted = [];
+    public array $affectingQueriesForAssertions = [];
 
     public bool $ignoreTransactions = false;
 
     public bool $recordTransaction = false;
 
+    public bool $skipAffectingQueries = false;
+
     protected Closure | null $onInsertCallback = null;
 
     protected Closure | null $onUpdateCallback = null;
-
-    protected Closure | null $onDeleteCallback = null;
 
     public int | string | null $lastInsertId = null;
 
@@ -82,6 +82,11 @@ trait FakeQueries
         $this->recordTransaction = $recordTransactions;
     }
 
+    public function skipAffectingQueries(bool $skipAffectingQueries = true): void
+    {
+        $this->skipAffectingQueries = $skipAffectingQueries;
+    }
+
     public function expectTransaction(callable $callback): void
     {
         $this->shouldBeginTransaction();
@@ -101,13 +106,6 @@ trait FakeQueries
     public function onUpdateQuery(Closure $callback): static
     {
         $this->onUpdateCallback = $callback;
-
-        return $this;
-    }
-
-    public function onDeleteQuery(Closure $callback): static
-    {
-        $this->onDeleteCallback = $callback;
 
         return $this;
     }
@@ -138,7 +136,7 @@ trait FakeQueries
             }
 
             // TODO: use built-in query recorder
-            $this->queryExecuted[] = [
+            $this->affectingQueriesForAssertions[] = [
                 'sql' => $query,
                 'bindings' => $bindings,
             ];
@@ -178,16 +176,14 @@ trait FakeQueries
                 return 0;
             }
 
-            // TODO: use built-in query recorder
-            $this->queryExecuted[] = [
-                'sql' => $query,
-                'bindings' => $bindings,
-            ];
+            if ($this->skipAffectingQueries) {
+                $this->affectingQueriesForAssertions[] = [
+                    'sql' => $query,
+                    'bindings' => $bindings,
+                ];
 
-            // TODO: do not use callbacks for write
-             if ($this->onInsertCallback) {
-                 return call_user_func($this->onInsertCallback, $query, $bindings);
-             }
+                return 1;
+            }
 
             TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
@@ -215,7 +211,7 @@ trait FakeQueries
     // TODO: use affectingStatement instead
     public function update($query, $bindings = [])
     {
-        $this->queryExecuted[] = [
+        $this->affectingQueriesForAssertions[] = [
             'sql' => $query,
             'bindings' => $bindings,
         ];
@@ -235,32 +231,6 @@ trait FakeQueries
         }
 
         throw new RuntimeException(sprintf('Unexpected update query: [%s] [%s]', $query, implode(', ', $bindings)));
-    }
-
-    #[Override]
-    // TODO: use affectingStatement instead
-    public function delete($query, $bindings = [])
-    {
-        $this->queryExecuted[] = [
-            'sql' => $query,
-            'bindings' => $bindings,
-        ];
-
-        if ($this->onDeleteCallback) {
-            return call_user_func($this->onDeleteCallback, $query, $bindings);
-        }
-
-        $expectations = array_shift($this->expectations);
-
-        if ($expectations && $expectations->query === $query) {
-            if ($this->compareBindings($expectations->bindings, $bindings)) {
-                return $expectations->affectedRows;
-            }
-
-            throw new RuntimeException(sprintf('Unexpected delete query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
-        }
-
-        throw new RuntimeException(sprintf('Unexpected delete query: [%s] [%s]', $query, implode(', ', $bindings)));
     }
 
     public function getLastInsertId()
@@ -332,7 +302,7 @@ trait FakeQueries
 
     protected function verifyBeginTransaction(): void
     {
-        $this->queryExecuted[] = [
+        $this->affectingQueriesForAssertions[] = [
             'sql' => 'PDO::beginTransaction()',
             'bindings' => [],
         ];
@@ -370,7 +340,7 @@ trait FakeQueries
 
     protected function verifyCommit(): void
     {
-        $this->queryExecuted[] = [
+        $this->affectingQueriesForAssertions[] = [
             'sql' => 'PDO::commit()',
             'bindings' => [],
         ];
@@ -421,7 +391,7 @@ trait FakeQueries
 
     protected function verifyRollback(): void
     {
-        $this->queryExecuted[] = [
+        $this->affectingQueriesForAssertions[] = [
             'sql' => 'PDO::rollback()',
             'bindings' => [],
         ];
@@ -469,22 +439,22 @@ trait FakeQueries
 
     public function assertExpectationsFulfilled(): void
     {
-        // TODO: format this to display all queries and bindings, each on new line
-        TestCase::assertEmpty(
-            $this->expectations, vsprintf("Some queries were not executed: %d", [
-                count($this->expectations),
-            ])
-        );
+        TestCase::assertEmpty($this->expectations, 'Some expectations were not fulfilled.');
+    }
+
+    public function assertAffectingQueriesFulfilled(): void
+    {
+        TestCase::assertEmpty($this->affectingQueriesForAssertions, 'Some affecting queries were not fulfilled.');
     }
 
     public function assertQueried(string $sql, array | null $bindings = []): void
     {
-        TestCase::assertNotEmpty($this->queryExecuted, 'No queries were executed');
+        TestCase::assertNotEmpty($this->affectingQueriesForAssertions, 'No queries were executed');
 
-        $queryExecuted = array_shift($this->queryExecuted);
+        $affectingQueriesForAssertions = array_shift($this->affectingQueriesForAssertions);
 
-        TestCase::assertEquals($sql, $queryExecuted['sql'], 'Query does not match');
-        TestCase::assertEquals($bindings, $queryExecuted['bindings'], 'Bindings do not match');
+        TestCase::assertEquals($sql, $affectingQueriesForAssertions['sql'], 'Query does not match');
+        TestCase::assertEquals($bindings, $affectingQueriesForAssertions['bindings'], 'Bindings do not match');
     }
 
     public function assertBeganTransaction(): void

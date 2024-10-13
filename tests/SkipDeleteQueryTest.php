@@ -6,36 +6,14 @@ use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
-class PostDeleteBuilderTest extends TestCase
+class SkipDeleteQueryTest extends TestCase
 {
     #[Test]
-    public function itShouldHandleDeleteQueriesOnFly(): void
+    public function itShouldVerifyDeleteQueriesAfterExecution(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onDeleteQuery(fn () => 3);
-
-        $result = (new Builder($connection))
-            ->from('users')
-            ->where(['id' => 7])
-            ->delete();
-
-        static::assertEquals(3, $result);
-
-        $result = (new Builder($connection))
-            ->from('posts')
-            ->where(['id' => 1])
-            ->delete();
-
-        static::assertEquals(3, $result);
-    }
-
-    #[Test]
-    public function itShouldVerifyExecutedQuery(): void
-    {
-        $connection = $this->getFakeConnection();
-
-        $connection->onDeleteQuery(fn () => 1);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -63,7 +41,7 @@ class PostDeleteBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onDeleteQuery(fn () => 1);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -83,7 +61,7 @@ class PostDeleteBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onDeleteQuery(fn () => 1);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -96,5 +74,25 @@ class PostDeleteBuilderTest extends TestCase
         $this->expectExceptionMessage('Bindings do not match');
 
         $connection->assertQueried('delete from "users" where ("id" = ?)', [1]);
+    }
+
+    #[Test]
+    public function itShouldThrowExceptionWhenDeleteQueryWasntVerified(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->skipAffectingQueries();
+
+        $result = (new Builder($connection))
+            ->from('users')
+            ->where(['id' => 7])
+            ->delete();
+
+        static::assertEquals(1, $result);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Some affecting queries were not fulfilled.');
+
+        $connection->assertAffectingQueriesFulfilled();
     }
 }
