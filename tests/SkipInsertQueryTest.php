@@ -68,7 +68,7 @@ class SkipInsertQueryTest extends TestCase
         static::assertEquals(1, $result);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Bindings do not match');
+        $this->expectExceptionMessage('Unexpected query bindings: [insert into "users" ("name") values (?)] [xala]');
 
         $connection->assertQueried('insert into "users" ("name") values (?)', ['john']);
     }

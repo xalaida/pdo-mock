@@ -71,7 +71,7 @@ class SkipUpdateQueryTest extends TestCase
         static::assertEquals(1, $result);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Bindings do not match');
+        $this->expectExceptionMessage('Unexpected query bindings: [update "users" set "name" = ? where ("id" = ?)] [xala, 7]');
 
         $connection->assertQueried('update "users" set "name" = ? where ("id" = ?)', ['xala', 5]);
     }

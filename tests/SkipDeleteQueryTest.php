@@ -71,7 +71,7 @@ class SkipDeleteQueryTest extends TestCase
         static::assertEquals(1, $result);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Bindings do not match');
+        $this->expectExceptionMessage('Unexpected query bindings: [delete from "users" where ("id" = ?)] [7]');
 
         $connection->assertQueried('delete from "users" where ("id" = ?)', [1]);
     }

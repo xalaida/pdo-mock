@@ -99,7 +99,7 @@ trait FakeQueries
 
             TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            $this->verifyBindings($expectation, $query, $bindings);
+            $this->verifyBindings($expectation->bindings, $bindings, $query);
 
             return $expectation->rows;
         });
@@ -128,9 +128,7 @@ trait FakeQueries
 
             TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            if (! is_null($expectation->bindings)) {
-                TestCase::assertEquals($expectation->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
-            }
+            $this->verifyBindings($expectation->bindings, $bindings, $query);
 
             $this->lastInsertId = $expectation->lastInsertId;
 
@@ -167,9 +165,7 @@ trait FakeQueries
 
             TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            if (! is_null($expectation->bindings)) {
-                TestCase::assertEquals($expectation->bindings, $bindings, sprintf("Unexpected query bindings: [%s] [%s]", $query, implode(', ', $bindings)));
-            }
+            $this->verifyBindings($expectation->bindings, $bindings, $query);
 
             if ($expectation->exception) {
                 throw $expectation->exception;
@@ -388,15 +384,6 @@ trait FakeQueries
         }
     }
 
-    protected function compareBindings(array | null $expectedBindings, array $actualBindings): bool
-    {
-        if (is_null($expectedBindings)) {
-            return true;
-        }
-
-        return $expectedBindings == $actualBindings;
-    }
-
     // TODO: check if it works with latest laravel version
     protected function isUniqueConstraintError(Exception $exception): bool
     {
@@ -417,14 +404,15 @@ trait FakeQueries
         TestCase::assertEmpty($this->writeQueriesForAssertions, 'Some write queries were not fulfilled:' . PHP_EOL . $queriesFormatted);
     }
 
-    public function assertQueried(string $query, array | null $bindings = []): void
+    public function assertQueried(string $query, array | Closure | null $bindings = null): void
     {
         TestCase::assertNotEmpty($this->writeQueriesForAssertions, 'No queries were executed');
 
         $writeQueriesForAssertions = array_shift($this->writeQueriesForAssertions);
 
         TestCase::assertEquals($query, $writeQueriesForAssertions['query'], 'Query does not match');
-        TestCase::assertEquals($bindings, $writeQueriesForAssertions['bindings'], 'Bindings do not match');
+
+        $this->verifyBindings($bindings, $writeQueriesForAssertions['bindings'], $writeQueriesForAssertions['query']);
     }
 
     public function assertBeganTransaction(): void
@@ -451,18 +439,18 @@ trait FakeQueries
         $this->assertCommitted();
     }
 
-    protected function verifyBindings(Expectation $expectation, string $query, array $bindings): void
+    protected function verifyBindings(array | Closure | null $expectedBindings, array $bindings, string $query): void
     {
-        if (is_null($expectation->bindings)) {
+        if (is_null($expectedBindings)) {
             return;
         }
 
-        if (is_array($expectation->bindings)) {
-            TestCase::assertEquals($expectation->bindings, $bindings, sprintf('Unexpected query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
+        if (is_array($expectedBindings)) {
+            TestCase::assertEquals($expectedBindings, $bindings, sprintf('Unexpected query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
         }
 
-        if (is_callable($expectation->bindings)) {
-            TestCase::assertNotFalse(call_user_func($expectation->bindings, $bindings), sprintf('Unexpected query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
+        if (is_callable($expectedBindings)) {
+            TestCase::assertNotFalse(call_user_func($expectedBindings, $bindings), sprintf('Unexpected query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
         }
     }
 }
