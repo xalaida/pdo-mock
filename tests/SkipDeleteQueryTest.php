@@ -13,7 +13,7 @@ class SkipDeleteQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -41,7 +41,7 @@ class SkipDeleteQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -61,7 +61,7 @@ class SkipDeleteQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -81,7 +81,7 @@ class SkipDeleteQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -91,8 +91,8 @@ class SkipDeleteQueryTest extends TestCase
         static::assertEquals(1, $result);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Some affecting queries were not fulfilled.');
+        $this->expectExceptionMessage('Some write queries were not fulfilled.');
 
-        $connection->assertAffectingQueriesFulfilled();
+        $connection->assertWriteQueriesFulfilled();
     }
 }

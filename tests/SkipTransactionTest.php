@@ -5,16 +5,14 @@ namespace Tests\Xala\Elomock;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 
-class PostTransactionTest extends TestCase
+class SkipTransactionTest extends TestCase
 {
     #[Test]
-    public function itShouldVerifyTransactionAfterExecution(): void
+    public function itShouldVerifySkippedTransaction(): void
     {
         $connection = $this->getFakeConnection();
 
-        // TODO: refactor this configuration using single method to handle all write queries automatically
-        $connection->recordTransactions();
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $connection->transaction(function () use ($connection) {
             (new Builder($connection))
@@ -34,9 +32,7 @@ class PostTransactionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        // TODO: refactor this configuration using single method to handle all write queries automatically
-        $connection->recordTransactions();
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $connection->transaction(function () use ($connection) {
             (new Builder($connection))

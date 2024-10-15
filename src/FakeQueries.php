@@ -22,13 +22,11 @@ trait FakeQueries
      */
     public array $expectations = [];
 
-    public array $affectingQueriesForAssertions = [];
+    public array $writeQueriesForAssertions = [];
 
     public bool $ignoreTransactions = false;
 
-    public bool $recordTransaction = false;
-
-    public bool $skipAffectingQueries = false;
+    public bool $skipWriteQueries = false;
 
     public int | string | null $lastInsertId = null;
 
@@ -73,14 +71,9 @@ trait FakeQueries
         $this->ignoreTransactions = $ignoreTransactions;
     }
 
-    public function recordTransactions(bool $recordTransactions = true): void
+    public function skipWriteQueries(bool $skipWriteQueries = true): void
     {
-        $this->recordTransaction = $recordTransactions;
-    }
-
-    public function skipAffectingQueries(bool $skipAffectingQueries = true): void
-    {
-        $this->skipAffectingQueries = $skipAffectingQueries;
+        $this->skipWriteQueries = $skipWriteQueries;
     }
 
     public function expectTransaction(callable $callback): void
@@ -117,8 +110,8 @@ trait FakeQueries
                 return true;
             }
 
-            if ($this->skipAffectingQueries) {
-                $this->affectingQueriesForAssertions[] = [
+            if ($this->skipWriteQueries) {
+                $this->writeQueriesForAssertions[] = [
                     'sql' => $query,
                     'bindings' => $bindings,
                 ];
@@ -156,8 +149,8 @@ trait FakeQueries
                 return 0;
             }
 
-            if ($this->skipAffectingQueries) {
-                $this->affectingQueriesForAssertions[] = [
+            if ($this->skipWriteQueries) {
+                $this->writeQueriesForAssertions[] = [
                     'sql' => $query,
                     'bindings' => $bindings,
                 ];
@@ -256,19 +249,24 @@ trait FakeQueries
 
     protected function verifyBeginTransaction(): void
     {
-        $this->affectingQueriesForAssertions[] = [
-            'sql' => 'PDO::beginTransaction()',
-            'bindings' => [],
-        ];
-
-        // TODO: refactor condition
-        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
-            TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::beginTransaction()');
-
-            $expectations = array_shift($this->expectations);
-
-            TestCase::assertEquals($expectations->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
+        if ($this->ignoreTransactions) {
+            return;
         }
+
+        if ($this->skipWriteQueries) {
+            $this->writeQueriesForAssertions[] = [
+                'sql' => 'PDO::beginTransaction()',
+                'bindings' => [],
+            ];
+
+            return;
+        }
+
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::beginTransaction()');
+
+        $expectations = array_shift($this->expectations);
+
+        TestCase::assertEquals($expectations->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
     }
 
     #[Override]
@@ -294,19 +292,24 @@ trait FakeQueries
 
     protected function verifyCommit(): void
     {
-        $this->affectingQueriesForAssertions[] = [
-            'sql' => 'PDO::commit()',
-            'bindings' => [],
-        ];
-
-        // TODO: refactor condition
-        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
-            TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::commit()');
-
-            $expectations = array_shift($this->expectations);
-
-            TestCase::assertEquals($expectations->query, 'PDO::commit()', 'Unexpected PDO::commit()');
+        if ($this->ignoreTransactions) {
+            return;
         }
+
+        if ($this->skipWriteQueries) {
+            $this->writeQueriesForAssertions[] = [
+                'sql' => 'PDO::commit()',
+                'bindings' => [],
+            ];
+
+            return;
+        }
+
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::commit()');
+
+        $expectations = array_shift($this->expectations);
+
+        TestCase::assertEquals($expectations->query, 'PDO::commit()', 'Unexpected PDO::commit()');
     }
 
     #[Override]
@@ -345,19 +348,24 @@ trait FakeQueries
 
     protected function verifyRollback(): void
     {
-        $this->affectingQueriesForAssertions[] = [
-            'sql' => 'PDO::rollback()',
-            'bindings' => [],
-        ];
-
-        // TODO: refactor condition
-        if (! $this->ignoreTransactions && ! $this->recordTransaction) {
-            TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::rollback()');
-
-            $expectations = array_shift($this->expectations);
-
-            TestCase::assertEquals($expectations->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
+        if ($this->ignoreTransactions) {
+            return;
         }
+
+        if ($this->skipWriteQueries) {
+            $this->writeQueriesForAssertions[] = [
+                'sql' => 'PDO::rollback()',
+                'bindings' => [],
+            ];
+
+            return;
+        }
+
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::rollback()');
+
+        $expectations = array_shift($this->expectations);
+
+        TestCase::assertEquals($expectations->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
     }
 
     #[Override]
@@ -396,19 +404,19 @@ trait FakeQueries
         TestCase::assertEmpty($this->expectations, 'Some expectations were not fulfilled.');
     }
 
-    public function assertAffectingQueriesFulfilled(): void
+    public function assertWriteQueriesFulfilled(): void
     {
-        TestCase::assertEmpty($this->affectingQueriesForAssertions, 'Some affecting queries were not fulfilled.');
+        TestCase::assertEmpty($this->writeQueriesForAssertions, 'Some write queries were not fulfilled.');
     }
 
     public function assertQueried(string $sql, array | null $bindings = []): void
     {
-        TestCase::assertNotEmpty($this->affectingQueriesForAssertions, 'No queries were executed');
+        TestCase::assertNotEmpty($this->writeQueriesForAssertions, 'No queries were executed');
 
-        $affectingQueriesForAssertions = array_shift($this->affectingQueriesForAssertions);
+        $writeQueriesForAssertions = array_shift($this->writeQueriesForAssertions);
 
-        TestCase::assertEquals($sql, $affectingQueriesForAssertions['sql'], 'Query does not match');
-        TestCase::assertEquals($bindings, $affectingQueriesForAssertions['bindings'], 'Bindings do not match');
+        TestCase::assertEquals($sql, $writeQueriesForAssertions['sql'], 'Query does not match');
+        TestCase::assertEquals($bindings, $writeQueriesForAssertions['bindings'], 'Bindings do not match');
     }
 
     public function assertBeganTransaction(): void

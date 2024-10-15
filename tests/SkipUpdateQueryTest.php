@@ -13,7 +13,7 @@ class SkipUpdateQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -41,7 +41,7 @@ class SkipUpdateQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -61,7 +61,7 @@ class SkipUpdateQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipAffectingQueries();
+        $connection->skipWriteQueries();
 
         $result = (new Builder($connection))
             ->from('users')
