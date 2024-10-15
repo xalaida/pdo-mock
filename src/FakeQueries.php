@@ -30,9 +30,9 @@ trait FakeQueries
 
     public int | string | null $lastInsertId = null;
 
-    public function expectQuery(string $sql, ?array $bindings = null): Expectation
+    public function expectQuery(string $query, ?array $bindings = null): Expectation
     {
-        $expectations = new Expectation($sql, $bindings);
+        $expectations = new Expectation($query, $bindings);
 
         $this->expectations[] = $expectations;
 
@@ -112,7 +112,7 @@ trait FakeQueries
 
             if ($this->skipWriteQueries) {
                 $this->writeQueriesForAssertions[] = [
-                    'sql' => $query,
+                    'query' => $query,
                     'bindings' => $bindings,
                 ];
 
@@ -151,7 +151,7 @@ trait FakeQueries
 
             if ($this->skipWriteQueries) {
                 $this->writeQueriesForAssertions[] = [
-                    'sql' => $query,
+                    'query' => $query,
                     'bindings' => $bindings,
                 ];
 
@@ -255,7 +255,7 @@ trait FakeQueries
 
         if ($this->skipWriteQueries) {
             $this->writeQueriesForAssertions[] = [
-                'sql' => 'PDO::beginTransaction()',
+                'query' => 'PDO::beginTransaction()',
                 'bindings' => [],
             ];
 
@@ -298,7 +298,7 @@ trait FakeQueries
 
         if ($this->skipWriteQueries) {
             $this->writeQueriesForAssertions[] = [
-                'sql' => 'PDO::commit()',
+                'query' => 'PDO::commit()',
                 'bindings' => [],
             ];
 
@@ -354,7 +354,7 @@ trait FakeQueries
 
         if ($this->skipWriteQueries) {
             $this->writeQueriesForAssertions[] = [
-                'sql' => 'PDO::rollback()',
+                'query' => 'PDO::rollback()',
                 'bindings' => [],
             ];
 
@@ -406,16 +406,20 @@ trait FakeQueries
 
     public function assertWriteQueriesFulfilled(): void
     {
-        TestCase::assertEmpty($this->writeQueriesForAssertions, 'Some write queries were not fulfilled.');
+        $queriesFormatted = implode(PHP_EOL, array_map(function (array $query) {
+            return sprintf('%s [%s]', $query['query'], implode(', ', $query['bindings']));
+        }, $this->writeQueriesForAssertions));
+
+        TestCase::assertEmpty($this->writeQueriesForAssertions, 'Some write queries were not fulfilled:' . PHP_EOL . $queriesFormatted);
     }
 
-    public function assertQueried(string $sql, array | null $bindings = []): void
+    public function assertQueried(string $query, array | null $bindings = []): void
     {
         TestCase::assertNotEmpty($this->writeQueriesForAssertions, 'No queries were executed');
 
         $writeQueriesForAssertions = array_shift($this->writeQueriesForAssertions);
 
-        TestCase::assertEquals($sql, $writeQueriesForAssertions['sql'], 'Query does not match');
+        TestCase::assertEquals($query, $writeQueriesForAssertions['query'], 'Query does not match');
         TestCase::assertEquals($bindings, $writeQueriesForAssertions['bindings'], 'Bindings do not match');
     }
 

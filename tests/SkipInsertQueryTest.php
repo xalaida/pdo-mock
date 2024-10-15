@@ -88,7 +88,7 @@ class SkipInsertQueryTest extends TestCase
         static::assertTrue($result);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Some write queries were not fulfilled.');
+        $this->expectExceptionMessage('Some write queries were not fulfilled');
 
         $connection->assertWriteQueriesFulfilled();
     }

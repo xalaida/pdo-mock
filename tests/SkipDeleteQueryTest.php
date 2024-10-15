@@ -91,7 +91,7 @@ class SkipDeleteQueryTest extends TestCase
         static::assertEquals(1, $result);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Some write queries were not fulfilled.');
+        $this->expectExceptionMessage('Some write queries were not fulfilled');
 
         $connection->assertWriteQueriesFulfilled();
     }
