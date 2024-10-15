@@ -14,7 +14,7 @@ class PostTransactionTest extends TestCase
 
         // TODO: refactor this configuration using single method to handle all write queries automatically
         $connection->recordTransactions();
-        $connection->onInsertQuery(fn () => 1);
+        $connection->skipAffectingQueries();
 
         $connection->transaction(function () use ($connection) {
             (new Builder($connection))
@@ -36,7 +36,7 @@ class PostTransactionTest extends TestCase
 
         // TODO: refactor this configuration using single method to handle all write queries automatically
         $connection->recordTransactions();
-        $connection->onInsertQuery(fn () => 1);
+        $connection->skipAffectingQueries();
 
         $connection->transaction(function () use ($connection) {
             (new Builder($connection))

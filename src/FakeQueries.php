@@ -30,8 +30,6 @@ trait FakeQueries
 
     public bool $skipAffectingQueries = false;
 
-    protected Closure | null $onInsertCallback = null;
-
     protected Closure | null $onUpdateCallback = null;
 
     public int | string | null $lastInsertId = null;
@@ -96,13 +94,6 @@ trait FakeQueries
         $this->shouldCommit();
     }
 
-    public function onInsertQuery(Closure $callback): static
-    {
-        $this->onInsertCallback = $callback;
-
-        return $this;
-    }
-
     public function onUpdateQuery(Closure $callback): static
     {
         $this->onUpdateCallback = $callback;
@@ -135,16 +126,14 @@ trait FakeQueries
                 return true;
             }
 
-            // TODO: use built-in query recorder
-            $this->affectingQueriesForAssertions[] = [
-                'sql' => $query,
-                'bindings' => $bindings,
-            ];
+            if ($this->skipAffectingQueries) {
+                $this->affectingQueriesForAssertions[] = [
+                    'sql' => $query,
+                    'bindings' => $bindings,
+                ];
 
-            // TODO: do not use callbacks for write, simplify this
-             if ($this->onInsertCallback) {
-                 return call_user_func($this->onInsertCallback, $query, $bindings);
-             }
+                return true;
+            }
 
             TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 

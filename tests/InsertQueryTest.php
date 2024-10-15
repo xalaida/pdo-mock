@@ -6,7 +6,7 @@ use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
-class InsertBuilderTest extends TestCase
+class InsertQueryTest extends TestCase
 {
     #[Test]
     public function itShouldValidateQuery(): void

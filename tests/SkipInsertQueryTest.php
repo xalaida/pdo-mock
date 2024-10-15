@@ -6,14 +6,14 @@ use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
-class PostInsertBuilderTest extends TestCase
+class SkipInsertQueryTest extends TestCase
 {
     #[Test]
     public function itShouldHandleQueriesOnFly(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onInsertQuery(fn () => true);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -27,7 +27,7 @@ class PostInsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onInsertQuery(fn () => true);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -54,7 +54,7 @@ class PostInsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onInsertQuery(fn () => true);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -73,7 +73,7 @@ class PostInsertBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onInsertQuery(fn () => true);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -85,5 +85,25 @@ class PostInsertBuilderTest extends TestCase
         $this->expectExceptionMessage('Bindings do not match');
 
         $connection->assertQueried('insert into "users" ("name") values (?)', ['john']);
+    }
+
+
+    #[Test]
+    public function itShouldThrowExceptionWhenInsertQueryWasntVerified(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->skipAffectingQueries();
+
+        $result = (new Builder($connection))
+            ->from('users')
+            ->insert(['name' => 'xala']);
+
+        static::assertTrue($result);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Some affecting queries were not fulfilled.');
+
+        $connection->assertAffectingQueriesFulfilled();
     }
 }
