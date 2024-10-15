@@ -30,8 +30,6 @@ trait FakeQueries
 
     public bool $skipAffectingQueries = false;
 
-    protected Closure | null $onUpdateCallback = null;
-
     public int | string | null $lastInsertId = null;
 
     public function expectQuery(string $sql, ?array $bindings = null): Expectation
@@ -92,13 +90,6 @@ trait FakeQueries
         $callback($this);
 
         $this->shouldCommit();
-    }
-
-    public function onUpdateQuery(Closure $callback): static
-    {
-        $this->onUpdateCallback = $callback;
-
-        return $this;
     }
 
     #[Override]
@@ -194,32 +185,6 @@ trait FakeQueries
 
             return $expectations->affectedRows;
         });
-    }
-
-    #[Override]
-    // TODO: use affectingStatement instead
-    public function update($query, $bindings = [])
-    {
-        $this->affectingQueriesForAssertions[] = [
-            'sql' => $query,
-            'bindings' => $bindings,
-        ];
-
-        if ($this->onUpdateCallback) {
-            return call_user_func($this->onUpdateCallback, $query, $bindings);
-        }
-
-        $expectations = array_shift($this->expectations);
-
-        if ($expectations && $expectations->query === $query) {
-            if ($this->compareBindings($expectations->bindings, $bindings)) {
-                return $expectations->affectedRows;
-            }
-
-            throw new RuntimeException(sprintf('Unexpected update query bindings: [%s] [%s]', $query, implode(', ', $bindings)));
-        }
-
-        throw new RuntimeException(sprintf('Unexpected update query: [%s] [%s]', $query, implode(', ', $bindings)));
     }
 
     public function getLastInsertId()

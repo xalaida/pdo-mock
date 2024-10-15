@@ -9,21 +9,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 class SkipInsertQueryTest extends TestCase
 {
     #[Test]
-    public function itShouldHandleQueriesOnFly(): void
-    {
-        $connection = $this->getFakeConnection();
-
-        $connection->skipAffectingQueries();
-
-        $result = (new Builder($connection))
-            ->from('users')
-            ->insert(['name' => 'john']);
-
-        static::assertTrue($result);
-    }
-
-    #[Test]
-    public function itShouldVerifyExecutedQuery(): void
+    public function itShouldVerifySkippedQuery(): void
     {
         $connection = $this->getFakeConnection();
 

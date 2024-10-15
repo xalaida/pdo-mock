@@ -4,9 +4,10 @@ namespace Tests\Xala\Elomock;
 
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\ExpectationFailedException;
 use RuntimeException;
 
-class UpdateBuilderTest extends TestCase
+class UpdateQueryTest extends TestCase
 {
     #[Test]
     public function itShouldVerifyQuery(): void
@@ -32,8 +33,8 @@ class UpdateBuilderTest extends TestCase
             ->from('users')
             ->where(['id' => 1]);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected update query: [update "users" set "name" = ? where ("id" = ?)] [xala, 1]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query: [update "users" set "name" = ? where ("id" = ?)] [xala, 1]');
 
         $builder->update(['name' => 'xala']);
     }
@@ -66,8 +67,8 @@ class UpdateBuilderTest extends TestCase
             ->from('users')
             ->where(['id' => 1]);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected update query bindings: [update "users" set "name" = ? where ("id" = ?)] [xala, 1]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query bindings: [update "users" set "name" = ? where ("id" = ?)] [xala, 1]');
 
         $builder->update(['name' => 'xala']);
     }

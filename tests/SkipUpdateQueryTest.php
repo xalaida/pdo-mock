@@ -6,36 +6,14 @@ use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
-class PostUpdateBuilderTest extends TestCase
+class SkipUpdateQueryTest extends TestCase
 {
     #[Test]
-    public function itShouldHandleQueriesOnFly(): void
+    public function itShouldVerifySkippedQuery(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onUpdateQuery(fn () => 5);
-
-        $result = (new Builder($connection))
-            ->from('users')
-            ->where(['id' => 5])
-            ->update(['name' => 'john']);
-
-        static::assertEquals(5, $result);
-
-        $result = (new Builder($connection))
-            ->from('posts')
-            ->where(['id' => 6])
-            ->update(['name' => 'jane']);
-
-        static::assertEquals(5, $result);
-    }
-
-    #[Test]
-    public function itShouldVerifyExecutedQuery(): void
-    {
-        $connection = $this->getFakeConnection();
-
-        $connection->onUpdateQuery(fn () => 1);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -63,7 +41,7 @@ class PostUpdateBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onUpdateQuery(fn () => 1);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')
@@ -83,7 +61,7 @@ class PostUpdateBuilderTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->onUpdateQuery(fn () => 1);
+        $connection->skipAffectingQueries();
 
         $result = (new Builder($connection))
             ->from('users')

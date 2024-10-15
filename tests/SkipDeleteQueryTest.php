@@ -9,7 +9,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 class SkipDeleteQueryTest extends TestCase
 {
     #[Test]
-    public function itShouldVerifyDeleteQueriesAfterExecution(): void
+    public function itShouldVerifySkippedQueries(): void
     {
         $connection = $this->getFakeConnection();
 
