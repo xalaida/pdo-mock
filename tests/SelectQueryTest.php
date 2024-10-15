@@ -5,9 +5,8 @@ namespace Tests\Xala\Elomock;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use RuntimeException;
 
-class SelectBuilderTest extends TestCase
+class SelectQueryTest extends TestCase
 {
     #[Test]
     public function itShouldVerifySelectQuery(): void
@@ -46,8 +45,8 @@ class SelectBuilderTest extends TestCase
             ->select('*')
             ->from('posts');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected select query: [select * from "posts"]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query: [select * from "posts"]');
 
         $builder->get();
     }
@@ -76,8 +75,8 @@ class SelectBuilderTest extends TestCase
             ->select('*')
             ->from('users');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected select query: [select * from "users"]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query: [select * from "users"]');
 
         $builder->get();
     }
@@ -117,8 +116,8 @@ class SelectBuilderTest extends TestCase
             ->select('*')
             ->from('users');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected select query bindings: [select * from "users" where "id" = ? limit 1] [7]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query bindings: [select * from "users" where "id" = ? limit 1] [7]');
 
         $builder->find(7);
     }
@@ -135,8 +134,8 @@ class SelectBuilderTest extends TestCase
             ->select('*')
             ->from('users');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected select query bindings: [select * from "users" where "id" = ? limit 1] [7]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query bindings: [select * from "users" where "id" = ? limit 1] [7]');
 
         $builder->find(7);
     }
@@ -229,7 +228,7 @@ class SelectBuilderTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenMultipleSameSelectQueriesWithDifferentBindingsAreExecutedInIncorrectOrder(): void
+    public function itShouldThrowExceptionWhenMultipleQueriesWithDifferentBindingsAreExecutedInIncorrectOrder(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -249,8 +248,8 @@ class SelectBuilderTest extends TestCase
             ->select('*')
             ->from('users');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected select query bindings: [select * from "users" where "id" = ? limit 1] [2]');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query bindings: [select * from "users" where "id" = ? limit 1] [2]');
 
         $builder->find(2);
     }

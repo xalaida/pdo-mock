@@ -73,7 +73,6 @@ class SkipInsertQueryTest extends TestCase
         $connection->assertQueried('insert into "users" ("name") values (?)', ['john']);
     }
 
-
     #[Test]
     public function itShouldThrowExceptionWhenInsertQueryWasntVerified(): void
     {

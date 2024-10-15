@@ -2,6 +2,7 @@
 
 namespace Xala\Elomock;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,7 +10,7 @@ class Expectation
 {
     public string $query;
 
-    public array | null $bindings = [];
+    public array | Closure | null $bindings = [];
 
     public string | false $lastInsertId = false;
 
@@ -21,13 +22,13 @@ class Expectation
 
     public ?Exception $exception = null;
 
-    public function __construct(string $query, ?array $bindings = null)
+    public function __construct(string $query, array | Closure | null $bindings = null)
     {
         $this->query = $query;
         $this->bindings = $bindings;
     }
 
-    public function withBindings(array $bindings): static
+    public function withBindings(array | Closure $bindings): static
     {
         $this->bindings = $bindings;
 
