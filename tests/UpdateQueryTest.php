@@ -5,7 +5,6 @@ namespace Tests\Xala\Elomock;
 use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use RuntimeException;
 
 class UpdateQueryTest extends TestCase
 {
@@ -25,7 +24,7 @@ class UpdateQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenUnexpectedQuery(): void
+    public function itShouldFailWhenUnexpectedQuery(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -56,7 +55,7 @@ class UpdateQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenBindingsDontMatch(): void
+    public function itShouldFailWhenBindingsDontMatch(): void
     {
         $connection = $this->getFakeConnection();
 

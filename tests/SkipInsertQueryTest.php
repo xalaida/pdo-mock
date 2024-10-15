@@ -25,7 +25,7 @@ class SkipInsertQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenQueryWasntExecuted(): void
+    public function itShouldFailWhenQueryWasntExecuted(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -36,7 +36,7 @@ class SkipInsertQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenQueryDoesntMatch(): void
+    public function itShouldFailWhenQueryDoesntMatch(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -55,7 +55,7 @@ class SkipInsertQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenBindingsDontMatch(): void
+    public function itShouldFailWhenBindingsDontMatch(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -74,7 +74,7 @@ class SkipInsertQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenInsertQueryWasntVerified(): void
+    public function itShouldFailWhenInsertQueryWasntVerified(): void
     {
         $connection = $this->getFakeConnection();
 

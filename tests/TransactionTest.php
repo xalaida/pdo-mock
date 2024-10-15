@@ -35,7 +35,7 @@ class TransactionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenTransactionWasntCreated(): void
+    public function itShouldFailWhenTransactionWasntCreated(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -78,7 +78,7 @@ class TransactionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenTransactionalQueryWasntExecuted(): void
+    public function itShouldFailWhenTransactionalQueryWasntExecuted(): void
     {
         $connection = $this->getFakeConnection();
 

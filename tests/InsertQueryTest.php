@@ -25,7 +25,7 @@ class InsertQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenUnexpectedQuery(): void
+    public function itShouldFailWhenUnexpectedQuery(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -41,7 +41,7 @@ class InsertQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenQueryDoesNotMatch(): void
+    public function itShouldFailWhenQueryDoesNotMatch(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -111,7 +111,7 @@ class InsertQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenBindingsDontMatch(): void
+    public function itShouldFailWhenBindingsDontMatch(): void
     {
         $connection = $this->getFakeConnection();
 

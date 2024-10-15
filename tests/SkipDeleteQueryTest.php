@@ -26,7 +26,7 @@ class SkipDeleteQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenQueryWasntExecuted(): void
+    public function itShouldFailWhenQueryWasntExecuted(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -37,7 +37,7 @@ class SkipDeleteQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenQueryDoesntMatch(): void
+    public function itShouldFailWhenQueryDoesntMatch(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -57,7 +57,7 @@ class SkipDeleteQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenBindingsDontMatch(): void
+    public function itShouldFailWhenBindingsDontMatch(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -77,7 +77,7 @@ class SkipDeleteQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenDeleteQueryWasntVerified(): void
+    public function itShouldFailWhenDeleteQueryWasntVerified(): void
     {
         $connection = $this->getFakeConnection();
 

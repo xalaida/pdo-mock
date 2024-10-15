@@ -32,7 +32,7 @@ class SelectQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenQueryDoesNotMatch(): void
+    public function itShouldFailWhenQueryDoesNotMatch(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -67,7 +67,7 @@ class SelectQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionOnUnexpectedSelectQuery(): void
+    public function itShouldFailOnUnexpectedSelectQuery(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -102,7 +102,7 @@ class SelectQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenExpectedBindingsAreMissing(): void
+    public function itShouldFailWhenExpectedBindingsAreMissing(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -123,7 +123,7 @@ class SelectQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionOnSelectQueryWithUnexpectedBindings(): void
+    public function itShouldFailOnSelectQueryWithUnexpectedBindings(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -228,7 +228,7 @@ class SelectQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenMultipleQueriesWithDifferentBindingsAreExecutedInIncorrectOrder(): void
+    public function itShouldFailWhenMultipleQueriesWithDifferentBindingsAreExecutedInIncorrectOrder(): void
     {
         $connection = $this->getFakeConnection();
 
@@ -272,7 +272,7 @@ class SelectQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowExceptionWhenQueryWasntExecuted(): void
+    public function itShouldFailWhenQueryWasntExecuted(): void
     {
         $connection = $this->getFakeConnection();
 
