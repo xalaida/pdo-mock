@@ -17,8 +17,7 @@ class QueryExceptionTest extends TestCase
             ->withBindings(['xala'])
             ->andThrow('Integrity constraint violation');
 
-        $builder = (new Builder($connection))
-            ->from('users');
+        $builder = $connection->table('users');
 
         $this->expectException(QueryException::class);
 

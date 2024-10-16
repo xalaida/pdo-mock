@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
@@ -21,8 +20,8 @@ class SqlServerConnectionTest extends TestCase
                 ['id' => 777, 'name' => 'John'],
             ]);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where('name', 'like', '%john%')
             ->get();
 
@@ -41,8 +40,8 @@ class SqlServerConnectionTest extends TestCase
             ->withBindings(['John'])
             ->withLastInsertId(777);
 
-        $id = (new Builder($connection))
-            ->from('users')
+        $id = $connection
+            ->table('users')
             ->insertGetId([
                 'name' => 'John',
             ]);

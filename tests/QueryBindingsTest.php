@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -21,9 +20,8 @@ class QueryBindingsTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        $user = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $user = $connection
+            ->table('users')
             ->find(7);
 
         static::assertEquals(7, $user['id']);
@@ -43,9 +41,7 @@ class QueryBindingsTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        $builder = (new Builder($connection))
-            ->select('*')
-            ->from('users');
+        $builder = $connection->table('users');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query bindings: [select * from "users" where "id" = ? limit 1] [7]');
@@ -66,9 +62,8 @@ class QueryBindingsTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $connection
+            ->table('users')
             ->find(7);
     }
 
@@ -85,9 +80,8 @@ class QueryBindingsTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $connection
+            ->table('users')
             ->find(7);
     }
 }

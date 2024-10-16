@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 
 class SkipTransactionTest extends TestCase
@@ -15,8 +14,8 @@ class SkipTransactionTest extends TestCase
         $connection->skipWriteQueries();
 
         $connection->transaction(function () use ($connection) {
-            (new Builder($connection))
-                ->from('users')
+            $connection
+                ->table('users')
                 ->insert(['name' => 'xala']);
         });
 
@@ -35,8 +34,8 @@ class SkipTransactionTest extends TestCase
         $connection->skipWriteQueries();
 
         $connection->transaction(function () use ($connection) {
-            (new Builder($connection))
-                ->from('users')
+            $connection
+                ->table('users')
                 ->insert(['name' => 'xala']);
         });
 

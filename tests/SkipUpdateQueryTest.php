@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -15,8 +14,8 @@ class SkipUpdateQueryTest extends TestCase
 
         $connection->skipWriteQueries();
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where(['id' => 7])
             ->update(['name' => 'xala']);
 
@@ -43,8 +42,8 @@ class SkipUpdateQueryTest extends TestCase
 
         $connection->skipWriteQueries();
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where(['id' => 7])
             ->update(['name' => 'xala']);
 
@@ -63,8 +62,8 @@ class SkipUpdateQueryTest extends TestCase
 
         $connection->skipWriteQueries();
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where(['id' => 7])
             ->update(['name' => 'xala']);
 

@@ -21,8 +21,8 @@ class MySqlConnectionTest extends TestCase
                 ['id' => 777, 'name' => 'John'],
             ]);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where('name', 'like', '%john%')
             ->get();
 
@@ -41,8 +41,8 @@ class MySqlConnectionTest extends TestCase
             ->withBindings(['John'])
             ->withLastInsertId(777);
 
-        $id = (new Builder($connection))
-            ->from('users')
+        $id = $connection
+            ->table('users')
             ->insertGetId([
                 'name' => 'John',
             ]);

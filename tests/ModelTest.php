@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\Support\FakeConnectionResolver;
 use Tests\Xala\Elomock\Support\User;
@@ -85,9 +84,8 @@ class ModelTest extends TestCase
             ->withBindings([7])
             ->andReturnRow($john);
 
-        $result = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->find(7);
 
         static::assertEquals(7, $result['id']);

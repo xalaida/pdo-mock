@@ -29,8 +29,8 @@ class RawQueryTest extends TestCase
         $connection->expectQuery('delete from "users" where exists (select 1 from "orders" where "orders"."user_id" = "users"."id")')
             ->andAffectCount(3);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->whereExists(function (Builder $query) {
                 $query->select(new Expression(1))
                     ->from('orders')

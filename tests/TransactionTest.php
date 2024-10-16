@@ -3,7 +3,6 @@
 namespace Tests\Xala\Elomock;
 
 use Illuminate\Database\DatabaseTransactionsManager;
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use RuntimeException;
@@ -25,8 +24,8 @@ class TransactionTest extends TestCase
 
         $connection->beginTransaction();
 
-        (new Builder($connection))
-            ->from('users')
+        $connection
+            ->table('users')
             ->insert(['name' => 'john']);
 
         $connection->commit();
@@ -45,8 +44,8 @@ class TransactionTest extends TestCase
 
         $connection->expectCommit();
 
-        $builder = (new Builder($connection))
-            ->from('users');
+        $builder = $connection
+            ->table('users');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: [insert into "users" ("name") values (?)] [john]');
@@ -65,12 +64,12 @@ class TransactionTest extends TestCase
         });
 
         $connection->transaction(function () use ($connection) {
-            (new Builder($connection))
-                ->from('users')
+            $connection
+                ->table('users')
                 ->insert(['name' => 'john']);
 
-            (new Builder($connection))
-                ->from('posts')
+            $connection
+                ->table('posts')
                 ->insert(['title' => 'john']);
         });
 
@@ -91,8 +90,8 @@ class TransactionTest extends TestCase
         $this->expectExceptionMessage('Unexpected PDO::commit()');
 
         $connection->transaction(function () use ($connection) {
-            (new Builder($connection))
-                ->from('users')
+            $connection
+                ->table('users')
                 ->insert(['name' => 'john']);
         });
     }
@@ -110,8 +109,8 @@ class TransactionTest extends TestCase
 
         try {
             $connection->transaction(function () use ($connection) {
-                (new Builder($connection))
-                    ->from('users')
+                $connection
+                    ->table('users')
                     ->insert(['name' => 'john']);
 
                 throw new RuntimeException('Something went wrong');
@@ -180,8 +179,8 @@ class TransactionTest extends TestCase
 
         $connection->beginTransaction();
 
-        (new Builder($connection))
-            ->from('users')
+        $connection
+            ->table('users')
             ->insert(['name' => 'john']);
 
         $connection->commit();

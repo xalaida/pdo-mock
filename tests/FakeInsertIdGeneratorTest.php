@@ -4,7 +4,7 @@ namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
 
-class FakeIdLastInsertIdGeneratorTest extends TestCase
+class FakeInsertIdGeneratorTest extends TestCase
 {
     #[Test]
     public function itShouldGenerateLastInsertId(): void

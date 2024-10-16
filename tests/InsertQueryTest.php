@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -15,8 +14,8 @@ class InsertQueryTest extends TestCase
 
         $connection->expectQuery('insert into "users" ("name") values (?)');
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->insert([
                 ['name' => 'xala']
             ]);
@@ -29,8 +28,7 @@ class InsertQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $builder = (new Builder($connection))
-            ->from('users');
+        $builder = $connection->table('users');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: [insert into "users" ("name") values (?)] [xala]');
@@ -48,8 +46,7 @@ class InsertQueryTest extends TestCase
         $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala']);
 
-        $builder = (new Builder($connection))
-            ->from('posts');
+        $builder = $connection->table('posts');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: [insert into "posts" ("title") values (?)] [PHP]');
@@ -67,8 +64,8 @@ class InsertQueryTest extends TestCase
         $connection->expectQuery('insert into "users" ("name") values (?), (?)')
             ->withBindings(['john', 'jane']);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->insert([
                 ['name' => 'john'],
                 ['name' => 'jane'],
@@ -84,8 +81,8 @@ class InsertQueryTest extends TestCase
 
         $connection->expectQuery('insert into "users" ("name") values (?)', ['xala']);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->insert([
                 ['name' => 'xala'],
             ]);
@@ -101,8 +98,8 @@ class InsertQueryTest extends TestCase
         $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala']);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->insert([
                 ['name' => 'xala'],
             ]);
@@ -117,8 +114,7 @@ class InsertQueryTest extends TestCase
 
         $connection->expectQuery('insert into "users" ("name") values (?)', ['john']);
 
-        $builder = (new Builder($connection))
-            ->from('users');
+        $builder = $connection->table('users');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query bindings: [insert into "users" ("name") values (?)] [xala]');
@@ -137,8 +133,8 @@ class InsertQueryTest extends TestCase
             ->withBindings(['xala'])
             ->asFailedStatement();
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->insert(['name' => 'xala']);
 
         static::assertFalse($result);

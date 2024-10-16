@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -15,8 +14,8 @@ class DeleteQueryTest extends TestCase
 
         $connection->expectQuery('delete from "users" where ("id" = ?)');
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where(['id' => 7])
             ->delete();
 
@@ -28,8 +27,8 @@ class DeleteQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $builder = (new Builder($connection))
-            ->from('users')
+        $builder = $connection
+            ->table('users')
             ->where(['id' => 7]);
 
         $this->expectException(ExpectationFailedException::class);
@@ -46,8 +45,8 @@ class DeleteQueryTest extends TestCase
         $connection->expectQuery('delete from "users" where ("id" = ?)')
             ->withBindings([7]);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where(['id' => 7])
             ->delete();
 
@@ -62,8 +61,8 @@ class DeleteQueryTest extends TestCase
         $connection->expectQuery('delete from "users" where ("id" = ?)')
             ->withBindings([1]);
 
-        $builder = (new Builder($connection))
-            ->from('users')
+        $builder = $connection
+            ->table('users')
             ->where(['id' => 7]);
 
         $this->expectException(ExpectationFailedException::class);
@@ -80,8 +79,8 @@ class DeleteQueryTest extends TestCase
         $connection->expectQuery('delete from "products"')
             ->andAffectCount(3);
 
-        $result = (new Builder($connection))
-            ->from('products')
+        $result = $connection
+            ->table('products')
             ->delete();
 
         static::assertEquals(3, $result);

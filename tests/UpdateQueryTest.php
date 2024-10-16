@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -15,8 +14,8 @@ class UpdateQueryTest extends TestCase
 
         $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)');
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where(['id' => 1])
             ->update(['name' => 'xala']);
 
@@ -28,8 +27,8 @@ class UpdateQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $builder = (new Builder($connection))
-            ->from('users')
+        $builder = $connection
+            ->table('users')
             ->where(['id' => 1]);
 
         $this->expectException(ExpectationFailedException::class);
@@ -46,8 +45,8 @@ class UpdateQueryTest extends TestCase
         $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)')
             ->withBindings(['xala', 1]);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where(['id' => 1])
             ->update(['name' => 'xala']);
 
@@ -62,8 +61,8 @@ class UpdateQueryTest extends TestCase
         $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)')
             ->withBindings(['john', 1]);
 
-        $builder = (new Builder($connection))
-            ->from('users')
+        $builder = $connection
+            ->table('users')
             ->where(['id' => 1]);
 
         $this->expectException(ExpectationFailedException::class);
@@ -81,8 +80,8 @@ class UpdateQueryTest extends TestCase
             ->withBindings(['processed'])
             ->andAffectCount(3);
 
-        $result = (new Builder($connection))
-            ->from('products')
+        $result = $connection
+            ->table('products')
             ->update(['status' => 'processed']);
 
         static::assertEquals(3, $result);

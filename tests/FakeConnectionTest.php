@@ -26,25 +26,23 @@ class FakeConnectionTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        $users = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $users = $connection
+            ->table('users')
             ->get();
 
         static::assertCount(1, $users);
         static::assertEquals(7, $users[0]['id']);
         static::assertEquals('test', $users[0]['name']);
 
-        $result = (new Builder($connection))
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->where(['id' => 7])
             ->update(['name' => 'xala']);
 
         static::assertEquals(1, $result);
 
-        $user = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $user = $connection
+            ->table('users')
             ->where(['id' => 7])
             ->first();
 

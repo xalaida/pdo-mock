@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -20,15 +19,31 @@ class SelectQueryTest extends TestCase
                 ['id' => 3, 'name' => 'ryan'],
             ]);
 
-        $users = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $users = $connection
+            ->table('users')
             ->get();
 
         static::assertCount(3, $users);
         static::assertEquals('xala', $users[0]['name']);
         static::assertEquals('john', $users[1]['name']);
         static::assertEquals('ryan', $users[2]['name']);
+    }
+
+    #[Test]
+    public function itShouldSelectOneRow(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->expectQuery('select * from users where id = ?', [5])
+            ->andReturnRow([
+                'id' => 1,
+                'name' => 'xala',
+            ]);
+
+        $user = $connection->selectOne('select * from users where id = ?', [5]);
+
+        static::assertEquals(1, $user['id']);
+        static::assertEquals('xala', $user['name']);
     }
 
     #[Test]
@@ -41,9 +56,7 @@ class SelectQueryTest extends TestCase
                 ['id' => 1, 'name' => 'xala'],
             ]);
 
-        $builder = (new Builder($connection))
-            ->select('*')
-            ->from('posts');
+        $builder = $connection->table('posts');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: [select * from "posts"]');
@@ -58,9 +71,8 @@ class SelectQueryTest extends TestCase
 
         $connection->expectQuery('select * from "users"');
 
-        $users = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $users = $connection
+            ->table('users')
             ->get();
 
         static::assertEmpty($users);
@@ -71,9 +83,7 @@ class SelectQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $builder = (new Builder($connection))
-            ->select('*')
-            ->from('users');
+        $builder = $connection->table('users');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: [select * from "users"]');
@@ -92,9 +102,8 @@ class SelectQueryTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        $user = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $user = $connection
+            ->table('users')
             ->find(7);
 
         static::assertEquals(7, $user['id']);
@@ -112,9 +121,7 @@ class SelectQueryTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        $builder = (new Builder($connection))
-            ->select('*')
-            ->from('users');
+        $builder = $connection->table('users');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query bindings: [select * from "users" where "id" = ? limit 1] [7]');
@@ -130,9 +137,7 @@ class SelectQueryTest extends TestCase
         $connection->expectQuery('select * from "users" where "id" = ? limit 1')
             ->withBindings([1]);
 
-        $builder = (new Builder($connection))
-            ->select('*')
-            ->from('users');
+        $builder = $connection->table('users');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query bindings: [select * from "users" where "id" = ? limit 1] [7]');
@@ -150,9 +155,8 @@ class SelectQueryTest extends TestCase
                 ['id' => 7, 'name' => 'xala'],
             ]);
 
-        $user = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $user = $connection
+            ->table('users')
             ->find(7);
 
         static::assertEquals(7, $user['id']);
@@ -178,14 +182,12 @@ class SelectQueryTest extends TestCase
                 ['id' => 3, 'user_id' => 1, 'title' => 'Eloquent'],
             ]);
 
-        $user = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $user = $connection
+            ->table('users')
             ->find(1);
 
-        $posts = (new Builder($connection))
-            ->select('*')
-            ->from('posts')
+        $posts = $connection
+            ->table('posts')
             ->where(['user_id' => 1])
             ->get();
 
@@ -213,14 +215,12 @@ class SelectQueryTest extends TestCase
                 ['id' => 2, 'name' => 'jane'],
             ]);
 
-        $john = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $john = $connection
+            ->table('users')
             ->find(1);
 
-        $jane = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $jane = $connection
+            ->table('users')
             ->find(2);
 
         static::assertEquals('john', $john['name']);
@@ -244,9 +244,7 @@ class SelectQueryTest extends TestCase
                 ['id' => 2, 'name' => 'jane'],
             ]);
 
-        $builder = (new Builder($connection))
-            ->select('*')
-            ->from('users');
+        $builder = $connection->table('users');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query bindings: [select * from "users" where "id" = ? limit 1] [2]');
@@ -263,9 +261,8 @@ class SelectQueryTest extends TestCase
             ->withBindings([7])
             ->andReturnNothing();
 
-        $result = (new Builder($connection))
-            ->select('*')
-            ->from('users')
+        $result = $connection
+            ->table('users')
             ->find(7);
 
         static::assertNull($result);
