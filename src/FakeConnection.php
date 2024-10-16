@@ -111,8 +111,19 @@ class FakeConnection extends Connection
 
             $expectation = $this->verifyQueryExpectation($query, $bindings);
 
+            // TODO: add ability to throw
+
             return $expectation->rows;
         });
+    }
+
+    public function cursor($query, $bindings = [], $useReadPdo = true)
+    {
+        $rows = $this->select($query, $bindings, $useReadPdo);
+
+        foreach ($rows as $row) {
+            yield $row;
+        }
     }
 
     #[Override]
