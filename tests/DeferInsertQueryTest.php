@@ -88,6 +88,6 @@ class DeferInsertQueryTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Some write queries were not fulfilled');
 
-        $connection->assertWriteQueriesFulfilled();
+        $connection->assertDeferredQueriesFulfilled();
     }
 }

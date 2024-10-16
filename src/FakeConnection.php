@@ -186,7 +186,7 @@ class FakeConnection extends Connection
         TestCase::assertEmpty($this->expectations, 'Some expectations were not fulfilled.');
     }
 
-    public function assertWriteQueriesFulfilled(): void
+    public function assertDeferredQueriesFulfilled(): void
     {
         $queriesFormatted = implode(PHP_EOL, array_map(function (array $query) {
             return sprintf('%s [%s]', $query['query'], implode(', ', $query['bindings']));
