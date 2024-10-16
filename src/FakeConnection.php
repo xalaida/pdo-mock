@@ -7,18 +7,15 @@ use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
 use Override;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
-use Throwable;
 
 class FakeConnection extends Connection
 {
+    use HandleTransactions;
+
     public array $expectations = [];
 
     public array $deferredQueries = [];
-
-    public bool $ignoreTransactions = false;
 
     public bool $deferWriteQueries = false;
 
@@ -31,11 +28,6 @@ class FakeConnection extends Connection
         parent::__construct(null);
 
         $this->insertIdGenerator = new InsertIdGenerator();
-    }
-
-    public function ignoreTransactions(bool $ignoreTransactions = true): void
-    {
-        $this->ignoreTransactions = $ignoreTransactions;
     }
 
     public function deferWriteQueries(bool $deferWriteQueries = true): void
@@ -65,42 +57,6 @@ class FakeConnection extends Connection
         return $expectation;
     }
 
-    public function expectBeginTransaction(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
-        }
-
-        $this->expectations[] = new Expectation('PDO::beginTransaction()');
-    }
-
-    public function expectCommit(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
-        }
-
-        $this->expectations[] = new Expectation('PDO::commit()');
-    }
-
-    public function expectRollback(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
-        }
-
-        $this->expectations[] = new Expectation('PDO::rollback()');
-    }
-
-    public function expectTransaction(callable $callback): void
-    {
-        $this->expectBeginTransaction();
-
-        $callback($this);
-
-        $this->expectCommit();
-    }
-
     #[Override]
     public function select($query, $bindings = [], $useReadPdo = true)
     {
@@ -109,11 +65,7 @@ class FakeConnection extends Connection
                 return [];
             }
 
-            $expectation = $this->verifyQueryExpectation($query, $bindings);
-
-            if ($expectation->exception) {
-                throw $expectation->exception;
-            }
+            $expectation = $this->handleQueryExpectation($query, $bindings);
 
             return $expectation->rows;
         });
@@ -145,11 +97,7 @@ class FakeConnection extends Connection
                 return true;
             }
 
-            $expectation = $this->verifyQueryExpectation($query, $bindings);
-
-            if ($expectation->exception) {
-                throw $expectation->exception;
-            }
+            $expectation = $this->handleQueryExpectation($query, $bindings);
 
             $this->lastInsertId = $expectation->lastInsertId;
 
@@ -176,11 +124,7 @@ class FakeConnection extends Connection
                 return 1;
             }
 
-            $expectation = $this->verifyQueryExpectation($query, $bindings);
-
-            if ($expectation->exception) {
-                throw $expectation->exception;
-            }
+            $expectation = $this->handleQueryExpectation($query, $bindings);
 
             $this->recordsHaveBeenModified(
                 $expectation->rowCount > 0
@@ -207,15 +151,7 @@ class FakeConnection extends Connection
                 return 1;
             }
 
-            TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s]', $query));
-
-            $expectation = array_shift($this->expectations);
-
-            TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s]', $query));
-
-            if ($expectation->exception) {
-                throw $expectation->exception;
-            }
+            $expectation = $this->handleQueryExpectation($query, []);
 
             $this->recordsHaveBeenModified(
                 $expectation->rowCount > 0
@@ -226,195 +162,17 @@ class FakeConnection extends Connection
     }
 
     #[Override]
-    public function transaction(Closure $callback, $attempts = 1)
+    protected function run($query, $bindings, Closure $callback)
     {
-        for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
-            $this->beginTransaction();
-
-            try {
-                $callbackResult = $callback($this);
-            } catch (Throwable $e) {
-                $this->verifyRollback();
-
-                throw $e;
-            }
-
-            $levelBeingCommitted = $this->transactions;
-
-            try {
-                if ($this->transactions == 1) {
-                    $this->fireConnectionEvent('committing');
-
-                    $this->verifyCommit();
-                }
-
-                $this->transactions = max(0, $this->transactions - 1);
-            } catch (Throwable $e) {
-                $this->handleCommitTransactionException(
-                    $e, $currentAttempt, $attempts
-                );
-
-                continue;
-            }
-
-            $this->transactionsManager?->commit(
-                $this->getName(),
-                $levelBeingCommitted,
-                $this->transactions
-            );
-
-            $this->fireConnectionEvent('committed');
-
-            return $callbackResult;
-        }
-    }
-
-    #[Override]
-    protected function createTransaction(): void
-    {
-        if ($this->transactions == 0) {
-            $this->verifyBeginTransaction();
-        } elseif ($this->transactions >= 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->createSavepoint();
-        }
-    }
-
-    protected function verifyBeginTransaction(): void
-    {
-        if ($this->ignoreTransactions) {
-            return;
+        foreach ($this->beforeExecutingCallbacks as $beforeExecutingCallback) {
+            $beforeExecutingCallback($query, $bindings, $this);
         }
 
-        if ($this->deferWriteQueries) {
-            $this->deferredQueries[] = [
-                'query' => 'PDO::beginTransaction()',
-                'bindings' => [],
-            ];
+        $result = $callback($query, $bindings);
 
-            return;
-        }
+        $this->logQuery($query, $bindings, 0);
 
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::beginTransaction()');
-
-        $expectation = array_shift($this->expectations);
-
-        TestCase::assertEquals($expectation->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
-    }
-
-    #[Override]
-    public function commit(): void
-    {
-        if ($this->transactions == 1) {
-            $this->fireConnectionEvent('committing');
-
-            $this->verifyCommit();
-        }
-
-        [$levelBeingCommitted, $this->transactions] = [
-            $this->transactions,
-            max(0, $this->transactions - 1),
-        ];
-
-        $this->transactionsManager?->commit(
-            $this->getName(), $levelBeingCommitted, $this->transactions
-        );
-
-        $this->fireConnectionEvent('committed');
-    }
-
-    protected function verifyCommit(): void
-    {
-        if ($this->ignoreTransactions) {
-            return;
-        }
-
-        if ($this->deferWriteQueries) {
-            $this->deferredQueries[] = [
-                'query' => 'PDO::commit()',
-                'bindings' => [],
-            ];
-
-            return;
-        }
-
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::commit()');
-
-        $expectation = array_shift($this->expectations);
-
-        TestCase::assertEquals($expectation->query, 'PDO::commit()', 'Unexpected PDO::commit()');
-    }
-
-    #[Override]
-    public function rollBack($toLevel = null)
-    {
-        $toLevel = is_null($toLevel)
-            ? $this->transactions - 1
-            : $toLevel;
-
-        if ($toLevel < 0 || $toLevel >= $this->transactions) {
-            return;
-        }
-
-        $this->performRollBack($toLevel);
-
-        $this->transactions = $toLevel;
-
-        $this->transactionsManager?->rollback(
-            $this->getName(), $this->transactions
-        );
-
-        $this->fireConnectionEvent('rollingBack');
-    }
-
-    #[Override]
-    protected function performRollBack($toLevel)
-    {
-        if ($toLevel == 0) {
-            $this->verifyRollback();
-        } elseif ($this->queryGrammar->supportsSavepoints()) {
-            $this->getPdo()->exec(
-                $this->queryGrammar->compileSavepointRollBack('trans'.($toLevel + 1))
-            );
-        }
-    }
-
-    protected function verifyRollback(): void
-    {
-        if ($this->ignoreTransactions) {
-            return;
-        }
-
-        if ($this->deferWriteQueries) {
-            $this->deferredQueries[] = [
-                'query' => 'PDO::rollback()',
-                'bindings' => [],
-            ];
-
-            return;
-        }
-
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::rollback()');
-
-        $expectation = array_shift($this->expectations);
-
-        TestCase::assertEquals($expectation->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
-    }
-
-    #[Override]
-    protected function runQueryCallback($query, $bindings, Closure $callback)
-    {
-        try {
-            return $callback($query, $bindings);
-        } catch (Exception $e) {
-            // Rethrow PHPUnit assertion exception
-            if ($e instanceof ExpectationFailedException) {
-                throw $e;
-            }
-
-            throw new QueryException(
-                $this->getName(), $query, $this->prepareBindings($bindings), $e
-            );
-        }
+        return $result;
     }
 
     // TODO: check if it works with latest laravel version
@@ -448,31 +206,7 @@ class FakeConnection extends Connection
         $this->validateBindings($bindings, $deferredQuery['bindings'], $deferredQuery['query']);
     }
 
-    public function assertBeganTransaction(): void
-    {
-        $this->assertQueried('PDO::beginTransaction()');
-    }
-
-    public function assertCommitted(): void
-    {
-        $this->assertQueried('PDO::commit()');
-    }
-
-    public function assertRolledBack(): void
-    {
-        $this->assertQueried('PDO::rollback()');
-    }
-
-    public function assertTransaction(Closure $callback)
-    {
-        $this->assertBeganTransaction();
-
-        $callback($this);
-
-        $this->assertCommitted();
-    }
-
-    protected function verifyQueryExpectation(string $query, array $bindings): Expectation
+    protected function handleQueryExpectation(string $query, array $bindings): Expectation
     {
         $bindings = $this->prepareBindings($bindings);
 
@@ -483,6 +217,12 @@ class FakeConnection extends Connection
         TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
         $this->validateBindings($expectation->bindings, $bindings, $query);
+
+        if ($expectation->exception) {
+            throw new QueryException(
+                $this->getName(), $query, $bindings, $expectation->exception
+            );
+        }
 
         return $expectation;
     }
@@ -506,11 +246,5 @@ class FakeConnection extends Connection
     protected function getDefaultPostProcessor(): FakeProcessor
     {
         return new FakeProcessor();
-    }
-
-    #[Override]
-    public function reconnectIfMissingConnection()
-    {
-        //
     }
 }
