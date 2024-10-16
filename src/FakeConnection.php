@@ -28,6 +28,8 @@ class FakeConnection extends Connection
         parent::__construct(null);
 
         $this->insertIdGenerator = new InsertIdGenerator();
+
+        $this->enableQueryLog();
     }
 
     public function deferWriteQueries(bool $deferWriteQueries = true): void

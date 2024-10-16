@@ -4,6 +4,7 @@ namespace Xala\Elomock;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class Expectation
 {
@@ -46,9 +47,17 @@ class Expectation
         return $this;
     }
 
-    public function andReturnRows(array $rows): static
+    public function andReturnRows(array|Collection $rows): static
     {
-        $this->rows = array_map(function (array $row) {
+        if ($rows instanceof Collection) {
+            $rows = $rows->all();
+        }
+
+        $this->rows = array_map(function (array|Model $row) {
+            if ($row instanceof Model) {
+                $row = $row->getAttributes();
+            }
+
             return (object) $row;
         }, $rows);
 
