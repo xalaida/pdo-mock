@@ -30,42 +30,6 @@ trait FakeQueries
 
     public int | string | null $lastInsertId = null;
 
-    public function expectQuery(string $query, array | Closure | null $bindings = null): Expectation
-    {
-        $expectation = new Expectation($query, $bindings);
-
-        $this->expectations[] = $expectation;
-
-        return $expectation;
-    }
-
-    public function shouldBeginTransaction(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
-        }
-
-        $this->expectations[] = new Expectation('PDO::beginTransaction()');
-    }
-
-    public function shouldCommit(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
-        }
-
-        $this->expectations[] = new Expectation('PDO::commit()');
-    }
-
-    public function shouldRollback(): void
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
-        }
-
-        $this->expectations[] = new Expectation('PDO::rollback()');
-    }
-
     public function ignoreTransactions(bool $ignoreTransactions = true): void
     {
         $this->ignoreTransactions = $ignoreTransactions;
@@ -76,13 +40,62 @@ trait FakeQueries
         $this->skipWriteQueries = $skipWriteQueries;
     }
 
+    public function getLastInsertId(): int | string | null
+    {
+        if (! is_null($this->lastInsertId)) {
+            $lastInsertId = $this->lastInsertId;
+
+            $this->lastInsertId = null;
+
+            return $lastInsertId;
+        }
+
+        return $this->insertIdGenerator->generate();
+    }
+
+    public function expectQuery(string $query, array | Closure | null $bindings = null): Expectation
+    {
+        $expectation = new Expectation($query, $bindings);
+
+        $this->expectations[] = $expectation;
+
+        return $expectation;
+    }
+
+    public function expectBeginTransaction(): void
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
+        }
+
+        $this->expectations[] = new Expectation('PDO::beginTransaction()');
+    }
+
+    public function expectCommit(): void
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
+        }
+
+        $this->expectations[] = new Expectation('PDO::commit()');
+    }
+
+    public function expectRollback(): void
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
+        }
+
+        $this->expectations[] = new Expectation('PDO::rollback()');
+    }
+
     public function expectTransaction(callable $callback): void
     {
-        $this->shouldBeginTransaction();
+        $this->expectBeginTransaction();
 
         $callback($this);
 
-        $this->shouldCommit();
+        $this->expectCommit();
     }
 
     #[Override]
@@ -99,7 +112,7 @@ trait FakeQueries
 
             TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            $this->verifyBindings($expectation->bindings, $bindings, $query);
+            $this->assertBindingsMatch($expectation->bindings, $bindings, $query);
 
             return $expectation->rows;
         });
@@ -128,7 +141,7 @@ trait FakeQueries
 
             TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            $this->verifyBindings($expectation->bindings, $bindings, $query);
+            $this->assertBindingsMatch($expectation->bindings, $bindings, $query);
 
             $this->lastInsertId = $expectation->lastInsertId;
 
@@ -165,7 +178,7 @@ trait FakeQueries
 
             TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
 
-            $this->verifyBindings($expectation->bindings, $bindings, $query);
+            $this->assertBindingsMatch($expectation->bindings, $bindings, $query);
 
             if ($expectation->exception) {
                 throw $expectation->exception;
@@ -177,19 +190,6 @@ trait FakeQueries
 
             return $expectation->affectedRows;
         });
-    }
-
-    public function getLastInsertId()
-    {
-        if ($this->lastInsertId) {
-            $lastInsertId = $this->lastInsertId;
-
-            $this->lastInsertId = null;
-
-            return $lastInsertId;
-        }
-
-        return $this->insertIdGenerator->generate();
     }
 
     #[Override]
@@ -412,7 +412,7 @@ trait FakeQueries
 
         TestCase::assertEquals($query, $writeQueriesForAssertions['query'], 'Query does not match');
 
-        $this->verifyBindings($bindings, $writeQueriesForAssertions['bindings'], $writeQueriesForAssertions['query']);
+        $this->assertBindingsMatch($bindings, $writeQueriesForAssertions['bindings'], $writeQueriesForAssertions['query']);
     }
 
     public function assertBeganTransaction(): void
@@ -439,7 +439,7 @@ trait FakeQueries
         $this->assertCommitted();
     }
 
-    protected function verifyBindings(array | Closure | null $expectedBindings, array $bindings, string $query): void
+    protected function assertBindingsMatch(array | Closure | null $expectedBindings, array $bindings, string $query): void
     {
         if (is_null($expectedBindings)) {
             return;

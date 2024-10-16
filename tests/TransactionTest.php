@@ -17,11 +17,11 @@ class TransactionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldBeginTransaction();
+        $connection->expectBeginTransaction();
 
         $connection->expectQuery('insert into "users" ("name") values (?)');
 
-        $connection->shouldCommit();
+        $connection->expectCommit();
 
         $connection->beginTransaction();
 
@@ -39,11 +39,11 @@ class TransactionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldBeginTransaction();
+        $connection->expectBeginTransaction();
 
         $connection->expectQuery('insert into "users" ("name") values (?)');
 
-        $connection->shouldCommit();
+        $connection->expectCommit();
 
         $builder = (new Builder($connection))
             ->from('users');
@@ -98,15 +98,15 @@ class TransactionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldRollbackTransaction(): void
+    public function itexpectRollbackTransaction(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->shouldBeginTransaction();
+        $connection->expectBeginTransaction();
 
         $connection->expectQuery('insert into "users" ("name") values (?)');
 
-        $connection->shouldRollback();
+        $connection->expectRollback();
 
         try {
             $connection->transaction(function () use ($connection) {
@@ -128,9 +128,9 @@ class TransactionTest extends TestCase
 
         $connection->setTransactionManager(new DatabaseTransactionsManager());
 
-        $connection->shouldBeginTransaction();
+        $connection->expectBeginTransaction();
 
-        $connection->shouldCommit();
+        $connection->expectCommit();
 
         $connection->beginTransaction();
 
@@ -152,9 +152,9 @@ class TransactionTest extends TestCase
 
         $connection->setTransactionManager(new DatabaseTransactionsManager());
 
-        $connection->shouldBeginTransaction();
+        $connection->expectBeginTransaction();
 
-        $connection->shouldRollback();
+        $connection->expectRollback();
 
         $connection->beginTransaction();
 

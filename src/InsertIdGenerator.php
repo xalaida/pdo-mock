@@ -6,8 +6,8 @@ class InsertIdGenerator
 {
     public int $lastInsertId = 1;
 
-    public function generate(): string
+    public function generate(): int
     {
-        return (string) $this->lastInsertId++;
+        return $this->lastInsertId++;
     }
 }
