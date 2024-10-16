@@ -96,7 +96,7 @@ class Expectation
         return $this;
     }
 
-    public function andAffectRows(int $rows): static
+    public function andAffectCount(int $rows): static
     {
         $this->affectedRows = $rows;
 

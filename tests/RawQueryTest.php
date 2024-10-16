@@ -14,7 +14,7 @@ class RawQueryTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->expectQuery('delete from "users"')
-            ->andAffectRows(3);
+            ->andAffectCount(3);
 
         $result = $connection->statement('delete from "users"');
 
@@ -27,7 +27,7 @@ class RawQueryTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->expectQuery('delete from "users" where exists (select 1 from "orders" where "orders"."user_id" = "users"."id")')
-            ->andAffectRows(3);
+            ->andAffectCount(3);
 
         $result = (new Builder($connection))
             ->from('users')
