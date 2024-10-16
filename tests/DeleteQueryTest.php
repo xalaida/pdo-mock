@@ -77,7 +77,7 @@ class DeleteQueryTest extends TestCase
         $connection = $this->getFakeConnection();
 
         $connection->expectQuery('delete from "products"')
-            ->andAffectCount(3);
+            ->andReturnCount(3);
 
         $result = $connection
             ->table('products')

@@ -78,7 +78,7 @@ class UpdateQueryTest extends TestCase
 
         $connection->expectQuery('update "products" set "status" = ?')
             ->withBindings(['processed'])
-            ->andAffectCount(3);
+            ->andReturnCount(3);
 
         $result = $connection
             ->table('products')

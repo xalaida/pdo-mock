@@ -12,13 +12,13 @@ class Expectation
 
     public array | Closure | null $bindings = [];
 
-    public string | false $lastInsertId = false;
-
     public array $rows = [];
 
-    public bool $successfulStatement = true;
+    public int $rowCount = 1;
 
-    public int $affectedRows = 1;
+    public string | false $lastInsertId = false;
+
+    public bool $successfulStatement = true;
 
     public ?Exception $exception = null;
 
@@ -74,6 +74,13 @@ class Expectation
         return $this;
     }
 
+    public function andReturnCount(int $count): static
+    {
+        $this->rowCount = $count;
+
+        return $this;
+    }
+
     public function andThrow(string $message = ''): static
     {
         $this->exception = new FakePdoException($message);
@@ -92,13 +99,6 @@ class Expectation
     public function asFailedStatement(): static
     {
         $this->successfulStatement = false;
-
-        return $this;
-    }
-
-    public function andAffectCount(int $rows): static
-    {
-        $this->affectedRows = $rows;
 
         return $this;
     }

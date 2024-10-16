@@ -181,10 +181,10 @@ class FakeConnection extends Connection
             }
 
             $this->recordsHaveBeenModified(
-                $expectation->affectedRows > 0
+                $expectation->rowCount > 0
             );
 
-            return $expectation->affectedRows;
+            return $expectation->rowCount;
         });
     }
 
@@ -216,10 +216,10 @@ class FakeConnection extends Connection
             }
 
             $this->recordsHaveBeenModified(
-                $expectation->affectedRows > 0
+                $expectation->rowCount > 0
             );
 
-            return $expectation->affectedRows;
+            return $expectation->rowCount;
         });
     }
 
