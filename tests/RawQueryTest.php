@@ -3,7 +3,6 @@
 namespace Tests\Xala\Elomock;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\Expression;
 use PHPUnit\Framework\Attributes\Test;
 
 class RawQueryTest extends TestCase
@@ -31,14 +30,29 @@ class RawQueryTest extends TestCase
 
         $result = $connection
             ->table('users')
-            ->whereExists(function (Builder $query) {
-                $query->select(new Expression(1))
+            ->whereExists(function (Builder $query) use ($connection) {
+                $query->select($connection->raw(1))
                     ->from('orders')
                     ->whereColumn('orders.user_id', 'users.id');
             })
             ->delete();
 
         static::assertEquals(3, $result);
+
+        $connection->assertExpectationsFulfilled();
+    }
+
+    #[Test]
+    public function itShouldVerifyUnpreparedQuery(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->expectQuery('delete from "users" where "id" = 7')
+            ->andAffectCount(1);
+
+        $result = $connection->unprepared('delete from "users" where "id" = 7');
+
+        static::assertEquals(1, $result);
 
         $connection->assertExpectationsFulfilled();
     }

@@ -196,6 +196,41 @@ class FakeConnection extends Connection
     }
 
     #[Override]
+    public function unprepared($query)
+    {
+        return $this->run($query, [], function ($query) {
+            if ($this->pretending()) {
+                return true;
+            }
+
+            if ($this->skipWriteQueries) {
+                $this->writeQueriesForAssertions[] = [
+                    'query' => $query,
+                    'bindings' => [],
+                ];
+
+                return 1;
+            }
+
+            TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s]', $query));
+
+            $expectation = array_shift($this->expectations);
+
+            TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s]', $query));
+
+            if ($expectation->exception) {
+                throw $expectation->exception;
+            }
+
+            $this->recordsHaveBeenModified(
+                $expectation->affectedRows > 0
+            );
+
+            return $expectation->affectedRows;
+        });
+    }
+
+    #[Override]
     public function transaction(Closure $callback, $attempts = 1)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
