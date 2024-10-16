@@ -15,8 +15,6 @@ class Expectation
 
     public int $rowCount = 1;
 
-    public bool $successfulStatement = true;
-
     public ?FailedQueryException $exception = null;
 
     public string | false $lastInsertId = false;
