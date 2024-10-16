@@ -88,7 +88,7 @@ class ModelTest extends TestCase
             ->table('users')
             ->find(7);
 
-        static::assertEquals(7, $result['id']);
-        static::assertEquals('john', $result['name']);
+        static::assertEquals(7, $result->id);
+        static::assertEquals('john', $result->name);
     }
 }

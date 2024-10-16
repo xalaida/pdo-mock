@@ -24,9 +24,9 @@ class SelectQueryTest extends TestCase
             ->get();
 
         static::assertCount(3, $users);
-        static::assertEquals('xala', $users[0]['name']);
-        static::assertEquals('john', $users[1]['name']);
-        static::assertEquals('ryan', $users[2]['name']);
+        static::assertEquals('xala', $users[0]->name);
+        static::assertEquals('john', $users[1]->name);
+        static::assertEquals('ryan', $users[2]->name);
     }
 
     #[Test]
@@ -42,8 +42,8 @@ class SelectQueryTest extends TestCase
 
         $user = $connection->selectOne('select * from users where id = ?', [5]);
 
-        static::assertEquals(1, $user['id']);
-        static::assertEquals('xala', $user['name']);
+        static::assertEquals(1, $user->id);
+        static::assertEquals('xala', $user->name);
     }
 
     #[Test]
@@ -106,8 +106,8 @@ class SelectQueryTest extends TestCase
             ->table('users')
             ->find(7);
 
-        static::assertEquals(7, $user['id']);
-        static::assertEquals('xala', $user['name']);
+        static::assertEquals(7, $user->id);
+        static::assertEquals('xala', $user->name);
     }
 
     #[Test]
@@ -159,8 +159,8 @@ class SelectQueryTest extends TestCase
             ->table('users')
             ->find(7);
 
-        static::assertEquals(7, $user['id']);
-        static::assertEquals('xala', $user['name']);
+        static::assertEquals(7, $user->id);
+        static::assertEquals('xala', $user->name);
     }
 
     #[Test]
@@ -191,11 +191,11 @@ class SelectQueryTest extends TestCase
             ->where(['user_id' => 1])
             ->get();
 
-        static::assertEquals('john', $user['name']);
+        static::assertEquals('john', $user->name);
         static::assertCount(3, $posts);
-        static::assertEquals('PHP', $posts[0]['title']);
-        static::assertEquals('Laravel', $posts[1]['title']);
-        static::assertEquals('Eloquent', $posts[2]['title']);
+        static::assertEquals('PHP', $posts[0]->title);
+        static::assertEquals('Laravel', $posts[1]->title);
+        static::assertEquals('Eloquent', $posts[2]->title);
     }
 
     #[Test]
@@ -223,8 +223,8 @@ class SelectQueryTest extends TestCase
             ->table('users')
             ->find(2);
 
-        static::assertEquals('john', $john['name']);
-        static::assertEquals('jane', $jane['name']);
+        static::assertEquals('john', $john->name);
+        static::assertEquals('jane', $jane->name);
     }
 
     #[Test]

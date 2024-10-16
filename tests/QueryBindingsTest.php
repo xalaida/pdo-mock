@@ -24,7 +24,7 @@ class QueryBindingsTest extends TestCase
             ->get();
 
         $this->assertCount(1, $results);
-        $this->assertEquals('xala', $results[0]['name']);
+        $this->assertEquals('xala', $results[0]->name);
     }
 
     #[Test]
@@ -44,8 +44,8 @@ class QueryBindingsTest extends TestCase
             ->table('users')
             ->find(7);
 
-        static::assertEquals(7, $user['id']);
-        static::assertEquals('xala', $user['name']);
+        static::assertEquals(7, $user->id);
+        static::assertEquals('xala', $user->name);
     }
 
     #[Test]

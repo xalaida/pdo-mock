@@ -27,8 +27,8 @@ class PostgresConnectionTest extends TestCase
 
         static::assertInstanceOf(Collection::class, $result);
         static::assertCount(1, $result);
-        static::assertEquals(1, $result[0]['id']);
-        static::assertEquals('John', $result[0]['name']);
+        static::assertEquals(1, $result[0]->id);
+        static::assertEquals('John', $result[0]->name);
     }
 
     #[Test]

@@ -31,8 +31,8 @@ class FakeConnectionTest extends TestCase
             ->get();
 
         static::assertCount(1, $users);
-        static::assertEquals(7, $users[0]['id']);
-        static::assertEquals('test', $users[0]['name']);
+        static::assertEquals(7, $users[0]->id);
+        static::assertEquals('test', $users[0]->name);
 
         $result = $connection
             ->table('users')
@@ -46,6 +46,6 @@ class FakeConnectionTest extends TestCase
             ->where(['id' => 7])
             ->first();
 
-        static::assertEquals('xala', $user['name']);
+        static::assertEquals('xala', $user->name);
     }
 }

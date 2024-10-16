@@ -48,7 +48,9 @@ class Expectation
 
     public function andReturnRows(array $rows): static
     {
-        $this->rows = $rows;
+        $this->rows = array_map(function (array $row) {
+            return (object) $row;
+        }, $rows);
 
         return $this;
     }
@@ -59,7 +61,7 @@ class Expectation
             $row = $row->getAttributes();
         }
 
-        $this->rows = [$row];
+        $this->rows = [(object) $row];
 
         return $this;
     }

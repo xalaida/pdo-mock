@@ -26,8 +26,8 @@ class CursorQueryTest extends TestCase
         $users = iterator_to_array($users);
 
         static::assertCount(3, $users);
-        static::assertEquals('xala', $users[0]['name']);
-        static::assertEquals('john', $users[1]['name']);
-        static::assertEquals('ryan', $users[2]['name']);
+        static::assertEquals('xala', $users[0]->name);
+        static::assertEquals('john', $users[1]->name);
+        static::assertEquals('ryan', $users[2]->name);
     }
 }
