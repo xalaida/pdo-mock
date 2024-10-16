@@ -4,14 +4,14 @@ namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
 
-class SkipTransactionTest extends TestCase
+class DeferTransactionTest extends TestCase
 {
     #[Test]
-    public function itShouldVerifySkippedTransaction(): void
+    public function itShouldVerifyDeferredTransaction(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipWriteQueries();
+        $connection->deferWriteQueries();
 
         $connection->transaction(function () use ($connection) {
             $connection
@@ -31,7 +31,7 @@ class SkipTransactionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipWriteQueries();
+        $connection->deferWriteQueries();
 
         $connection->transaction(function () use ($connection) {
             $connection

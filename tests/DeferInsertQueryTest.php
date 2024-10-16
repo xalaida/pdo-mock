@@ -5,14 +5,14 @@ namespace Tests\Xala\Elomock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
-class SkipInsertQueryTest extends TestCase
+class DeferInsertQueryTest extends TestCase
 {
     #[Test]
-    public function itShouldVerifySkippedQuery(): void
+    public function itShouldVerifyDeferredQuery(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipWriteQueries();
+        $connection->deferWriteQueries();
 
         $result = $connection
             ->table('users')
@@ -39,7 +39,7 @@ class SkipInsertQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipWriteQueries();
+        $connection->deferWriteQueries();
 
         $result = $connection
             ->table('users')
@@ -58,7 +58,7 @@ class SkipInsertQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipWriteQueries();
+        $connection->deferWriteQueries();
 
         $result = $connection
             ->table('users')
@@ -77,7 +77,7 @@ class SkipInsertQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->skipWriteQueries();
+        $connection->deferWriteQueries();
 
         $result = $connection
             ->table('users')

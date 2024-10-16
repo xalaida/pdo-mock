@@ -16,11 +16,11 @@ class FakeConnection extends Connection
 {
     public array $expectations = [];
 
-    public array $writeQueriesForAssertions = [];
+    public array $deferredQueries = [];
 
     public bool $ignoreTransactions = false;
 
-    public bool $skipWriteQueries = false;
+    public bool $deferWriteQueries = false;
 
     public int | string | null $lastInsertId = null;
 
@@ -38,9 +38,9 @@ class FakeConnection extends Connection
         $this->ignoreTransactions = $ignoreTransactions;
     }
 
-    public function skipWriteQueries(bool $skipWriteQueries = true): void
+    public function deferWriteQueries(bool $deferWriteQueries = true): void
     {
-        $this->skipWriteQueries = $skipWriteQueries;
+        $this->deferWriteQueries = $deferWriteQueries;
     }
 
     public function getLastInsertId(): int | string | null
@@ -136,8 +136,8 @@ class FakeConnection extends Connection
                 return true;
             }
 
-            if ($this->skipWriteQueries) {
-                $this->writeQueriesForAssertions[] = [
+            if ($this->deferWriteQueries) {
+                $this->deferredQueries[] = [
                     'query' => $query,
                     'bindings' => $bindings,
                 ];
@@ -167,8 +167,8 @@ class FakeConnection extends Connection
                 return 0;
             }
 
-            if ($this->skipWriteQueries) {
-                $this->writeQueriesForAssertions[] = [
+            if ($this->deferWriteQueries) {
+                $this->deferredQueries[] = [
                     'query' => $query,
                     'bindings' => $bindings,
                 ];
@@ -198,8 +198,8 @@ class FakeConnection extends Connection
                 return true;
             }
 
-            if ($this->skipWriteQueries) {
-                $this->writeQueriesForAssertions[] = [
+            if ($this->deferWriteQueries) {
+                $this->deferredQueries[] = [
                     'query' => $query,
                     'bindings' => [],
                 ];
@@ -285,8 +285,8 @@ class FakeConnection extends Connection
             return;
         }
 
-        if ($this->skipWriteQueries) {
-            $this->writeQueriesForAssertions[] = [
+        if ($this->deferWriteQueries) {
+            $this->deferredQueries[] = [
                 'query' => 'PDO::beginTransaction()',
                 'bindings' => [],
             ];
@@ -328,8 +328,8 @@ class FakeConnection extends Connection
             return;
         }
 
-        if ($this->skipWriteQueries) {
-            $this->writeQueriesForAssertions[] = [
+        if ($this->deferWriteQueries) {
+            $this->deferredQueries[] = [
                 'query' => 'PDO::commit()',
                 'bindings' => [],
             ];
@@ -384,8 +384,8 @@ class FakeConnection extends Connection
             return;
         }
 
-        if ($this->skipWriteQueries) {
-            $this->writeQueriesForAssertions[] = [
+        if ($this->deferWriteQueries) {
+            $this->deferredQueries[] = [
                 'query' => 'PDO::rollback()',
                 'bindings' => [],
             ];
@@ -432,20 +432,20 @@ class FakeConnection extends Connection
     {
         $queriesFormatted = implode(PHP_EOL, array_map(function (array $query) {
             return sprintf('%s [%s]', $query['query'], implode(', ', $query['bindings']));
-        }, $this->writeQueriesForAssertions));
+        }, $this->deferredQueries));
 
-        TestCase::assertEmpty($this->writeQueriesForAssertions, 'Some write queries were not fulfilled:' . PHP_EOL . $queriesFormatted);
+        TestCase::assertEmpty($this->deferredQueries, 'Some write queries were not fulfilled:' . PHP_EOL . $queriesFormatted);
     }
 
     public function assertQueried(string $query, array | Closure | null $bindings = null): void
     {
-        TestCase::assertNotEmpty($this->writeQueriesForAssertions, 'No queries were executed');
+        TestCase::assertNotEmpty($this->deferredQueries, 'No queries were executed');
 
-        $writeQueriesForAssertions = array_shift($this->writeQueriesForAssertions);
+        $deferredQuery = array_shift($this->deferredQueries);
 
-        TestCase::assertEquals($query, $writeQueriesForAssertions['query'], 'Query does not match');
+        TestCase::assertEquals($query, $deferredQuery['query'], 'Query does not match');
 
-        $this->validateBindings($bindings, $writeQueriesForAssertions['bindings'], $writeQueriesForAssertions['query']);
+        $this->validateBindings($bindings, $deferredQuery['bindings'], $deferredQuery['query']);
     }
 
     public function assertBeganTransaction(): void
