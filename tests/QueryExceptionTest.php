@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -15,7 +14,7 @@ class QueryExceptionTest extends TestCase
 
         $connection->expectQuery('insert into "users" ("name") values (?)')
             ->withBindings(['xala'])
-            ->andThrow('Integrity constraint violation');
+            ->andFail('Integrity constraint violation');
 
         $builder = $connection->table('users');
 

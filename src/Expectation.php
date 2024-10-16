@@ -3,7 +3,6 @@
 namespace Xala\Elomock;
 
 use Closure;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 
 class Expectation
@@ -16,11 +15,11 @@ class Expectation
 
     public int $rowCount = 1;
 
-    public string | false $lastInsertId = false;
-
     public bool $successfulStatement = true;
 
-    public ?Exception $exception = null;
+    public ?FailedQueryException $exception = null;
+
+    public string | false $lastInsertId = false;
 
     public function __construct(string $query, array | Closure | null $bindings = null)
     {
@@ -81,24 +80,9 @@ class Expectation
         return $this;
     }
 
-    public function andThrow(string $message = ''): static
+    public function andFail(string $message = 'Query error'): static
     {
-        $this->exception = new FakePdoException($message);
-
-        return $this;
-    }
-
-    public function asSuccessfulStatement(): static
-    {
-        $this->successfulStatement = true;
-
-        return $this;
-    }
-
-    // TODO: consider removing this method and use andThrow() instead
-    public function asFailedStatement(): static
-    {
-        $this->successfulStatement = false;
+        $this->exception = new FailedQueryException($message);
 
         return $this;
     }

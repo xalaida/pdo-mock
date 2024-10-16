@@ -125,22 +125,6 @@ class InsertQueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldReturnCorrectResult(): void
-    {
-        $connection = $this->getFakeConnection();
-
-        $connection->expectQuery('insert into "users" ("name") values (?)')
-            ->withBindings(['xala'])
-            ->asFailedStatement();
-
-        $result = $connection
-            ->table('users')
-            ->insert(['name' => 'xala']);
-
-        static::assertFalse($result);
-    }
-
-    #[Test]
     public function itShouldVerifyNamedBindings(): void
     {
         $connection = $this->getFakeConnection();

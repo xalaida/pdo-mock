@@ -111,7 +111,9 @@ class FakeConnection extends Connection
 
             $expectation = $this->verifyQueryExpectation($query, $bindings);
 
-            // TODO: add ability to throw
+            if ($expectation->exception) {
+                throw $expectation->exception;
+            }
 
             return $expectation->rows;
         });
@@ -145,15 +147,15 @@ class FakeConnection extends Connection
 
             $expectation = $this->verifyQueryExpectation($query, $bindings);
 
-            $this->lastInsertId = $expectation->lastInsertId;
-
             if ($expectation->exception) {
                 throw $expectation->exception;
             }
 
+            $this->lastInsertId = $expectation->lastInsertId;
+
             $this->recordsHaveBeenModified();
 
-            return $expectation->successfulStatement;
+            return true;
         });
     }
 
