@@ -109,13 +109,7 @@ class FakeConnection extends Connection
                 return [];
             }
 
-            TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
-
-            $expectation = array_shift($this->expectations);
-
-            TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
-
-            $this->assertBindingsMatch($expectation->bindings, $bindings, $query);
+            $expectation = $this->verifyQueryExpectation($query, $bindings);
 
             return $expectation->rows;
         });
@@ -138,13 +132,7 @@ class FakeConnection extends Connection
                 return true;
             }
 
-            TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
-
-            $expectation = array_shift($this->expectations);
-
-            TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
-
-            $this->assertBindingsMatch($expectation->bindings, $bindings, $query);
+            $expectation = $this->verifyQueryExpectation($query, $bindings);
 
             $this->lastInsertId = $expectation->lastInsertId;
 
@@ -175,13 +163,7 @@ class FakeConnection extends Connection
                 return 1;
             }
 
-            TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
-
-            $expectation = array_shift($this->expectations);
-
-            TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
-
-            $this->assertBindingsMatch($expectation->bindings, $bindings, $query);
+            $expectation = $this->verifyQueryExpectation($query, $bindings);
 
             if ($expectation->exception) {
                 throw $expectation->exception;
@@ -450,7 +432,7 @@ class FakeConnection extends Connection
 
         TestCase::assertEquals($query, $writeQueriesForAssertions['query'], 'Query does not match');
 
-        $this->assertBindingsMatch($bindings, $writeQueriesForAssertions['bindings'], $writeQueriesForAssertions['query']);
+        $this->validateBindings($bindings, $writeQueriesForAssertions['bindings'], $writeQueriesForAssertions['query']);
     }
 
     public function assertBeganTransaction(): void
@@ -477,7 +459,22 @@ class FakeConnection extends Connection
         $this->assertCommitted();
     }
 
-    protected function assertBindingsMatch(array | Closure | null $expectedBindings, array $bindings, string $query): void
+    protected function verifyQueryExpectation(string $query, array $bindings): Expectation
+    {
+        $bindings = $this->prepareBindings($bindings);
+
+        TestCase::assertNotEmpty($this->expectations, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
+
+        $expectation = array_shift($this->expectations);
+
+        TestCase::assertEquals($expectation->query, $query, sprintf('Unexpected query: [%s] [%s]', $query, implode(', ', $bindings)));
+
+        $this->validateBindings($expectation->bindings, $bindings, $query);
+
+        return $expectation;
+    }
+
+    protected function validateBindings(array | Closure | null $expectedBindings, array $bindings, string $query): void
     {
         if (is_null($expectedBindings)) {
             return;

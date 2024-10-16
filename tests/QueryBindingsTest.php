@@ -2,11 +2,31 @@
 
 namespace Tests\Xala\Elomock;
 
+use DateTime;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
 class QueryBindingsTest extends TestCase
 {
+    #[Test]
+    public function itShouldValidatePreparedBindings(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->expectQuery('select * from "users" where "created_at" > ?')
+            ->withBindings(['2020-10-10 00:00:00'])
+            ->andReturnRows([
+                ['id' => 7, 'name' => 'xala'],
+            ]);
+
+        $results = $connection->table('users')
+            ->where('created_at', '>', new DateTime('2020-10-10'))
+            ->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals('xala', $results[0]['name']);
+    }
+
     #[Test]
     public function itShouldVerifySelectQueryWithCallableBindings(): void
     {
