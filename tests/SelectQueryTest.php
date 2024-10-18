@@ -47,6 +47,23 @@ class SelectQueryTest extends TestCase
     }
 
     #[Test]
+    public function itShouldSelectRowsUsingCallableSyntax(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->expectQuery('select * from users where id = ?', [5])
+            ->andReturnRowsUsing(function (array $bindings) {
+                return [
+                    (object) ['id' => $bindings[0]],
+                ];
+            });
+
+        $user = $connection->selectOne('select * from users where id = ?', [5]);
+
+        static::assertEquals(5, $user->id);
+    }
+
+    #[Test]
     public function itShouldFailWhenQueryDoesNotMatch(): void
     {
         $connection = $this->getFakeConnection();

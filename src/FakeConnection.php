@@ -5,13 +5,17 @@ namespace Xala\Elomock;
 use Closure;
 use Exception;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 use Override;
 use PHPUnit\Framework\TestCase;
 
 class FakeConnection extends Connection
 {
     use HandleTransactions;
+
+    public const FETCH_MODE_OBJECT = 5;
 
     public array $expectations = [];
 
@@ -69,7 +73,27 @@ class FakeConnection extends Connection
 
             $expectation = $this->handleQueryExpectation($query, $bindings);
 
-            return $expectation->rows;
+            $rows = $expectation->rows;
+
+            if (is_callable($rows)) {
+                $rows = call_user_func($rows, $bindings);
+            }
+
+            if ($rows instanceof Collection) {
+                $rows = $rows->all();
+            }
+
+            return array_map(function ($row) {
+                if ($row instanceof Model) {
+                    $row = $row->getAttributes();
+                }
+
+                if ($this->fetchMode === self::FETCH_MODE_OBJECT) {
+                    $row = (object) $row;
+                }
+
+                return $row;
+            }, $rows);
         });
     }
 
@@ -185,10 +209,11 @@ class FakeConnection extends Connection
 
     public function assertExpectationsFulfilled(): void
     {
+        // TODO: improve error message
         TestCase::assertEmpty($this->expectations, 'Some expectations were not fulfilled.');
     }
 
-    public function assertDeferredQueriesFulfilled(): void
+    public function assertDeferredQueriesVerified(): void
     {
         $queriesFormatted = implode(PHP_EOL, array_map(function (array $query) {
             return sprintf('%s [%s]', $query['query'], implode(', ', $query['bindings']));

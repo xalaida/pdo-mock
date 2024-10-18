@@ -12,7 +12,7 @@ class Expectation
 
     public array | Closure | null $bindings = [];
 
-    public array $rows = [];
+    public array | Collection | Closure $rows = [];
 
     public int $rowCount = 1;
 
@@ -47,32 +47,23 @@ class Expectation
         return $this;
     }
 
-    public function andReturnRows(array|Collection $rows): static
+    public function andReturnRows(array | Collection | Closure $rows): static
     {
-        if ($rows instanceof Collection) {
-            $rows = $rows->all();
-        }
-
-        $this->rows = array_map(function (array|Model $row) {
-            if ($row instanceof Model) {
-                $row = $row->getAttributes();
-            }
-
-            return (object) $row;
-        }, $rows);
+        $this->rows = $rows;
 
         return $this;
     }
 
-    public function andReturnRow(array|Model $row): static
+    public function andReturnRowsUsing(Closure $callback): static
     {
-        if ($row instanceof Model) {
-            $row = $row->getAttributes();
-        }
-
-        $this->rows = [(object) $row];
+        $this->andReturnRows($callback);
 
         return $this;
+    }
+
+    public function andReturnRow(array | Model $row): static
+    {
+        return $this->andReturnRows([$row]);
     }
 
     public function andReturnNothing(): static
