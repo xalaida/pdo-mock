@@ -96,6 +96,8 @@ trait HandleTransactions
             throw $e;
         }
 
+        $levelBeingCommitted = $this->transactions;
+
         try {
             if ($this->transactions == 1) {
                 $this->fireConnectionEvent('committing');
@@ -107,7 +109,7 @@ trait HandleTransactions
         }
 
         if ($this->afterCommitCallbacksShouldBeExecuted()) {
-            $this->transactionsManager?->commit($this->getName());
+            $this->transactionsManager?->commit($this->getName(), $levelBeingCommitted, $this->transactions);
         }
 
         $this->fireConnectionEvent('committed');
@@ -178,10 +180,12 @@ trait HandleTransactions
             $this->verifyCommit();
         }
 
+        $levelBeingCommitted = $this->transactions;
+
         $this->transactions = max(0, $this->transactions - 1);
 
         if ($this->afterCommitCallbacksShouldBeExecuted()) {
-            $this->transactionsManager?->commit($this->getName());
+            $this->transactionsManager?->commit($this->getName(), $levelBeingCommitted, $this->transactions);
         }
 
         $this->fireConnectionEvent('committed');
