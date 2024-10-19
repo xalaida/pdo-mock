@@ -187,4 +187,24 @@ class TransactionTest extends TestCase
 
         $connection->assertExpectationsFulfilled();
     }
+
+    #[Test]
+    public function itShouldNotRollbackIfExpectationFails(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->ignoreTransactions();
+
+        $connection->expectQuery('insert into "users" ("name") values (?)');
+
+        $connection->beginTransaction();
+
+        $connection
+            ->table('users')
+            ->insert(['name' => 'john']);
+
+        $connection->commit();
+
+        $connection->assertExpectationsFulfilled();
+    }
 }

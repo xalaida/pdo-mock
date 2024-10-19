@@ -74,7 +74,7 @@ trait HandleTransactions
         $this->assertQueried('PDO::rollback()');
     }
 
-    public function assertTransaction(Closure $callback)
+    public function assertTransactional(Closure $callback)
     {
         $this->assertBeganTransaction();
 

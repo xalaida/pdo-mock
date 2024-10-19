@@ -39,7 +39,7 @@ class DeferTransactionTest extends TestCase
                 ->insert(['name' => 'xala']);
         });
 
-        $connection->assertTransaction(function () use ($connection) {
+        $connection->assertTransactional(function () use ($connection) {
             $connection->assertQueried('insert into "users" ("name") values (?)', ['xala']);
         });
     }
