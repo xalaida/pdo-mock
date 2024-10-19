@@ -3,10 +3,8 @@
 namespace Xala\Elomock;
 
 use Closure;
-use Exception;
-use Illuminate\Database\Connection;
-use Illuminate\Database\QueryException;
 use Override;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Throwable;
@@ -26,28 +24,28 @@ trait HandleTransactions
     public function expectBeginTransaction(): void
     {
         if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
+            throw new RuntimeException('Cannot expect DB::beginTransaction() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation('PDO::beginTransaction()');
+        $this->expectations[] = new Expectation('DB::beginTransaction()');
     }
 
     public function expectCommit(): void
     {
         if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
+            throw new RuntimeException('Cannot expect DB::commit() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation('PDO::commit()');
+        $this->expectations[] = new Expectation('DB::commit()');
     }
 
     public function expectRollback(): void
     {
         if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
+            throw new RuntimeException('Cannot expect DB::rollback() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation('PDO::rollback()');
+        $this->expectations[] = new Expectation('DB::rollback()');
     }
 
     public function expectTransaction(callable $callback): void
@@ -61,17 +59,17 @@ trait HandleTransactions
 
     public function assertBeganTransaction(): void
     {
-        $this->assertQueried('PDO::beginTransaction()');
+        $this->assertQueried('DB::beginTransaction()');
     }
 
     public function assertCommitted(): void
     {
-        $this->assertQueried('PDO::commit()');
+        $this->assertQueried('DB::commit()');
     }
 
     public function assertRolledBack(): void
     {
-        $this->assertQueried('PDO::rollback()');
+        $this->assertQueried('DB::rollback()');
     }
 
     public function assertTransactional(Closure $callback)
@@ -86,55 +84,67 @@ trait HandleTransactions
     #[Override]
     public function transaction(Closure $callback, $attempts = 1)
     {
-        for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
-            $this->beginTransaction();
+        $this->beginTransaction();
 
-            try {
-                $callbackResult = $callback($this);
-            } catch (Throwable $e) {
+        try {
+            $callbackResult = $callback($this);
+        } catch (Throwable $e) {
+            if (! ($e instanceof ExpectationFailedException)) {
                 $this->verifyRollback();
-
-                throw $e;
             }
 
-            $levelBeingCommitted = $this->transactions;
-
-            try {
-                if ($this->transactions == 1) {
-                    $this->fireConnectionEvent('committing');
-
-                    $this->verifyCommit();
-                }
-
-                $this->transactions = max(0, $this->transactions - 1);
-            } catch (Throwable $e) {
-                $this->handleCommitTransactionException(
-                    $e, $currentAttempt, $attempts
-                );
-
-                continue;
-            }
-
-            $this->transactionsManager?->commit(
-                $this->getName(),
-                $levelBeingCommitted,
-                $this->transactions
-            );
-
-            $this->fireConnectionEvent('committed');
-
-            return $callbackResult;
+            throw $e;
         }
+
+        try {
+            if ($this->transactions == 1) {
+                $this->fireConnectionEvent('committing');
+
+                $this->verifyCommit();
+            }
+        } finally {
+            $this->transactions = max(0, $this->transactions - 1);
+        }
+
+        if ($this->afterCommitCallbacksShouldBeExecuted()) {
+            $this->transactionsManager?->commit($this->getName());
+        }
+
+        $this->fireConnectionEvent('committed');
+
+        return $callbackResult;
+    }
+
+    public function beginTransaction(): void
+    {
+        $this->createTransaction();
+
+        $this->transactions++;
+
+        $this->transactionsManager?->begin(
+            $this->getName(), $this->transactions
+        );
+
+        $this->fireConnectionEvent('beganTransaction');
+    }
+
+    protected function afterCommitCallbacksShouldBeExecuted(): bool
+    {
+        if ($this->transactions == 0) {
+            return true;
+        }
+
+        if (is_null($this->transactionsManager)) {
+            return false;
+        }
+
+        return $this->transactionsManager->callbackApplicableTransactions()->count() === 1;
     }
 
     #[Override]
     protected function createTransaction(): void
     {
-        if ($this->transactions == 0) {
-            $this->verifyBeginTransaction();
-        } elseif ($this->transactions >= 1 && $this->queryGrammar->supportsSavepoints()) {
-            $this->createSavepoint();
-        }
+        $this->verifyBeginTransaction();
     }
 
     protected function verifyBeginTransaction(): void
@@ -145,18 +155,18 @@ trait HandleTransactions
 
         if ($this->deferWriteQueries) {
             $this->deferredQueries[] = [
-                'query' => 'PDO::beginTransaction()',
+                'query' => 'DB::beginTransaction()',
                 'bindings' => [],
             ];
 
             return;
         }
 
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::beginTransaction()');
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected DB::beginTransaction()');
 
         $expectation = array_shift($this->expectations);
 
-        TestCase::assertEquals($expectation->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
+        TestCase::assertEquals($expectation->query, 'DB::beginTransaction()', 'Unexpected DB::beginTransaction()');
     }
 
     #[Override]
@@ -168,14 +178,11 @@ trait HandleTransactions
             $this->verifyCommit();
         }
 
-        [$levelBeingCommitted, $this->transactions] = [
-            $this->transactions,
-            max(0, $this->transactions - 1),
-        ];
+        $this->transactions = max(0, $this->transactions - 1);
 
-        $this->transactionsManager?->commit(
-            $this->getName(), $levelBeingCommitted, $this->transactions
-        );
+        if ($this->afterCommitCallbacksShouldBeExecuted()) {
+            $this->transactionsManager?->commit($this->getName());
+        }
 
         $this->fireConnectionEvent('committed');
     }
@@ -188,18 +195,18 @@ trait HandleTransactions
 
         if ($this->deferWriteQueries) {
             $this->deferredQueries[] = [
-                'query' => 'PDO::commit()',
+                'query' => 'DB::commit()',
                 'bindings' => [],
             ];
 
             return;
         }
 
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::commit()');
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected DB::commit()');
 
         $expectation = array_shift($this->expectations);
 
-        TestCase::assertEquals($expectation->query, 'PDO::commit()', 'Unexpected PDO::commit()');
+        TestCase::assertEquals($expectation->query, 'DB::commit()', 'Unexpected DB::commit()');
     }
 
     #[Override]
@@ -227,13 +234,7 @@ trait HandleTransactions
     #[Override]
     protected function performRollBack($toLevel)
     {
-        if ($toLevel == 0) {
-            $this->verifyRollback();
-        } elseif ($this->queryGrammar->supportsSavepoints()) {
-            $this->getPdo()->exec(
-                $this->queryGrammar->compileSavepointRollBack('trans'.($toLevel + 1))
-            );
-        }
+        $this->verifyRollback();
     }
 
     protected function verifyRollback(): void
@@ -244,17 +245,17 @@ trait HandleTransactions
 
         if ($this->deferWriteQueries) {
             $this->deferredQueries[] = [
-                'query' => 'PDO::rollback()',
+                'query' => 'DB::rollback()',
                 'bindings' => [],
             ];
 
             return;
         }
 
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::rollback()');
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected DB::rollback()');
 
         $expectation = array_shift($this->expectations);
 
-        TestCase::assertEquals($expectation->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
+        TestCase::assertEquals($expectation->query, 'DB::rollback()', 'Unexpected DB::rollback()');
     }
 }

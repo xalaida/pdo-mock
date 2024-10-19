@@ -127,7 +127,9 @@ class FakeConnection extends Connection
 
             $this->lastInsertId = $expectation->lastInsertId;
 
-            $this->recordsHaveBeenModified();
+            $this->recordsHaveBeenModified(
+                $expectation->rowCount > 0
+            );
 
             return true;
         });

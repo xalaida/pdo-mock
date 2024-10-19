@@ -9,8 +9,6 @@ use RuntimeException;
 
 class TransactionTest extends TestCase
 {
-    // TODO: verify savepoints
-
     #[Test]
     public function itShouldVerifyTransaction(): void
     {
@@ -87,7 +85,7 @@ class TransactionTest extends TestCase
         });
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Unexpected PDO::commit()');
+        $this->expectExceptionMessage('Unexpected DB::commit()');
 
         $connection->transaction(function () use ($connection) {
             $connection
@@ -193,18 +191,45 @@ class TransactionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->ignoreTransactions();
+        $connection->expectBeginTransaction();
+        $connection->expectQuery('insert into "users" ("name") values (?)', []);
 
-        $connection->expectQuery('insert into "users" ("name") values (?)');
-
-        $connection->beginTransaction();
-
-        $connection
-            ->table('users')
-            ->insert(['name' => 'john']);
-
-        $connection->commit();
+        try {
+            $connection->transaction(function () use ($connection) {
+                $connection
+                    ->table('users')
+                    ->insert(['name' => 'john']);
+            });
+        } catch (ExpectationFailedException $e) {
+            static::assertStringStartsWith('Unexpected query', $e->getMessage());
+        }
 
         $connection->assertExpectationsFulfilled();
+    }
+
+    #[Test]
+    public function itShouldHandleSavepoints(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->expectBeginTransaction();
+        $connection->expectQuery('insert into "users" ("name") values (?)');
+        $connection->expectBeginTransaction();
+        $connection->expectRollback();
+        $connection->expectCommit();
+
+        try {
+            $connection->transaction(function () use ($connection) {
+                $connection
+                    ->table('users')
+                    ->insert(['name' => 'john']);
+
+                $connection->transaction(function () use ($connection) {
+                    throw new RuntimeException('Fail to rollback');
+                });
+            });
+        } catch (RuntimeException $e) {
+            $connection->assertExpectationsFulfilled();
+        }
     }
 }
