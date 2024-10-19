@@ -27,9 +27,9 @@ class FakeConnection extends Connection
 
     public InsertIdGenerator $insertIdGenerator;
 
-    public function __construct()
+    public function __construct($database = '', $tablePrefix = '', array $config = [])
     {
-        parent::__construct(null);
+        parent::__construct(null, $database, $tablePrefix, $config);
 
         $this->insertIdGenerator = new InsertIdGenerator();
 
