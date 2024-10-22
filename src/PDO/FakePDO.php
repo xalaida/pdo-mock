@@ -7,6 +7,9 @@ use PHPUnit\Framework\TestCase;
 
 class FakePDO extends PDO
 {
+    /**
+     * @var array<int, QueryExpectation>
+     */
     public array $expectations = [];
 
     /**
@@ -30,15 +33,17 @@ class FakePDO extends PDO
     {
         $expectation = array_shift($this->expectations);
 
+        TestCase::assertFalse($expectation->prepared);
+
         TestCase::assertEquals($expectation->query, $statement);
 
         return 1;
     }
 
+    public function prepare($query, $options = [])
+    {
+        // parent::prepare();
 
-
-//    public function exec(string $statement): int|false
-//    {
-//
-//    }
+        return new FakePDOStatement($this, $query);
+    }
 }

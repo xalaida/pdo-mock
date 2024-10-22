@@ -12,7 +12,8 @@
     },
     "require": {
         "php": "^8.3",
-        "illuminate/database": "^10.0 | ^11.0"
+        "illuminate/database": "^10.0 | ^11.0",
+        "ext-pdo": "*"
     },
     "autoload-dev": {
         "psr-4": {
