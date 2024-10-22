@@ -3,7 +3,7 @@
 namespace Tests\Xala\Elomock\Laravel;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Xala\Elomock\FakeConnection;
+use Xala\Elomock\Laravel\FakeConnection;
 
 class TestCase extends BaseTestCase
 {

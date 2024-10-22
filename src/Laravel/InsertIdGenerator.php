@@ -1,6 +1,6 @@
 <?php
 
-namespace Xala\Elomock;
+namespace Xala\Elomock\Laravel;
 
 class InsertIdGenerator
 {

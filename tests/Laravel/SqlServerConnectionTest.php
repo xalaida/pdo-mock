@@ -5,7 +5,7 @@ namespace Tests\Xala\Elomock\Laravel;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
-use Xala\Elomock\FakeConnection;
+use Xala\Elomock\Laravel\FakeConnection;
 
 class SqlServerConnectionTest extends TestCase
 {

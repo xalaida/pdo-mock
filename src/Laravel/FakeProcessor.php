@@ -1,6 +1,6 @@
 <?php
 
-namespace Xala\Elomock;
+namespace Xala\Elomock\Laravel;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Processors\Processor;
