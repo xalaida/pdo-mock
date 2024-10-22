@@ -13,6 +13,8 @@ class QueryExpectation
 
     public array $bindings = [];
 
+    public array $rows = [];
+
     public function __construct(string $query)
     {
         $this->query = $query;
@@ -51,6 +53,13 @@ class QueryExpectation
                 'type' => $type,
             ];
         }
+
+        return $this;
+    }
+
+    public function andReturnRows(array $rows): static
+    {
+        $this->rows = $rows;
 
         return $this;
     }

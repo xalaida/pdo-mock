@@ -8,11 +8,13 @@ use PHPUnit\Framework\TestCase;
 
 class FakePDOStatement extends PDOStatement
 {
-    private FakePDO $pdo;
+    protected FakePDO $pdo;
 
     public string $query;
 
     public array $bindings = [];
+
+    protected ?QueryExpectation $expectation = null;
 
     public function __construct(FakePDO $pdo, string $query)
     {
@@ -42,7 +44,7 @@ class FakePDOStatement extends PDOStatement
 
     public function execute(?array $params = null)
     {
-        $expectation = array_shift($this->pdo->expectations);
+        $this->expectation = array_shift($this->pdo->expectations);
 
         if (! is_null($params)) {
             $bindings = [];
@@ -61,10 +63,17 @@ class FakePDOStatement extends PDOStatement
             $bindings = $this->bindings;
         }
 
-        TestCase::assertTrue($expectation->prepared);
-        TestCase::assertEquals($expectation->query, $this->query);
-        TestCase::assertEquals($expectation->bindings, $bindings);
+        TestCase::assertTrue($this->expectation->prepared);
+        TestCase::assertEquals($this->expectation->query, $this->query);
+        TestCase::assertEquals($this->expectation->bindings, $bindings);
 
         return 1;
+    }
+
+    public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$args)
+    {
+        // TODO: ensure statement is executed
+
+        return $this->expectation->rows;
     }
 }
