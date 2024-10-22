@@ -30,11 +30,11 @@ class FakePDOStatement extends PDOStatement
         return true;
     }
 
-    public function execute($params = [])
+    public function execute(?array $params = null)
     {
         $expectation = array_shift($this->pdo->expectations);
 
-        if (!empty($params)) {
+        if (! is_null($params)) {
             $bindings = [];
 
             foreach ($params as $key => $value) {

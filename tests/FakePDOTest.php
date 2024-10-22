@@ -245,4 +245,20 @@ class FakePDOTest extends TestCase
 
         $this->assertEquals(1, $result);
     }
+
+    #[Test]
+    public function itShouldFailWhenParamsOverwriteBoundValues(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+            ->toBePrepared()
+            ->withBindings(['published', 2024]);
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $result = $statement->execute(['published', 2024]);
+
+        $this->assertEquals(1, $result);
+    }
 }
