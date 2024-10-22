@@ -30,6 +30,16 @@ class FakePDOStatement extends PDOStatement
         return true;
     }
 
+    public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
+    {
+        $this->bindings[$param] = [
+            'value' => $var,
+            'type' => $type
+        ];
+
+        return true;
+    }
+
     public function execute(?array $params = null)
     {
         $expectation = array_shift($this->pdo->expectations);
@@ -51,6 +61,7 @@ class FakePDOStatement extends PDOStatement
             $bindings = $this->bindings;
         }
 
+        TestCase::assertTrue($expectation->prepared);
         TestCase::assertEquals($expectation->query, $this->query);
         TestCase::assertEquals($expectation->bindings, $bindings);
 

@@ -84,7 +84,30 @@ class FakePDOTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenQueryBidingsDontMatch(): void
+    public function itShouldHandleQueryBindingsUsingBindParam(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ?')
+            ->toBePrepared()
+            ->withBinding(1, 'published', PDO::PARAM_STR)
+            ->withBinding(2, 2024, PDO::PARAM_INT);
+
+        $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
+
+        $status = 'published';
+        $year = 2024;
+
+        $statement->bindParam(1, $status, PDO::PARAM_STR);
+        $statement->bindParam(2, $year, PDO::PARAM_INT);
+
+        $result = $statement->execute();
+
+        static::assertEquals(1, $result);
+    }
+
+    #[Test]
+    public function itShouldFailWhenQueryBindingsDontMatch(): void
     {
         $pdo = new FakePDO();
 
@@ -257,8 +280,11 @@ class FakePDOTest extends TestCase
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
-        $result = $statement->execute(['published', 2024]);
+        $statement->bindValue(1, 'draft', PDO::PARAM_STR);
+        $statement->bindValue(2, 2024, PDO::PARAM_INT);
 
-        $this->assertEquals(1, $result);
+        $this->expectException(ExpectationFailedException::class);
+
+        $statement->execute([]);
     }
 }

@@ -6,8 +6,7 @@ use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @todo handle bindValue
- * @todo handle bindParam
+ * @todo handle bindColumn
  * @todo handle prefix :placeholder
  */
 class FakePDO extends PDO
@@ -36,6 +35,8 @@ class FakePDO extends PDO
 
     public function exec($statement)
     {
+        // parent::exec();
+
         $expectation = array_shift($this->expectations);
 
         TestCase::assertFalse($expectation->prepared);
