@@ -1,8 +1,7 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Laravel;
 
-use Illuminate\Database\Query\Builder;
 use PHPUnit\Framework\Attributes\Test;
 
 class FakeConnectionTest extends TestCase

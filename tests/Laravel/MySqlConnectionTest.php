@@ -1,20 +1,20 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Laravel;
 
-use Illuminate\Database\Query\Grammars\SqlServerGrammar;
+use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\FakeConnection;
 
-class SqlServerConnectionTest extends TestCase
+class MySqlConnectionTest extends TestCase
 {
     #[Test]
-    public function itShouldUseSqlServerGrammar(): void
+    public function itShouldUseMySqlGrammar(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->expectQuery('select * from [users] where [name] like ?')
+        $connection->expectQuery('select * from `users` where `name` like ?')
             ->withBindings(['%john%'])
             ->andReturnRows([
                 ['id' => 777, 'name' => 'John'],
@@ -36,7 +36,7 @@ class SqlServerConnectionTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->expectQuery('insert into [users] ([name]) values (?)')
+        $connection->expectQuery('insert into `users` (`name`) values (?)')
             ->withBindings(['John'])
             ->withLastInsertId(777);
 
@@ -52,7 +52,7 @@ class SqlServerConnectionTest extends TestCase
     protected function getFakeConnection(): FakeConnection
     {
         $connection = new FakeConnection();
-        $connection->setQueryGrammar(new SqlServerGrammar());
+        $connection->setQueryGrammar(new MySqlGrammar());
 
         return $connection;
     }

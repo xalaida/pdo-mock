@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Laravel;
 
 use Illuminate\Database\DatabaseTransactionsManager;
 use PHPUnit\Framework\Attributes\Test;

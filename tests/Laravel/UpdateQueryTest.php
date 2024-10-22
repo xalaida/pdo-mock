@@ -1,23 +1,23 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Laravel;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
-class DeleteQueryTest extends TestCase
+class UpdateQueryTest extends TestCase
 {
     #[Test]
     public function itShouldVerifyQuery(): void
     {
         $connection = $this->getFakeConnection();
 
-        $connection->expectQuery('delete from "users" where ("id" = ?)');
+        $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)');
 
         $result = $connection
             ->table('users')
-            ->where(['id' => 7])
-            ->delete();
+            ->where(['id' => 1])
+            ->update(['name' => 'xala']);
 
         static::assertEquals(1, $result);
     }
@@ -29,12 +29,12 @@ class DeleteQueryTest extends TestCase
 
         $builder = $connection
             ->table('users')
-            ->where(['id' => 7]);
+            ->where(['id' => 1]);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Unexpected query: [delete from "users" where ("id" = ?)] [7]');
+        $this->expectExceptionMessage('Unexpected query: [update "users" set "name" = ? where ("id" = ?)] [xala, 1]');
 
-        $builder->delete();
+        $builder->update(['name' => 'xala']);
     }
 
     #[Test]
@@ -42,13 +42,13 @@ class DeleteQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->expectQuery('delete from "users" where ("id" = ?)')
-            ->withBindings([7]);
+        $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)')
+            ->withBindings(['xala', 1]);
 
         $result = $connection
             ->table('users')
-            ->where(['id' => 7])
-            ->delete();
+            ->where(['id' => 1])
+            ->update(['name' => 'xala']);
 
         static::assertEquals(1, $result);
     }
@@ -58,17 +58,17 @@ class DeleteQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->expectQuery('delete from "users" where ("id" = ?)')
-            ->withBindings([1]);
+        $connection->expectQuery('update "users" set "name" = ? where ("id" = ?)')
+            ->withBindings(['john', 1]);
 
         $builder = $connection
             ->table('users')
-            ->where(['id' => 7]);
+            ->where(['id' => 1]);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Unexpected query bindings: [delete from "users" where ("id" = ?)] [7]');
+        $this->expectExceptionMessage('Unexpected query bindings: [update "users" set "name" = ? where ("id" = ?)] [xala, 1]');
 
-        $builder->delete();
+        $builder->update(['name' => 'xala']);
     }
 
     #[Test]
@@ -76,27 +76,14 @@ class DeleteQueryTest extends TestCase
     {
         $connection = $this->getFakeConnection();
 
-        $connection->expectQuery('delete from "products"')
+        $connection->expectQuery('update "products" set "status" = ?')
+            ->withBindings(['processed'])
             ->andReturnCount(3);
 
         $result = $connection
             ->table('products')
-            ->delete();
+            ->update(['status' => 'processed']);
 
         static::assertEquals(3, $result);
-    }
-
-    #[Test]
-    public function itShouldFailWhenQueryWasntExecuted(): void
-    {
-        $connection = $this->getFakeConnection();
-
-        $connection->expectQuery('delete from "users" where "id" = ?')
-            ->withBindings([1]);
-
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Some expectations were not fulfilled.');
-
-        $connection->assertExpectationsFulfilled();
     }
 }

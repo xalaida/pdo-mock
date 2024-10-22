@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Laravel;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 
-class DeferUpdateQueryTest extends TestCase
+class DeferInsertQueryTest extends TestCase
 {
     #[Test]
     public function itShouldVerifyDeferredQuery(): void
@@ -16,12 +16,11 @@ class DeferUpdateQueryTest extends TestCase
 
         $result = $connection
             ->table('users')
-            ->where(['id' => 7])
-            ->update(['name' => 'xala']);
+            ->insert(['name' => 'xala']);
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
 
-        $connection->assertQueried('update "users" set "name" = ? where ("id" = ?)', ['xala', 7]);
+        $connection->assertQueried('insert into "users" ("name") values (?)', ['xala']);
     }
 
     #[Test]
@@ -32,7 +31,7 @@ class DeferUpdateQueryTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage("No queries were executed");
 
-        $connection->assertQueried('update "users" set "name" = ? where ("id" = ?)', [7]);
+        $connection->assertQueried('insert into "users" ("name") values (?)', ['xala']);
     }
 
     #[Test]
@@ -44,15 +43,14 @@ class DeferUpdateQueryTest extends TestCase
 
         $result = $connection
             ->table('users')
-            ->where(['id' => 7])
-            ->update(['name' => 'xala']);
+            ->insert(['name' => 'xala']);
 
         static::assertEquals(1, $result);
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Query does not match');
 
-        $connection->assertQueried('update "posts" set "name" = ? where ("id" = ?)', ['xala', 7]);
+        $connection->assertQueried('insert into "users" ("email") values (?)', ['xala']);
     }
 
     #[Test]
@@ -64,14 +62,32 @@ class DeferUpdateQueryTest extends TestCase
 
         $result = $connection
             ->table('users')
-            ->where(['id' => 7])
-            ->update(['name' => 'xala']);
+            ->insert(['name' => 'xala']);
 
         static::assertEquals(1, $result);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Unexpected query bindings: [update "users" set "name" = ? where ("id" = ?)] [xala, 7]');
+        $this->expectExceptionMessage('Unexpected query bindings: [insert into "users" ("name") values (?)] [xala]');
 
-        $connection->assertQueried('update "users" set "name" = ? where ("id" = ?)', ['xala', 5]);
+        $connection->assertQueried('insert into "users" ("name") values (?)', ['john']);
+    }
+
+    #[Test]
+    public function itShouldFailWhenInsertQueryWasntVerified(): void
+    {
+        $connection = $this->getFakeConnection();
+
+        $connection->deferWriteQueries();
+
+        $result = $connection
+            ->table('users')
+            ->insert(['name' => 'xala']);
+
+        static::assertTrue($result);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Some write queries were not fulfilled');
+
+        $connection->assertDeferredQueriesVerified();
     }
 }

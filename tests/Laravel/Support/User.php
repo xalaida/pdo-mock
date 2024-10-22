@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock\Support;
+namespace Tests\Xala\Elomock\Laravel\Support;
 
 use Illuminate\Database\Eloquent\Model;
 

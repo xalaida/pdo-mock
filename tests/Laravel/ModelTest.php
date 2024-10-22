@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Laravel;
 
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Xala\Elomock\Support\FakeConnectionResolver;
-use Tests\Xala\Elomock\Support\User;
+use Tests\Xala\Elomock\Laravel\Support\FakeConnectionResolver;
+use Tests\Xala\Elomock\Laravel\Support\User;
 
 class ModelTest extends TestCase
 {

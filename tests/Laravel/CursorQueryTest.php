@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Laravel;
 
 use Generator;
 use PHPUnit\Framework\Attributes\Test;

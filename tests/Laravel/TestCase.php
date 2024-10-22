@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Laravel;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Xala\Elomock\FakeConnection;
