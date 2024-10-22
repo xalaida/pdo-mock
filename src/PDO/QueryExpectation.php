@@ -35,14 +35,16 @@ class QueryExpectation
         return $this;
     }
 
-    public function withBindings(array $bindings): static
+    public function withBindings(array $bindings, bool $shouldResolveTypes = false): static
     {
         foreach ($bindings as $key => $value) {
             $param = is_int($key)
                 ? $key + 1
                 : $key;
 
-            $type = $this->resolveTypeFromValue($value);
+            $type = $shouldResolveTypes
+                ? $this->resolveTypeFromValue($value)
+                : PDO::PARAM_STR;
 
             $this->bindings[$param] = [
                 'value' => $value,

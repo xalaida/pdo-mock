@@ -34,8 +34,25 @@ class FakePDOStatement extends PDOStatement
     {
         $expectation = array_shift($this->pdo->expectations);
 
+        if (!empty($params)) {
+            $bindings = [];
+
+            foreach ($params as $key => $value) {
+                $param = is_int($key)
+                    ? $key + 1
+                    : $key;
+
+                $bindings[$param] = [
+                    'value' => $value,
+                    'type' => PDO::PARAM_STR,
+                ];
+            }
+        } else {
+            $bindings = $this->bindings;
+        }
+
         TestCase::assertEquals($expectation->query, $this->query);
-        TestCase::assertEquals($expectation->bindings, $this->bindings);
+        TestCase::assertEquals($expectation->bindings, $bindings);
 
         return 1;
     }

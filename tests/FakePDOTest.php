@@ -112,7 +112,7 @@ class FakePDOTest extends TestCase
 
         $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->withBindings(['active', 2024, true]);
+            ->withBindings(['active', 2024, true], true);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
@@ -176,7 +176,7 @@ class FakePDOTest extends TestCase
                 'status' => 'active',
                 'year' => 2024,
                 'published' => true,
-            ]);
+            ], true);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year and "published" = :published');
 
@@ -211,5 +211,38 @@ class FakePDOTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
 
         $statement->execute();
+    }
+
+    #[Test]
+    public function itShouldHandleExecBindings(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+            ->toBePrepared()
+            ->withBinding(1, 'published')
+            ->withBinding(2, 2024);
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $result = $statement->execute(['published', 2024]);
+
+        $this->assertEquals(1, $result);
+    }
+
+    #[Test]
+    public function itShouldHandleExecBindingsTypes(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+            ->toBePrepared()
+            ->withBindings(['published', 2024]);
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $result = $statement->execute(['published', 2024]);
+
+        $this->assertEquals(1, $result);
     }
 }

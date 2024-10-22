@@ -5,6 +5,11 @@ namespace Xala\Elomock\PDO;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @todo handle bindValue
+ * @todo handle bindParam
+ * @todo handle prefix :placeholder
+ */
 class FakePDO extends PDO
 {
     /**
