@@ -18,9 +18,9 @@ class QueryExpectation
         $this->query = $query;
     }
 
-    public function toBePrepared(): static
+    public function toBePrepared(bool $prepared = true): static
     {
-        $this->prepared = true;
+        $this->prepared = $prepared;
 
         return $this;
     }
@@ -38,9 +38,15 @@ class QueryExpectation
     public function withBindings(array $bindings): static
     {
         foreach ($bindings as $key => $value) {
-            $this->bindings[$key] = [
+            $param = is_int($key)
+                ? $key + 1
+                : $key;
+
+            $type = $this->resolveTypeFromValue($value);
+
+            $this->bindings[$param] = [
                 'value' => $value,
-                'type' => $this->resolveTypeFromValue($value),
+                'type' => $type,
             ];
         }
 
