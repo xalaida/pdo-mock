@@ -4,6 +4,7 @@ namespace Xala\Elomock;
 
 use InvalidArgumentException;
 use PDO;
+use PDOException;
 
 class QueryExpectation
 {
@@ -16,6 +17,8 @@ class QueryExpectation
     public int $rowCount = 0;
 
     public array $rows = [];
+
+    public ?PDOException $exception = null;
 
     public function __construct(string $query)
     {
@@ -69,6 +72,13 @@ class QueryExpectation
     public function andFetchRows(array $rows): static
     {
         $this->rows = $rows;
+
+        return $this;
+    }
+
+    public function andFail(string $errorMessage): static
+    {
+        $this->exception = new PDOException($errorMessage);
 
         return $this;
     }

@@ -73,6 +73,10 @@ class FakePDO extends PDO
         TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
         TestCase::assertEquals($expectation->query, $statement);
 
+        if ($expectation->exception) {
+            throw $expectation->exception;
+        }
+
         return $expectation->rowCount;
     }
 
