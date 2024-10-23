@@ -15,33 +15,6 @@ use Xala\Elomock\FakePDO;
 class FetchAllTest extends TestCase
 {
     #[Test]
-    public function itShouldHandleFetchAll(): void
-    {
-        $pdo = new FakePDO();
-
-        $pdo->expectQuery('select * from "users"')
-            ->toBePrepared()
-            ->andReturnRows([
-                ['id' => 1, 'name' => 'john'],
-                ['id' => 2, 'name' => 'jane'],
-            ]);
-
-        $statement = $pdo->prepare('select * from "users"');
-
-        $result = $statement->execute();
-
-        static::assertEquals(1, $result);
-
-        $rows = $statement->fetchAll();
-
-        static::assertCount(2, $rows);
-        static::assertIsArray($rows[0]);
-        static::assertEquals([0 => 1, 'id' => 1, 1 => 'john', 'name' => 'john'], $rows[0]);
-        static::assertIsArray($rows[1]);
-        static::assertEquals([0 => 2, 'id' => 2, 1 => 'jane', 'name' => 'jane'], $rows[1]);
-    }
-
-    #[Test]
     public function itShouldReturnEmptyRowsWhenStatementIsntExecuted(): void
     {
         $pdo = new FakePDO();
@@ -179,6 +152,61 @@ class FetchAllTest extends TestCase
         static::assertEquals(1, $result);
 
         $rows = $statement->fetchAll($pdo::FETCH_OBJ);
+
+        static::assertCount(2, $rows);
+        static::assertIsObject($rows[0]);
+        static::assertEquals((object) ['id' => 1, 'name' => 'john'], $rows[0]);
+        static::assertIsObject($rows[1]);
+        static::assertEquals((object) ['id' => 2, 'name' => 'jane'], $rows[1]);
+    }
+
+    #[Test]
+    public function itShouldHandleFetchAllInBothModeAsDefault(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared()
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'john'],
+                ['id' => 2, 'name' => 'jane'],
+            ]);
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $result = $statement->execute();
+
+        static::assertEquals(1, $result);
+
+        $rows = $statement->fetchAll();
+
+        static::assertCount(2, $rows);
+        static::assertIsArray($rows[0]);
+        static::assertEquals([0 => 1, 'id' => 1, 1 => 'john', 'name' => 'john'], $rows[0]);
+        static::assertIsArray($rows[1]);
+        static::assertEquals([0 => 2, 'id' => 2, 1 => 'jane', 'name' => 'jane'], $rows[1]);
+    }
+
+    #[Test]
+    public function itShouldUseCustomDefaultFetchMode(): void
+    {
+        $pdo = new FakePDO();
+        $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
+
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared()
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'john'],
+                ['id' => 2, 'name' => 'jane'],
+            ]);
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $result = $statement->execute();
+
+        static::assertEquals(1, $result);
+
+        $rows = $statement->fetchAll();
 
         static::assertCount(2, $rows);
         static::assertIsObject($rows[0]);

@@ -12,8 +12,6 @@ class FakePDOStatement extends PDOStatement
 {
     protected FakePDO $pdo;
 
-    protected int $fetchMode = PDO::FETCH_BOTH;
-
     public string $query;
 
     public array $bindings = [];
@@ -114,7 +112,7 @@ class FakePDOStatement extends PDOStatement
     protected function applyFetchMode(array $row, int $mode): object | array
     {
         if ($mode === PDO::FETCH_DEFAULT) {
-            $mode = $this->fetchMode;
+            $mode = $this->pdo->getAttribute($this->pdo::ATTR_DEFAULT_FETCH_MODE);
         }
 
         switch ($mode) {
