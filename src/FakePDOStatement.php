@@ -1,6 +1,6 @@
 <?php
 
-namespace Xala\Elomock\PDO;
+namespace Xala\Elomock;
 
 use PDO;
 use PDOStatement;

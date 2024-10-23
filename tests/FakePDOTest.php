@@ -5,7 +5,7 @@ namespace Tests\Xala\Elomock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\PDO\FakePDO;
+use Xala\Elomock\FakePDO;
 
 class FakePDOTest extends TestCase
 {
