@@ -54,15 +54,16 @@ class FakePDO extends PDO
         return $expectation;
     }
 
+    #[Override]
     public function exec($statement)
     {
         $expectation = array_shift($this->expectations);
 
-        TestCase::assertFalse($expectation->prepared);
+        TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
 
         TestCase::assertEquals($expectation->query, $statement);
 
-        return true;
+        return $expectation->rowCount;
     }
 
     public function prepare($query, $options = [])

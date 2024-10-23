@@ -13,6 +13,8 @@ class QueryExpectation
 
     public array $bindings = [];
 
+    public int $rowCount = 0;
+
     public array $rows = [];
 
     public function __construct(string $query)
@@ -53,6 +55,13 @@ class QueryExpectation
                 'type' => $type,
             ];
         }
+
+        return $this;
+    }
+
+    public function affectRows(int $rowCount): static
+    {
+        $this->rowCount = $rowCount;
 
         return $this;
     }
