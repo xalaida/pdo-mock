@@ -6,10 +6,22 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Xala\Elomock\FakePDO;
 
-class AffectRowsTest extends TestCase
+class AffectedRowsTest extends TestCase
 {
     #[Test]
-    public function itShouldHandleAffectRows(): void
+    public function itShouldReturnZeroAffectedRowsByDefault(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('insert into "users" ("name") values ("john")');
+
+        $result = $pdo->exec('insert into "users" ("name") values ("john")');
+
+        static::assertSame(0, $result);
+    }
+
+    #[Test]
+    public function itShouldHandleAffectedRows(): void
     {
         $pdo = new FakePDO();
 
