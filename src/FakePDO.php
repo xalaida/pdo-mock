@@ -5,10 +5,6 @@ namespace Xala\Elomock;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @todo handle bindColumn
- * @todo handle prefix :placeholder
- */
 class FakePDO extends PDO
 {
     /**
@@ -35,8 +31,6 @@ class FakePDO extends PDO
 
     public function exec($statement)
     {
-        // parent::exec();
-
         $expectation = array_shift($this->expectations);
 
         TestCase::assertFalse($expectation->prepared);
@@ -48,7 +42,7 @@ class FakePDO extends PDO
 
     public function prepare($query, $options = [])
     {
-        // parent::prepare();
+        // TODO: pass expectation to statement...
 
         return new FakePDOStatement($this, $query);
     }

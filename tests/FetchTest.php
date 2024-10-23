@@ -6,6 +6,13 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Xala\Elomock\FakePDO;
 
+/**
+ * @todo handle default fetch mode
+ * @todo handle different fetch modes in cursor mode
+ * @todo handle other fetch modes
+ * @todo ensure query is executed before fetching
+ * @todo add ability to fetch from different sources (csv file, generator, from class objects, etc)
+ */
 class FetchTest extends TestCase
 {
     #[Test]

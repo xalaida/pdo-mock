@@ -37,15 +37,15 @@ class QueryExpectation
         return $this;
     }
 
-    public function withBindings(array $bindings, bool $shouldResolveTypes = false): static
+    public function withBindings(array $bindings, bool $shouldInheritTypes = false): static
     {
         foreach ($bindings as $key => $value) {
             $param = is_int($key)
                 ? $key + 1
                 : $key;
 
-            $type = $shouldResolveTypes
-                ? $this->resolveTypeFromValue($value)
+            $type = $shouldInheritTypes
+                ? $this->inheritTypeFromValue($value)
                 : PDO::PARAM_STR;
 
             $this->bindings[$param] = [
@@ -64,7 +64,7 @@ class QueryExpectation
         return $this;
     }
 
-    protected function resolveTypeFromValue(mixed $value): int
+    protected function inheritTypeFromValue(mixed $value): int
     {
         if (is_string($value)) {
             return PDO::PARAM_STR;
