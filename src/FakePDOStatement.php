@@ -6,10 +6,13 @@ use InvalidArgumentException;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
+use ValueError;
 
 class FakePDOStatement extends PDOStatement
 {
     protected FakePDO $pdo;
+
+    protected int $fetchMode = PDO::FETCH_BOTH;
 
     public string $query;
 
@@ -19,6 +22,8 @@ class FakePDOStatement extends PDOStatement
     protected ?QueryExpectation $expectation = null;
 
     protected int $cursor = 0;
+
+    protected bool $executed = false;
 
     public function __construct(FakePDO $pdo, string $query)
     {
@@ -71,12 +76,20 @@ class FakePDOStatement extends PDOStatement
         TestCase::assertEquals($this->expectation->query, $this->query);
         TestCase::assertEquals($this->expectation->bindings, $bindings);
 
-        return 1;
+        $this->executed = true;
+
+        return true;
     }
 
     public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$args)
     {
-        // TODO: ensure statement is executed
+        if ($mode === PDO::FETCH_LAZY) {
+            throw new ValueError('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()');
+        }
+
+        if (! $this->executed) {
+            return [];
+        }
 
         return array_map(function ($row) use ($mode) {
             return $this->applyFetchMode($row, $mode);
@@ -98,9 +111,13 @@ class FakePDOStatement extends PDOStatement
         return false;
     }
 
-    protected function applyFetchMode(array $row, int $fetchMode): object | array
+    protected function applyFetchMode(array $row, int $mode): object | array
     {
-        switch ($fetchMode) {
+        if ($mode === PDO::FETCH_DEFAULT) {
+            $mode = $this->fetchMode;
+        }
+
+        switch ($mode) {
             case PDO::FETCH_ASSOC:
                 return (array) $row;
 
@@ -110,8 +127,11 @@ class FakePDOStatement extends PDOStatement
             case PDO::FETCH_OBJ:
                 return (object) $row;
 
+            case PDO::FETCH_BOTH:
+                return array_merge($row, array_values($row));
+
             default:
-                throw new InvalidArgumentException("Unsupported fetch mode: " . $fetchMode);
+                throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
         }
     }
 }

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Xala\Elomock\FakePDO;
 
 /**
- * @todo handle default fetch mode
+ * @todo handle rewriting default fetch mode
  * @todo handle different fetch modes in cursor mode
  * @todo handle other fetch modes
  * @todo ensure query is executed before fetching
@@ -16,7 +16,7 @@ use Xala\Elomock\FakePDO;
 class FetchTest extends TestCase
 {
     #[Test]
-    public function itShouldHandleFetchUsingFetchInObjMode(): void
+    public function itShouldHandleFetch(): void
     {
         $pdo = new FakePDO();
 
@@ -33,20 +33,23 @@ class FetchTest extends TestCase
 
         static::assertEquals(1, $result);
 
-        $row = $statement->fetch($pdo::FETCH_OBJ);
-        static::assertIsObject($row);
-        static::assertEquals($row, (object) ['id' => 1, 'name' => 'john']);
+        $row = $statement->fetch();
 
-        $row = $statement->fetch($pdo::FETCH_OBJ);
-        static::assertIsObject($row);
-        static::assertEquals($row, (object) ['id' => 2, 'name' => 'jane']);
+        static::assertIsArray($row);
+        static::assertEquals([0 => 1, 'id' => 1, 1 => 'john', 'name' => 'john'], $row);
 
-        $row = $statement->fetch($pdo::FETCH_OBJ);
+        $row = $statement->fetch();
+
+        static::assertIsArray($row);
+        static::assertEquals([0 => 2, 'id' => 2, 1 => 'jane', 'name' => 'jane'], $row);
+
+        $row = $statement->fetch();
+
         static::assertFalse($row);
     }
 
     #[Test]
-    public function itShouldHandleFetchUsingFetchInObjNumMode(): void
+    public function itShouldHandleFetchInAssocMode(): void
     {
         $pdo = new FakePDO();
 
@@ -63,20 +66,23 @@ class FetchTest extends TestCase
 
         static::assertEquals(1, $result);
 
-        $row = $statement->fetch($pdo::FETCH_NUM);
-        static::assertIsArray($row);
-        static::assertEquals($row, [1, 'john']);
+        $row = $statement->fetch($pdo::FETCH_ASSOC);
 
-        $row = $statement->fetch($pdo::FETCH_NUM);
         static::assertIsArray($row);
-        static::assertEquals($row, [2,'jane']);
+        static::assertEquals(['id' => 1, 'name' => 'john'], $row);
 
-        $row = $statement->fetch($pdo::FETCH_NUM);
+        $row = $statement->fetch($pdo::FETCH_ASSOC);
+
+        static::assertIsArray($row);
+        static::assertEquals(['id' => 2, 'name' => 'jane'], $row);
+
+        $row = $statement->fetch($pdo::FETCH_ASSOC);
+
         static::assertFalse($row);
     }
 
     #[Test]
-    public function itShouldHandleReturnRowsUsingFetchAllInAssocMode(): void
+    public function itShouldHandleFetchInNumMode(): void
     {
         $pdo = new FakePDO();
 
@@ -91,20 +97,25 @@ class FetchTest extends TestCase
 
         $result = $statement->execute();
 
-        $rows = $statement->fetchAll($pdo::FETCH_ASSOC);
-
         static::assertEquals(1, $result);
-        static::assertCount(2, $rows);
-        static::assertIsArray($rows[0]);
-        static::assertEquals(1, $rows[0]['id']);
-        static::assertEquals('john', $rows[0]['name']);
-        static::assertIsArray($rows[1]);
-        static::assertEquals(2, $rows[1]['id']);
-        static::assertEquals('jane', $rows[1]['name']);
+
+        $row = $statement->fetch($pdo::FETCH_NUM);
+
+        static::assertIsArray($row);
+        static::assertEquals([1, 'john'], $row);
+
+        $row = $statement->fetch($pdo::FETCH_NUM);
+
+        static::assertIsArray($row);
+        static::assertEquals([2,'jane'], $row);
+
+        $row = $statement->fetch($pdo::FETCH_NUM);
+
+        static::assertFalse($row);
     }
 
     #[Test]
-    public function itShouldHandleReturnRowsUsingFetchAllInObjMode(): void
+    public function itShouldHandleFetchInBothMode(): void
     {
         $pdo = new FakePDO();
 
@@ -119,15 +130,53 @@ class FetchTest extends TestCase
 
         $result = $statement->execute();
 
-        $rows = $statement->fetchAll($pdo::FETCH_OBJ);
+        static::assertEquals(1, $result);
+
+        $row = $statement->fetch($pdo::FETCH_BOTH);
+
+        static::assertIsArray($row);
+        static::assertEquals([0 => 1, 'id' => 1, 1 => 'john', 'name' => 'john'], $row);
+
+        $row = $statement->fetch($pdo::FETCH_BOTH);
+
+        static::assertIsArray($row);
+        static::assertEquals([0 => 2, 'id' => 2, 1 => 'jane', 'name' => 'jane'], $row);
+
+        $row = $statement->fetch($pdo::FETCH_BOTH);
+
+        static::assertFalse($row);
+    }
+
+    #[Test]
+    public function itShouldHandleFetchInObjMode(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared()
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'john'],
+                ['id' => 2, 'name' => 'jane'],
+            ]);
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $result = $statement->execute();
 
         static::assertEquals(1, $result);
-        static::assertCount(2, $rows);
-        static::assertIsObject($rows[0]);
-        static::assertEquals(1, $rows[0]->id);
-        static::assertEquals('john', $rows[0]->name);
-        static::assertIsObject($rows[1]);
-        static::assertEquals(2, $rows[1]->id);
-        static::assertEquals('jane', $rows[1]->name);
+
+        $row = $statement->fetch($pdo::FETCH_OBJ);
+
+        static::assertIsObject($row);
+        static::assertEquals((object) ['id' => 1, 'name' => 'john'], $row);
+
+        $row = $statement->fetch($pdo::FETCH_OBJ);
+
+        static::assertIsObject($row);
+        static::assertEquals((object) ['id' => 2, 'name' => 'jane'], $row);
+
+        $row = $statement->fetch($pdo::FETCH_OBJ);
+
+        static::assertFalse($row);
     }
 }

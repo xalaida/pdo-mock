@@ -37,7 +37,7 @@ class FakePDO extends PDO
 
         TestCase::assertEquals($expectation->query, $statement);
 
-        return 1;
+        return true;
     }
 
     public function prepare($query, $options = [])
