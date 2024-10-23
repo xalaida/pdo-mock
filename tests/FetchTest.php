@@ -9,7 +9,7 @@ use Xala\Elomock\FakePDO;
 class FetchTest extends TestCase
 {
     #[Test]
-    public function itShouldHandleFetch(): void
+    public function itShouldHandleFetchUsingFetchInObjMode(): void
     {
         $pdo = new FakePDO();
 
@@ -35,6 +35,36 @@ class FetchTest extends TestCase
         static::assertEquals($row, (object) ['id' => 2, 'name' => 'jane']);
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
+        static::assertFalse($row);
+    }
+
+    #[Test]
+    public function itShouldHandleFetchUsingFetchInObjNumMode(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared()
+            ->andReturnRows([
+                ['id' => 1, 'name' => 'john'],
+                ['id' => 2, 'name' => 'jane'],
+            ]);
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $result = $statement->execute();
+
+        static::assertEquals(1, $result);
+
+        $row = $statement->fetch($pdo::FETCH_NUM);
+        static::assertIsArray($row);
+        static::assertEquals($row, [1, 'john']);
+
+        $row = $statement->fetch($pdo::FETCH_NUM);
+        static::assertIsArray($row);
+        static::assertEquals($row, [2,'jane']);
+
+        $row = $statement->fetch($pdo::FETCH_NUM);
         static::assertFalse($row);
     }
 

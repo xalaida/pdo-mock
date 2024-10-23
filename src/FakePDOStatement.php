@@ -78,19 +78,9 @@ class FakePDOStatement extends PDOStatement
     {
         // TODO: ensure statement is executed
 
-        if ($mode === PDO::FETCH_ASSOC) {
-            return array_map(function ($row) {
-                return (array) $row;
-            }, $this->expectation->rows);
-        }
-
-        if ($mode === PDO::FETCH_OBJ) {
-            return array_map(function ($row) {
-                return (object) $row;
-            }, $this->expectation->rows);
-        }
-
-        throw new InvalidArgumentException('Unsupported fetch mode: ' . $mode);
+        return array_map(function ($row) use ($mode) {
+            return $this->applyFetchMode($row, $mode);
+        }, $this->expectation->rows);
     }
 
     public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
@@ -98,21 +88,30 @@ class FakePDOStatement extends PDOStatement
         // TODO: ensure statement is executed
 
         if (isset($this->expectation->rows[$this->cursor])) {
-            $row = $this->expectation->rows[$this->cursor];
+            $row = $this->applyFetchMode($this->expectation->rows[$this->cursor], $mode);
 
             $this->cursor += 1;
 
-            if ($mode === PDO::FETCH_OBJ) {
-                return (object) $row;
-            }
-
-            if ($mode === PDO::FETCH_ASSOC) {
-                return (array) $row;
-            }
-
-            throw new InvalidArgumentException('Unsupported fetch mode: ' . $mode);
+            return $row;
         }
 
         return false;
+    }
+
+    protected function applyFetchMode(array $row, int $fetchMode): object | array
+    {
+        switch ($fetchMode) {
+            case PDO::FETCH_ASSOC:
+                return (array) $row;
+
+            case PDO::FETCH_NUM:
+                return array_values($row);
+
+            case PDO::FETCH_OBJ:
+                return (object) $row;
+
+            default:
+                throw new InvalidArgumentException("Unsupported fetch mode: " . $fetchMode);
+        }
     }
 }
