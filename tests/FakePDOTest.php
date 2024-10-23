@@ -34,6 +34,18 @@ class FakePDOTest extends TestCase
     }
 
     #[Test]
+    public function itShouldFailWhenQueryWasntExecuted(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "users"');
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $pdo->assertExpectationsFulfilled();
+    }
+
+    #[Test]
     public function itShouldHandlePreparedQuery(): void
     {
         $pdo = new FakePDO();

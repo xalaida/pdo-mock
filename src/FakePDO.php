@@ -5,6 +5,7 @@ namespace Xala\Elomock;
 use Override;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class FakePDO extends PDO
 {
@@ -13,10 +14,14 @@ class FakePDO extends PDO
      */
     public array $expectations = [];
 
+    public bool $ignoreTransactions = false;
+
     /**
      * @var array<int, int>
      */
     public array $attributes = [];
+
+    protected bool $inTransaction = false;
 
     /**
      * @noinspection PhpMissingParentConstructorInspection
@@ -45,6 +50,11 @@ class FakePDO extends PDO
         return $this->attributes[$attribute];
     }
 
+    public function ignoreTransactions(bool $ignoreTransactions = true): void
+    {
+        $this->ignoreTransactions = $ignoreTransactions;
+    }
+
     public function expectQuery(string $query): QueryExpectation
     {
         $expectation = new QueryExpectation($query);
@@ -57,10 +67,10 @@ class FakePDO extends PDO
     #[Override]
     public function exec($statement)
     {
+        // TODO: ensure there is expectation defined (not empty)
         $expectation = array_shift($this->expectations);
 
         TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
-
         TestCase::assertEquals($expectation->query, $statement);
 
         return $expectation->rowCount;
@@ -71,5 +81,103 @@ class FakePDO extends PDO
         // TODO: pass expectation to statement...
 
         return new FakePDOStatement($this, $query);
+    }
+
+    public function expectBeginTransaction(): void
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
+        }
+
+        $this->expectations[] = new QueryExpectation('PDO::beginTransaction()');
+    }
+
+    public function expectCommit(): void
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
+        }
+
+        $this->expectations[] = new QueryExpectation('PDO::commit()');
+    }
+
+    public function expectRollback(): void
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
+        }
+
+        $this->expectations[] = new QueryExpectation('PDO::rollback()');
+    }
+
+    public function expectTransaction(callable $callback): void
+    {
+        $this->expectBeginTransaction();
+
+        $callback($this);
+
+        $this->expectCommit();
+    }
+
+    public function beginTransaction(): bool
+    {
+        $this->inTransaction = true;
+
+        if ($this->ignoreTransactions) {
+            return true;
+        }
+
+        // TODO: ensure there is expectation defined (not empty)
+        $expectation = array_shift($this->expectations);
+
+        // TODO: use proper assertions
+        TestCase::assertEquals($expectation->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
+
+        return true;
+    }
+
+    public function commit(): bool
+    {
+        $this->inTransaction = false;
+
+        if ($this->ignoreTransactions) {
+            return true;
+        }
+
+        // TODO: ensure there is expectation defined (not empty)
+        $expectation = array_shift($this->expectations);
+
+        // TODO: use proper assertions
+        TestCase::assertEquals($expectation->query, 'PDO::commit()', 'Unexpected PDO::commit()');
+
+        return true;
+    }
+
+    public function rollBack(): bool
+    {
+        $this->inTransaction = false;
+
+        if ($this->ignoreTransactions) {
+            return true;
+        }
+
+        // TODO: ensure there is expectation defined (not empty)
+        $expectation = array_shift($this->expectations);
+
+        // TODO: use proper assertions
+        TestCase::assertEquals($expectation->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
+
+        return true;
+    }
+
+    public function inTransaction(): bool
+    {
+        return $this->inTransaction;
+    }
+
+    public function assertExpectationsFulfilled(): void
+    {
+        // TODO: improve error message
+        TestCase::assertEmpty($this->expectations, 'Some expectations were not fulfilled.');
     }
 }
