@@ -22,7 +22,7 @@ class FetchTest extends TestCase
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
-            ->andReturnRows([
+            ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
                 ['id' => 2, 'name' => 'jane'],
             ]);
@@ -31,7 +31,7 @@ class FetchTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
 
         $row = $statement->fetch();
 
@@ -55,7 +55,7 @@ class FetchTest extends TestCase
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
-            ->andReturnRows([
+            ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
                 ['id' => 2, 'name' => 'jane'],
             ]);
@@ -64,17 +64,17 @@ class FetchTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArray($row);
-        static::assertEquals(['id' => 1, 'name' => 'john'], $row);
+        static::assertSame(['id' => 1, 'name' => 'john'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArray($row);
-        static::assertEquals(['id' => 2, 'name' => 'jane'], $row);
+        static::assertSame(['id' => 2, 'name' => 'jane'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
@@ -88,7 +88,7 @@ class FetchTest extends TestCase
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
-            ->andReturnRows([
+            ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
                 ['id' => 2, 'name' => 'jane'],
             ]);
@@ -97,17 +97,17 @@ class FetchTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArray($row);
-        static::assertEquals([1, 'john'], $row);
+        static::assertSame([1, 'john'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArray($row);
-        static::assertEquals([2,'jane'], $row);
+        static::assertSame([2,'jane'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
@@ -121,7 +121,7 @@ class FetchTest extends TestCase
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
-            ->andReturnRows([
+            ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
                 ['id' => 2, 'name' => 'jane'],
             ]);
@@ -130,7 +130,7 @@ class FetchTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
 
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
@@ -154,7 +154,7 @@ class FetchTest extends TestCase
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
-            ->andReturnRows([
+            ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
                 ['id' => 2, 'name' => 'jane'],
             ]);
@@ -163,7 +163,7 @@ class FetchTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 

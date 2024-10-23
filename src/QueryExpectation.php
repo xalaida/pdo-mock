@@ -57,7 +57,7 @@ class QueryExpectation
         return $this;
     }
 
-    public function andReturnRows(array $rows): static
+    public function andFetchRows(array $rows): static
     {
         $this->rows = $rows;
 

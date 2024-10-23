@@ -18,7 +18,7 @@ class FakePDOTest extends TestCase
 
         $result = $pdo->exec('select * from "users"');
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
@@ -45,7 +45,7 @@ class FakePDOTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
@@ -80,7 +80,7 @@ class FakePDOTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
@@ -103,7 +103,7 @@ class FakePDOTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
@@ -145,7 +145,7 @@ class FakePDOTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
@@ -185,7 +185,7 @@ class FakePDOTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
@@ -209,7 +209,7 @@ class FakePDOTest extends TestCase
 
         $result = $statement->execute();
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
@@ -250,7 +250,7 @@ class FakePDOTest extends TestCase
 
         $result = $statement->execute(['published', 2024]);
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
@@ -266,7 +266,7 @@ class FakePDOTest extends TestCase
 
         $result = $statement->execute(['published', 2024]);
 
-        static::assertEquals(1, $result);
+        static::assertTrue($result);
     }
 
     #[Test]
