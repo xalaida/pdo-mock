@@ -2,6 +2,7 @@
 
 namespace Xala\Elomock;
 
+use InvalidArgumentException;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +15,10 @@ class FakePDOStatement extends PDOStatement
 
     public array $bindings = [];
 
+    // TODO: consider passing this with constructor
     protected ?QueryExpectation $expectation = null;
+
+    protected int $cursor = 0;
 
     public function __construct(FakePDO $pdo, string $query)
     {
@@ -74,6 +78,41 @@ class FakePDOStatement extends PDOStatement
     {
         // TODO: ensure statement is executed
 
-        return $this->expectation->rows;
+        if ($mode === PDO::FETCH_ASSOC) {
+            return array_map(function ($row) {
+                return (array) $row;
+            }, $this->expectation->rows);
+        }
+
+        if ($mode === PDO::FETCH_OBJ) {
+            return array_map(function ($row) {
+                return (object) $row;
+            }, $this->expectation->rows);
+        }
+
+        throw new InvalidArgumentException('Unsupported fetch mode: ' . $mode);
+    }
+
+    public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
+    {
+        // TODO: ensure statement is executed
+
+        if (isset($this->expectation->rows[$this->cursor])) {
+            $row = $this->expectation->rows[$this->cursor];
+
+            $this->cursor += 1;
+
+            if ($mode === PDO::FETCH_OBJ) {
+                return (object) $row;
+            }
+
+            if ($mode === PDO::FETCH_ASSOC) {
+                return (array) $row;
+            }
+
+            throw new InvalidArgumentException('Unsupported fetch mode: ' . $mode);
+        }
+
+        return false;
     }
 }
