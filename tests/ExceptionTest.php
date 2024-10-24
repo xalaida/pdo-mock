@@ -7,7 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Xala\Elomock\FakePDO;
 
-class QueryExceptionTest extends TestCase
+class ExceptionTest extends TestCase
 {
     #[Test]
     public function itShouldHandleQueryException(): void

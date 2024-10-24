@@ -21,7 +21,7 @@ class AffectedRowsTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleAffectedRows(): void
+    public function itShouldReturnSpecifiedAffectedRows(): void
     {
         $pdo = new FakePDO();
 
@@ -34,7 +34,7 @@ class AffectedRowsTest extends TestCase
     }
 
     #[Test]
-    public function itShouldReturnZeroAffectedRowsUsingPreparedStatementByDefault(): void
+    public function itShouldReturnZeroAffectedRowsUsingNotExecutedPreparedStatement(): void
     {
         $pdo = new FakePDO();
 
@@ -47,7 +47,7 @@ class AffectedRowsTest extends TestCase
     }
 
     #[Test]
-    public function itShouldReturnZeroAffectedRowsUsingPreparedStatementWhenItIsntExecuted(): void
+    public function itShouldIgnoreSpecifiedAffectedRowsUsingNotExecutedPreparedStatement(): void
     {
         $pdo = new FakePDO();
 

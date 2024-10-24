@@ -7,44 +7,8 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Xala\Elomock\FakePDO;
 
-class FakePDOTest extends TestCase
+class PreparedStatementBindingsTest extends TestCase
 {
-    #[Test]
-    public function itShouldHandleQuery(): void
-    {
-        $pdo = new FakePDO();
-
-        $pdo->expectQuery('select * from "users"');
-
-        $result = $pdo->exec('select * from "users"');
-
-        static::assertTrue($result);
-    }
-
-    #[Test]
-    public function itShouldFailWhenQueryDoesntMatch(): void
-    {
-        $pdo = new FakePDO();
-
-        $pdo->expectQuery('select * from "users"');
-
-        $this->expectException(ExpectationFailedException::class);
-
-        $pdo->exec('select * from "books"');
-    }
-
-    #[Test]
-    public function itShouldFailWhenQueryWasntExecuted(): void
-    {
-        $pdo = new FakePDO();
-
-        $pdo->expectQuery('select * from "users"');
-
-        $this->expectException(ExpectationFailedException::class);
-
-        $pdo->assertExpectationsFulfilled();
-    }
-
     #[Test]
     public function itShouldHandleQueryBindings(): void
     {

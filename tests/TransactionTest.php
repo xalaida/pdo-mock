@@ -9,32 +9,28 @@ use Xala\Elomock\FakePDO;
 
 /**
  * @todo handle nested transactions
+ * @todo add ability to ignore rolled back queries
  */
 class TransactionTest extends TestCase
 {
     #[Test]
-    public function itShouldVerifyTransaction(): void
+    public function itShouldExecuteQueryInTransaction(): void
     {
         $pdo = new FakePDO();
 
         $pdo->expectBeginTransaction();
-
-        $pdo->expectQuery('insert into "users" ("name") values ("john")')
-            ->affectRows(1);
-
+        $pdo->expectQuery('insert into "users" ("name") values ("john")');
         $pdo->expectCommit();
 
         static::assertFalse($pdo->inTransaction());
 
         $pdo->beginTransaction();
 
-        $result = $pdo->exec('insert into "users" ("name") values ("john")');
+        $pdo->exec('insert into "users" ("name") values ("john")');
 
         static::assertTrue($pdo->inTransaction());
 
         $pdo->commit();
-
-        static::assertSame(1, $result);
 
         static::assertFalse($pdo->inTransaction());
 
@@ -42,7 +38,7 @@ class TransactionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldVerifyRollbackTransaction(): void
+    public function itShouldRollbackTransaction(): void
     {
         $pdo = new FakePDO();
 
@@ -72,7 +68,7 @@ class TransactionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldVerifyTransactionUsingCallableSyntax(): void
+    public function itShouldExpectTransactionUsingCallableSyntax(): void
     {
         $pdo = new FakePDO();
 
@@ -90,7 +86,7 @@ class TransactionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenTransactionalQueryWasntExecuted(): void
+    public function itShouldFailWhenTransactionalQueryIsNotExecuted(): void
     {
         $pdo = new FakePDO();
 

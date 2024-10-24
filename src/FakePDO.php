@@ -86,11 +86,13 @@ class FakePDO extends PDO
         return $expectation->rowCount;
     }
 
+    // TODO: handle $options
     public function prepare($query, $options = [])
     {
         return new FakePDOStatement($this, $query);
     }
 
+    // TODO: handle other arguments
     public function query($query, $fetchMode = null, ...$fetch_mode_args)
     {
         $statement = $this->prepare($query);
@@ -192,6 +194,7 @@ class FakePDO extends PDO
         return $this->inTransaction;
     }
 
+    // TODO: support $name
     public function lastInsertId($name = null)
     {
         return $this->lastInsertId;
