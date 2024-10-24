@@ -9,8 +9,6 @@ use Xala\Elomock\FakePDO;
 
 class PreparedStatementTest extends TestCase
 {
-    // TODO: it should fail if statement was not executed
-
     #[Test]
     public function itShouldHandlePreparedStatement(): void
     {
@@ -27,18 +25,32 @@ class PreparedStatementTest extends TestCase
     }
 
     #[Test]
+    public function itShouldFailWhenStatementIsNotExecuted(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared();
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Some expectations were not fulfilled');
+
+        $pdo->prepare('select * from "users"');
+
+        $pdo->assertExpectationsFulfilled();
+    }
+
+    #[Test]
     public function itShouldFailWhenStatementIsNotPrepared(): void
     {
+        $pdo = new FakePDO();
 
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared();
 
-//        $pdo = new FakePDO();
-//
-//        $pdo->expectQuery('select * from "users"')
-//            ->toBePrepared();
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Statement is not prepared');
 
-//        $this->expectException(ExpectationFailedException::class);
-//        $this->expectExceptionMessage('Statement is not prepared');
-
-        $statement = $pdo->exec('select * from "users"');
+        $pdo->exec('select * from "users"');
     }
 }
