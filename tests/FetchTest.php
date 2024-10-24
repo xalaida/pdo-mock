@@ -49,6 +49,18 @@ class FetchTest extends TestCase
     }
 
     #[Test]
+    public function itShouldReturnFalseWhenStatementIsNotExecuted(): void
+    {
+        $pdo = new FakePDO();
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $row = $statement->fetch($pdo::FETCH_ASSOC);
+
+        static::assertFalse($row);
+    }
+
+    #[Test]
     public function itShouldHandleFetchInAssocMode(): void
     {
         $pdo = new FakePDO();

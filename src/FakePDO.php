@@ -88,8 +88,6 @@ class FakePDO extends PDO
 
     public function prepare($query, $options = [])
     {
-        // TODO: pass expectation to statement...
-
         return new FakePDOStatement($this, $query);
     }
 
