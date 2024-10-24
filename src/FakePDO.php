@@ -23,6 +23,8 @@ class FakePDO extends PDO
 
     protected bool $inTransaction = false;
 
+    public string $lastInsertId = '0';
+
     /**
      * @noinspection PhpMissingParentConstructorInspection
      */
@@ -72,6 +74,10 @@ class FakePDO extends PDO
 
         TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
         TestCase::assertEquals($expectation->query, $statement);
+
+        if (! is_null($expectation->insertId)) {
+            $this->lastInsertId = $expectation->insertId;
+        }
 
         if ($expectation->exception) {
             throw $expectation->exception;
@@ -177,6 +183,11 @@ class FakePDO extends PDO
     public function inTransaction(): bool
     {
         return $this->inTransaction;
+    }
+
+    public function lastInsertId($name = null)
+    {
+        return $this->lastInsertId;
     }
 
     public function assertExpectationsFulfilled(): void

@@ -76,6 +76,10 @@ class FakePDOStatement extends PDOStatement
 
         $this->executed = true;
 
+        if (! is_null($this->expectation->insertId)) {
+            $this->pdo->lastInsertId = $this->expectation->insertId;
+        }
+
         return true;
     }
 

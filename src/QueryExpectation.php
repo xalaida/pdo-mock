@@ -18,6 +18,8 @@ class QueryExpectation
 
     public array $rows = [];
 
+    public ?string $insertId = null;
+
     public ?PDOException $exception = null;
 
     public function __construct(string $query)
@@ -58,6 +60,13 @@ class QueryExpectation
                 'type' => $type,
             ];
         }
+
+        return $this;
+    }
+
+    public function withInsertId(string $insertId): static
+    {
+        $this->insertId = $insertId;
 
         return $this;
     }
