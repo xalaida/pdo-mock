@@ -83,19 +83,13 @@ class FakePDOStatement extends PDOStatement
         return true;
     }
 
-    public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$args)
+    public function rowCount()
     {
-        if ($mode === PDO::FETCH_LAZY) {
-            throw new ValueError('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()');
+        if (is_null($this->expectation)) {
+            return 0;
         }
 
-        if (! $this->executed) {
-            return [];
-        }
-
-        return array_map(function ($row) use ($mode) {
-            return $this->applyFetchMode($row, $mode);
-        }, $this->expectation->rows);
+        return $this->expectation->rowCount;
     }
 
     public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
@@ -111,6 +105,21 @@ class FakePDOStatement extends PDOStatement
         }
 
         return false;
+    }
+
+    public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$args)
+    {
+        if ($mode === PDO::FETCH_LAZY) {
+            throw new ValueError('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()');
+        }
+
+        if (! $this->executed) {
+            return [];
+        }
+
+        return array_map(function ($row) use ($mode) {
+            return $this->applyFetchMode($row, $mode);
+        }, $this->expectation->rows);
     }
 
     protected function applyFetchMode(array $row, int $mode): object | array

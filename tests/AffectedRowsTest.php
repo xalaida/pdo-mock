@@ -32,4 +32,47 @@ class AffectedRowsTest extends TestCase
 
         static::assertSame(2, $result);
     }
+
+    #[Test]
+    public function itShouldReturnZeroAffectedRowsUsingPreparedStatementByDefault(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('delete from "users"')
+            ->toBePrepared();
+
+        $statement = $pdo->prepare('delete from "users"');
+
+        static::assertSame(0, $statement->rowCount());
+    }
+
+    #[Test]
+    public function itShouldReturnZeroAffectedRowsUsingPreparedStatementWhenItIsntExecuted(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('insert into "users" ("name") values ("john"), ("jane")')
+            ->toBePrepared()
+            ->affectRows(2);
+
+        $statement = $pdo->prepare('insert into "users" ("name") values ("john"), ("jane")');
+
+        static::assertSame(0, $statement->rowCount());
+    }
+
+    #[Test]
+    public function itShouldReturnAffectedRowsUsingPreparedStatement(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('insert into "users" ("name") values ("john"), ("jane")')
+            ->toBePrepared()
+            ->affectRows(2);
+
+        $statement = $pdo->prepare('insert into "users" ("name") values ("john"), ("jane")');
+
+        $statement->execute();
+
+        static::assertSame(2, $statement->rowCount());
+    }
 }
