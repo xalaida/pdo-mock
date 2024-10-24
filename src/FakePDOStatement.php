@@ -10,11 +10,11 @@ use ValueError;
 
 class FakePDOStatement extends PDOStatement
 {
+    public string $queryString;
+
     protected FakePDO $pdo;
 
-    public string $query;
-
-    public array $bindings = [];
+    protected array $bindings = [];
 
     // TODO: consider passing this with constructor
     protected ?QueryExpectation $expectation = null;
@@ -25,7 +25,7 @@ class FakePDOStatement extends PDOStatement
 
     public function __construct(FakePDO $pdo, string $query)
     {
-        $this->query = $query;
+        $this->queryString = $query;
         $this->pdo = $pdo;
     }
 
@@ -70,9 +70,13 @@ class FakePDOStatement extends PDOStatement
             $bindings = $this->bindings;
         }
 
-        TestCase::assertTrue($this->expectation->prepared);
-        TestCase::assertEquals($this->expectation->query, $this->query);
-        TestCase::assertEquals($this->expectation->bindings, $bindings);
+        TestCase::assertTrue($this->expectation->prepared, 'Statement is not prepared');
+        TestCase::assertEquals($this->expectation->query, $this->queryString, 'Query does not match');
+        TestCase::assertEquals($this->expectation->bindings, $bindings, 'Bindings do not match');
+
+        if ($this->expectation->exception) {
+            throw $this->expectation->exception;
+        }
 
         $this->executed = true;
 

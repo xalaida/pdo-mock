@@ -75,12 +75,12 @@ class FakePDO extends PDO
         TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
         TestCase::assertEquals($expectation->query, $statement);
 
-        if (! is_null($expectation->insertId)) {
-            $this->lastInsertId = $expectation->insertId;
-        }
-
         if ($expectation->exception) {
             throw $expectation->exception;
+        }
+
+        if (! is_null($expectation->insertId)) {
+            $this->lastInsertId = $expectation->insertId;
         }
 
         return $expectation->rowCount;
@@ -91,6 +91,15 @@ class FakePDO extends PDO
         // TODO: pass expectation to statement...
 
         return new FakePDOStatement($this, $query);
+    }
+
+    public function query($query, $fetchMode = null, ...$fetch_mode_args)
+    {
+        $statement = $this->prepare($query);
+
+        $statement->execute();
+
+        return $statement;
     }
 
     public function expectBeginTransaction(): void

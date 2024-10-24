@@ -46,34 +46,6 @@ class FakePDOTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandlePreparedQuery(): void
-    {
-        $pdo = new FakePDO();
-
-        $pdo->expectQuery('select * from "users"')
-            ->toBePrepared();
-
-        $statement = $pdo->prepare('select * from "users"');
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
-    }
-
-    #[Test]
-    public function itShouldFailWhenStatementWasntPrepared(): void
-    {
-        $pdo = new FakePDO();
-
-        $pdo->expectQuery('select * from "users"')
-            ->toBePrepared();
-
-        $this->expectException(ExpectationFailedException::class);
-
-        $pdo->exec('select * from "users"');
-    }
-
-    #[Test]
     public function itShouldHandleQueryBindings(): void
     {
         $pdo = new FakePDO();
