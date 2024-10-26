@@ -85,6 +85,13 @@ class QueryExpectation
         return $this;
     }
 
+    public function andFetchRow(array $row): static
+    {
+        $this->rows = [$row];
+
+        return $this;
+    }
+
     public function andFail(string $errorMessage): static
     {
         $this->exception = new PDOException($errorMessage);

@@ -242,4 +242,29 @@ class FetchAllTest extends TestCase
         static::assertIsObject($rows[1]);
         static::assertEquals((object) ['id' => 2, 'name' => 'jane'], $rows[1]);
     }
+
+    #[Test]
+    public function itShouldHandleFetchOne(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared()
+            ->andFetchRow([
+                'id' => 1,
+                'name' => 'john',
+            ]);
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+
+        $rows = $statement->fetchAll($pdo::FETCH_ASSOC);
+
+        static::assertCount(1, $rows);
+        static::assertIsArray($rows[0]);
+        static::assertSame(['id' => 1, 'name' => 'john'], $rows[0]);
+    }
 }
