@@ -199,14 +199,14 @@ class PDOMock extends PDO
         return $this->lastInsertId;
     }
 
-    public function errorCode(): string
+    public function errorCode(): ?string
     {
-        return '00000';
+        return null;
     }
 
     public function errorInfo(): array
     {
-        return [$this->errorCode(), null, null];
+        return ['', null, null];
     }
 
     public function assertExpectationsFulfilled(): void

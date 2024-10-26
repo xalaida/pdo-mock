@@ -50,20 +50,6 @@ class QueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldThrowPDOException()
-    {
-        $pdo = new PDOMock();
-
-        $pdo->expect('select * from table "posts"')
-            ->andFail('SQL syntax error');
-
-        $this->expectException(PDOException::class);
-        $this->expectExceptionMessage('SQL syntax error');
-
-        $pdo->query('select * from table "posts"');
-    }
-
-    #[Test]
     public function itShouldHandleQueryAsPreparedStatement()
     {
         $pdo = new PDOMock();

@@ -127,16 +127,18 @@ class PDOStatementMock extends PDOStatement
 
     public function errorCode(): ?string
     {
-        if (! $this->executed) {
-            return null;
-        }
-
-        return '00000';
+        return $this->executed
+            ? '00000'
+            : null;
     }
 
     public function errorInfo(): array
     {
-        return [$this->errorCode(), null, null];
+        $code = $this->executed
+            ? $this->errorCode()
+            : '';
+
+        return [$code, null, null];
     }
 
     #[Override]
@@ -147,7 +149,7 @@ class PDOStatementMock extends PDOStatement
         if (isset($this->expectation->rows[$this->cursor])) {
             $row = $this->applyFetchMode($this->expectation->rows[$this->cursor], $mode);
 
-            $this->cursor += 1;
+            $this->cursor++;
 
             return $row;
         }

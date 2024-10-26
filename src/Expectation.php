@@ -102,9 +102,9 @@ class Expectation
         return $this;
     }
 
-    public function andFail(string $errorMessage): static
+    public function andFail(PDOException $exception): static
     {
-        $this->exception = new PDOException($errorMessage);
+        $this->exception = $exception;
 
         return $this;
     }
