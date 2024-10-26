@@ -2,6 +2,7 @@
 
 namespace Tests\Xala\Elomock;
 
+use Cassandra\Uuid;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -298,5 +299,31 @@ class PreparedStatementBindingsTest extends TestCase
         $this->expectExceptionMessage('Bindings do not match');
 
         $statement->execute();
+    }
+
+    #[Test]
+    public function itShouldUseStatementFromPreviousExpectation(): void
+    {
+        $pdo = new PDOMock();
+
+        $insertBookExpectation = $pdo->expect('insert into "books" values ("id", "title") values (:id, :title)');
+
+        $pdo->expect('update "books" set "status" = :status where "id" = :id')
+            ->withBindingsUsing(function (array $bindings) use ($insertBookExpectation) {
+                static::assertEquals($insertBookExpectation->statement->bindings['id']['value'], $bindings['id']['value']);
+                static::assertEquals('published', $bindings['status']['value']);
+            });
+
+        $statement = $pdo->prepare('insert into "books" values ("id", "title") values (:id, :title)');
+        $statement->bindValue('id', $id = rand(1, 50), $pdo::PARAM_INT);
+        $statement->bindValue('title', 'The Forest Song', $pdo::PARAM_STR);
+        $statement->execute();
+
+        $statement = $pdo->prepare('update "books" set "status" = :status where "id" = :id');
+        $statement->bindValue('id', $id, $pdo::PARAM_INT);
+        $statement->bindValue('status', 'published', $pdo::PARAM_STR);
+        $statement->execute();
+
+        $pdo->assertExpectationsFulfilled();
     }
 }

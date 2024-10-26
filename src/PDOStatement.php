@@ -12,11 +12,11 @@ class PDOStatement extends PDOStatementBase
 {
     public string $queryString;
 
+    public array $bindings = [];
+
     protected int $fetchMode;
 
     protected PDOMock $pdo;
-
-    protected array $bindings = [];
 
     // TODO: consider passing this with constructor
     protected ?QueryExpectation $expectation = null;
@@ -61,6 +61,8 @@ class PDOStatement extends PDOStatementBase
         TestCase::assertNotEmpty($this->pdo->expectations, 'Unexpected query: ' . $this->queryString);
 
         $this->expectation = array_shift($this->pdo->expectations);
+
+        $this->expectation->statement = $this;
 
         if (! is_null($params)) {
             $bindings = [];

@@ -23,6 +23,8 @@ class QueryExpectation
 
     public ?PDOException $exception = null;
 
+    public ?PDOStatement $statement = null;
+
     public function __construct(string $query)
     {
         $this->query = $query;
