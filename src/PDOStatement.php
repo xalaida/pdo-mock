@@ -3,6 +3,7 @@
 namespace Xala\Elomock;
 
 use InvalidArgumentException;
+use Override;
 use PDO;
 use PDOStatement as PDOStatementBase;
 use PHPUnit\Framework\TestCase;
@@ -31,12 +32,14 @@ class PDOStatement extends PDOStatementBase
         $this->pdo = $pdo;
     }
 
-    public function setFetchMode($mode, $className = null, ...$params)
+    #[Override]
+    public function setFetchMode($mode, $className = null, ...$params): void
     {
         $this->fetchMode = $mode;
     }
 
-    public function bindValue($param, $value, $type = PDO::PARAM_STR)
+    #[Override]
+    public function bindValue($param, $value, $type = PDO::PARAM_STR): bool
     {
         $this->bindings[$param] = [
             'value' => $value,
@@ -46,7 +49,8 @@ class PDOStatement extends PDOStatementBase
         return true;
     }
 
-    public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
+    #[Override]
+    public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null): bool
     {
         $this->bindings[$param] = [
             'value' => $var,
@@ -56,7 +60,8 @@ class PDOStatement extends PDOStatementBase
         return true;
     }
 
-    public function execute(?array $params = null)
+    #[Override]
+    public function execute(?array $params = null): bool
     {
         TestCase::assertNotEmpty($this->pdo->expectations, 'Unexpected query: ' . $this->queryString);
 
@@ -110,7 +115,8 @@ class PDOStatement extends PDOStatementBase
         return true;
     }
 
-    public function rowCount()
+    #[Override]
+    public function rowCount(): int
     {
         if (is_null($this->expectation)) {
             return 0;
@@ -119,6 +125,7 @@ class PDOStatement extends PDOStatementBase
         return $this->expectation->rowCount;
     }
 
+    #[Override]
     public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
         // TODO: ensure statement is executed
@@ -134,6 +141,7 @@ class PDOStatement extends PDOStatementBase
         return false;
     }
 
+    #[Override]
     public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$args)
     {
         if ($mode === PDO::FETCH_LAZY) {
