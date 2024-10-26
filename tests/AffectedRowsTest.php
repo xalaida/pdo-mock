@@ -4,14 +4,14 @@ namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 class AffectedRowsTest extends TestCase
 {
     #[Test]
     public function itShouldReturnZeroAffectedRowsByDefault(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('insert into "users" ("name") values ("john")');
 
@@ -23,7 +23,7 @@ class AffectedRowsTest extends TestCase
     #[Test]
     public function itShouldReturnSpecifiedAffectedRows(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('insert into "users" ("name") values ("john"), ("jane")')
             ->affectRows(2);
@@ -36,7 +36,7 @@ class AffectedRowsTest extends TestCase
     #[Test]
     public function itShouldReturnZeroAffectedRowsUsingNotExecutedPreparedStatement(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('delete from "users"')
             ->toBePrepared();
@@ -49,7 +49,7 @@ class AffectedRowsTest extends TestCase
     #[Test]
     public function itShouldIgnoreSpecifiedAffectedRowsUsingNotExecutedPreparedStatement(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('insert into "users" ("name") values ("john"), ("jane")')
             ->toBePrepared()
@@ -63,7 +63,7 @@ class AffectedRowsTest extends TestCase
     #[Test]
     public function itShouldReturnAffectedRowsUsingPreparedStatement(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('insert into "users" ("name") values ("john"), ("jane")')
             ->toBePrepared()

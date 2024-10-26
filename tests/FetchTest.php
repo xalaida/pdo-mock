@@ -4,7 +4,7 @@ namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 /**
  * @todo handle rewriting default fetch mode
@@ -18,7 +18,7 @@ class FetchTest extends TestCase
     #[Test]
     public function itShouldHandleFetch(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -51,7 +51,7 @@ class FetchTest extends TestCase
     #[Test]
     public function itShouldReturnFalseWhenStatementIsNotExecuted(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $statement = $pdo->prepare('select * from "users"');
 
@@ -63,7 +63,7 @@ class FetchTest extends TestCase
     #[Test]
     public function itShouldHandleFetchInAssocMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -96,7 +96,7 @@ class FetchTest extends TestCase
     #[Test]
     public function itShouldHandleFetchInNumMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -129,7 +129,7 @@ class FetchTest extends TestCase
     #[Test]
     public function itShouldHandleFetchInBothMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -162,7 +162,7 @@ class FetchTest extends TestCase
     #[Test]
     public function itShouldHandleFetchInObjMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()

@@ -5,14 +5,14 @@ namespace Tests\Xala\Elomock;
 use PDOException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 class ExceptionTest extends TestCase
 {
     #[Test]
     public function itShouldHandleQueryException(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select table "users"')
             ->andFail('SQL syntax error');

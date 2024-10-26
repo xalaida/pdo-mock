@@ -5,14 +5,14 @@ namespace Tests\Xala\Elomock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 class PreparedStatementBindingsTest extends TestCase
 {
     #[Test]
     public function itShouldHandleQueryBindings(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
@@ -34,7 +34,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldHandleBindingsAsOptional(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared();
@@ -53,7 +53,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldHandleQueryBindingsUsingBindParam(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
@@ -76,7 +76,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldFailWhenQueryBindingsDontMatch(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
@@ -98,7 +98,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldHandleQueryBindingsUsingAssociativeArray(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
@@ -118,7 +118,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldFailWhenQueryBindingsUsingAssociativeArrayDontMatch(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
@@ -138,7 +138,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldHandleQueryNamedBindings(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "category_id" = :category_id and "published" = :published')
             ->toBePrepared()
@@ -158,7 +158,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldHandleQueryNamedBindingsUsingSingleAssociativeArray(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year and "published" = :published')
             ->toBePrepared()
@@ -182,7 +182,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldFailWhenQueryNamedBindingsUsingSingleAssociativeArrayDontMatch(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year and "published" = :published')
             ->toBePrepared()
@@ -206,7 +206,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldHandleExecBindings(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
@@ -223,7 +223,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldHandleExecBindingsTypes(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
@@ -239,7 +239,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldFailWhenParamsOverwriteBoundValues(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
@@ -258,7 +258,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldVerifyBindingsUsingCallableSyntax(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
             ->withBindingsUsing(function (array $bindings) use ($pdo) {
@@ -282,7 +282,7 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldFailWhenBindingsCallbackReturnsFalse(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
             ->withBindingsUsing(function () {

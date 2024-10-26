@@ -5,14 +5,14 @@ namespace Tests\Xala\Elomock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 class ExecTest extends TestCase
 {
     #[Test]
     public function itShouldExecuteQuery(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"');
 
@@ -24,7 +24,7 @@ class ExecTest extends TestCase
     #[Test]
     public function itShouldFailWhenQueryDoesntMatch(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"');
 
@@ -36,7 +36,7 @@ class ExecTest extends TestCase
     #[Test]
     public function itShouldFailWhenQueryIsNotExecuted(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"');
 

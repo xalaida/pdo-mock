@@ -5,7 +5,7 @@ namespace Tests\Xala\Elomock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ValueError;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 /**
  * @todo handle other fetch modes
@@ -16,7 +16,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -35,7 +35,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldFailOnFetchAllInLazyMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -54,7 +54,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldHandleFetchAllInAssocMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -81,7 +81,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldHandleFetchAllInNumMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -108,7 +108,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldHandleFetchAllInBothMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -135,7 +135,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldHandleFetchAllInObjMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -162,7 +162,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldHandleFetchAllInBothModeAsDefault(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -189,7 +189,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldUseCustomDefaultFetchMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
         $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
 
         $pdo->expectQuery('select * from "users"')
@@ -217,7 +217,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldUseCustomDefaultFetchModeForStatement(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()
@@ -246,7 +246,7 @@ class FetchAllTest extends TestCase
     #[Test]
     public function itShouldHandleFetchOne(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared()

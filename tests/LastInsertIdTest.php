@@ -4,14 +4,14 @@ namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 class LastInsertIdTest extends TestCase
 {
     #[Test]
     public function itShouldReturnZeroAsLastInsertId(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         static::assertSame('0', $pdo->lastInsertId());
         static::assertSame('0', $pdo->lastInsertId());
@@ -20,7 +20,7 @@ class LastInsertIdTest extends TestCase
     #[Test]
     public function itShouldUseLastInsertIdFromQuery(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('insert into "users" ("name") values ("john")')
             ->withInsertId(777);

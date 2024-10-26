@@ -5,7 +5,7 @@ namespace Tests\Xala\Elomock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 /**
  * @todo handle nested transactions
@@ -16,7 +16,7 @@ class TransactionTest extends TestCase
     #[Test]
     public function itShouldExecuteQueryInTransaction(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectBeginTransaction();
         $pdo->expectQuery('insert into "users" ("name") values ("john")');
@@ -40,7 +40,7 @@ class TransactionTest extends TestCase
     #[Test]
     public function itShouldRollbackTransaction(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectBeginTransaction();
         $pdo->expectQuery('insert into "users" ("name") values ("john")');
@@ -56,7 +56,7 @@ class TransactionTest extends TestCase
     #[Test]
     public function itShouldFailWhenQueryExecutedWithoutTransaction(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectBeginTransaction();
 
@@ -70,7 +70,7 @@ class TransactionTest extends TestCase
     #[Test]
     public function itShouldExpectTransactionUsingCallableSyntax(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectTransaction(function () use ($pdo) {
             $pdo->expectQuery('insert into "users" ("name") values ("john")');
@@ -88,7 +88,7 @@ class TransactionTest extends TestCase
     #[Test]
     public function itShouldFailWhenTransactionalQueryIsNotExecuted(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectTransaction(function () use ($pdo) {
             $pdo->expectQuery('insert into "users" ("name") values ("john")');
@@ -106,7 +106,7 @@ class TransactionTest extends TestCase
     #[Test]
     public function itShouldHandleIgnoreTransactionsMode(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
         $pdo->ignoreTransactions();
 
         $pdo->expectQuery('insert into "users" ("name") values ("john")');

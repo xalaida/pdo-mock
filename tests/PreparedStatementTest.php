@@ -5,14 +5,14 @@ namespace Tests\Xala\Elomock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 class PreparedStatementTest extends TestCase
 {
     #[Test]
     public function itShouldHandlePreparedStatement(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"');
 
@@ -26,7 +26,7 @@ class PreparedStatementTest extends TestCase
     #[Test]
     public function itShouldFailOnUnexpectedQuery(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $statement = $pdo->prepare('select * from "users"');
 
@@ -39,7 +39,7 @@ class PreparedStatementTest extends TestCase
     #[Test]
     public function itShouldVerifyIfStatementIsPrepared(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared();
@@ -54,7 +54,7 @@ class PreparedStatementTest extends TestCase
     #[Test]
     public function itShouldFailWhenStatementIsNotPrepared(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared();
@@ -68,7 +68,7 @@ class PreparedStatementTest extends TestCase
     #[Test]
     public function itShouldFailWhenStatementIsNotExecuted(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared();

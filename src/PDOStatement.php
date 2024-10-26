@@ -4,17 +4,17 @@ namespace Xala\Elomock;
 
 use InvalidArgumentException;
 use PDO;
-use PDOStatement;
+use PDOStatement as BasePDOStatement;
 use PHPUnit\Framework\TestCase;
 use ValueError;
 
-class FakePDOStatement extends PDOStatement
+class PDOStatement extends BasePDOStatement
 {
     public string $queryString;
 
     protected int $fetchMode;
 
-    protected FakePDO $pdo;
+    protected PDOMock $pdo;
 
     protected array $bindings = [];
 
@@ -25,7 +25,7 @@ class FakePDOStatement extends PDOStatement
 
     protected bool $executed = false;
 
-    public function __construct(FakePDO $pdo, string $query)
+    public function __construct(PDOMock $pdo, string $query)
     {
         $this->queryString = $query;
         $this->pdo = $pdo;

@@ -7,7 +7,7 @@ use PDO;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-class FakePDO extends PDO
+class PDOMock extends PDO
 {
     /**
      * @var array<int, QueryExpectation>
@@ -92,7 +92,7 @@ class FakePDO extends PDO
     // TODO: handle $options
     public function prepare($query, $options = [])
     {
-        $statement = new FakePDOStatement($this, $query);
+        $statement = new PDOStatement($this, $query);
 
         $statement->setFetchMode($this->getAttribute($this::ATTR_DEFAULT_FETCH_MODE));
 

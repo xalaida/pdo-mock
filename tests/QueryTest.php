@@ -7,14 +7,14 @@ use PDOStatement;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use Xala\Elomock\FakePDO;
+use Xala\Elomock\PDOMock;
 
 class QueryTest extends TestCase
 {
     #[Test]
     public function itShouldFetchRowsUsingQuery(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "users"')
             ->andFetchRows([
@@ -38,7 +38,7 @@ class QueryTest extends TestCase
     #[Test]
     public function itShouldFailWhenExpectBindingsUsingQuery(): void
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('delete from "posts" where "status" = ?')
             ->withBindings(['draft']);
@@ -52,7 +52,7 @@ class QueryTest extends TestCase
     #[Test]
     public function itShouldThrowPDOException()
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from table "posts"')
             ->andFail('SQL syntax error');
@@ -66,7 +66,7 @@ class QueryTest extends TestCase
     #[Test]
     public function itShouldHandleQueryAsPreparedStatement()
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('select * from "posts"')
             ->toBePrepared();
@@ -82,7 +82,7 @@ class QueryTest extends TestCase
     #[Test]
     public function itShouldExecQueryMultipleTimes()
     {
-        $pdo = new FakePDO();
+        $pdo = new PDOMock();
 
         $pdo->expectQuery('delete from "users" limit 1');
 
