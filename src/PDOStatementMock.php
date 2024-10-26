@@ -20,7 +20,7 @@ class PDOStatementMock extends PDOStatement
     protected PDOMock $pdo;
 
     // TODO: consider passing this with constructor
-    protected ?QueryExpectation $expectation = null;
+    protected ?Expectation $expectation = null;
 
     protected int $cursor = 0;
 

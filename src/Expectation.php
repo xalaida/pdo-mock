@@ -7,7 +7,7 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 
-class QueryExpectation
+class Expectation
 {
     public string $query;
 

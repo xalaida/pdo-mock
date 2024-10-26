@@ -10,7 +10,7 @@ use RuntimeException;
 class PDOMock extends PDO
 {
     /**
-     * @var array<int, QueryExpectation>
+     * @var array<int, Expectation>
      */
     public array $expectations = [];
 
@@ -57,9 +57,9 @@ class PDOMock extends PDO
         $this->ignoreTransactions = $ignoreTransactions;
     }
 
-    public function expect(string $query): QueryExpectation
+    public function expect(string $query): Expectation
     {
-        $expectation = new QueryExpectation($query);
+        $expectation = new Expectation($query);
 
         $this->expectations[] = $expectation;
 
@@ -115,7 +115,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
         }
 
-        $this->expectations[] = new QueryExpectation('PDO::beginTransaction()');
+        $this->expectations[] = new Expectation('PDO::beginTransaction()');
     }
 
     public function expectCommit(): void
@@ -124,7 +124,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
         }
 
-        $this->expectations[] = new QueryExpectation('PDO::commit()');
+        $this->expectations[] = new Expectation('PDO::commit()');
     }
 
     public function expectRollback(): void
@@ -133,7 +133,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
         }
 
-        $this->expectations[] = new QueryExpectation('PDO::rollback()');
+        $this->expectations[] = new Expectation('PDO::rollback()');
     }
 
     public function expectTransaction(callable $callback): void
