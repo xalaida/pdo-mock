@@ -84,7 +84,10 @@ class FakePDOStatement extends PDOStatement
         }
 
         TestCase::assertEquals($this->expectation->query, $this->queryString, 'Query does not match');
-        TestCase::assertEquals($this->expectation->bindings, $bindings, 'Bindings do not match');
+
+        if (! is_null($this->expectation->bindings)) {
+            TestCase::assertEquals($this->expectation->bindings, $bindings, 'Bindings do not match');
+        }
 
         if ($this->expectation->exception) {
             throw $this->expectation->exception;

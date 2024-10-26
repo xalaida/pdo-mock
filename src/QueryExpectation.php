@@ -12,7 +12,7 @@ class QueryExpectation
 
     public bool | null $prepared = null;
 
-    public array $bindings = [];
+    public array | null $bindings = null;
 
     public int $rowCount = 0;
 

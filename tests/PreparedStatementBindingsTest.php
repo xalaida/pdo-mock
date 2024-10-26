@@ -32,6 +32,25 @@ class PreparedStatementBindingsTest extends TestCase
     }
 
     #[Test]
+    public function itShouldHandleBindingsAsOptional(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
+            ->toBePrepared();
+
+        $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
+
+        $statement->bindValue(1, 'active', $pdo::PARAM_STR);
+        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+        $statement->bindValue(3, true, $pdo::PARAM_BOOL);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+    }
+
+    #[Test]
     public function itShouldHandleQueryBindingsUsingBindParam(): void
     {
         $pdo = new FakePDO();
