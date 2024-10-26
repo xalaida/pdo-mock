@@ -67,9 +67,8 @@ class PDOMock extends PDO
     }
 
     #[Override]
-    public function exec($statement)
+    public function exec($statement): int | false
     {
-        // TODO: ensure there is expectation defined (not empty)
         $expectation = array_shift($this->expectations);
 
         if (! is_null($expectation->prepared)) {
@@ -153,10 +152,8 @@ class PDOMock extends PDO
             return true;
         }
 
-        // TODO: ensure there is expectation defined (not empty)
         $expectation = array_shift($this->expectations);
 
-        // TODO: use proper assertions
         TestCase::assertEquals($expectation->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
 
         return true;
@@ -170,10 +167,8 @@ class PDOMock extends PDO
             return true;
         }
 
-        // TODO: ensure there is expectation defined (not empty)
         $expectation = array_shift($this->expectations);
 
-        // TODO: use proper assertions
         TestCase::assertEquals($expectation->query, 'PDO::commit()', 'Unexpected PDO::commit()');
 
         return true;
@@ -187,10 +182,8 @@ class PDOMock extends PDO
             return true;
         }
 
-        // TODO: ensure there is expectation defined (not empty)
         $expectation = array_shift($this->expectations);
 
-        // TODO: use proper assertions
         TestCase::assertEquals($expectation->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
 
         return true;
@@ -201,15 +194,23 @@ class PDOMock extends PDO
         return $this->inTransaction;
     }
 
-    // TODO: support $name
-    public function lastInsertId($name = null)
+    public function lastInsertId($name = null): string
     {
         return $this->lastInsertId;
     }
 
+    public function errorCode(): string
+    {
+        return '00000';
+    }
+
+    public function errorInfo(): array
+    {
+        return [$this->errorCode(), null, null];
+    }
+
     public function assertExpectationsFulfilled(): void
     {
-        // TODO: improve error message
         TestCase::assertEmpty($this->expectations, 'Some expectations were not fulfilled.');
     }
 }

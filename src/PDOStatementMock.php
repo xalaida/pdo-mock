@@ -125,6 +125,20 @@ class PDOStatementMock extends PDOStatement
         return $this->expectation->rowCount;
     }
 
+    public function errorCode(): ?string
+    {
+        if (! $this->executed) {
+            return null;
+        }
+
+        return '00000';
+    }
+
+    public function errorInfo(): array
+    {
+        return [$this->errorCode(), null, null];
+    }
+
     #[Override]
     public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {

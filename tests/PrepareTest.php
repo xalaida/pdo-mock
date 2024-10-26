@@ -7,7 +7,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
-class PreparedStatementTest extends TestCase
+class PrepareTest extends TestCase
 {
     #[Test]
     public function itShouldHandlePreparedStatement(): void
