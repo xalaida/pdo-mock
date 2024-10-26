@@ -22,7 +22,7 @@ class LastInsertIdTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('insert into "users" ("name") values ("john")')
+        $pdo->expect('insert into "users" ("name") values ("john")')
             ->withInsertId(777);
 
         $pdo->exec('insert into "users" ("name") values ("john")');

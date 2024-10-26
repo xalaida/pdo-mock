@@ -14,7 +14,7 @@ class ExceptionTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select table "users"')
+        $pdo->expect('select table "users"')
             ->andFail('SQL syntax error');
 
         $this->expectException(PDOException::class);

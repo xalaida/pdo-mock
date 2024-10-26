@@ -18,7 +18,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -37,7 +37,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -56,7 +56,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -83,7 +83,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -110,7 +110,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -137,7 +137,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -164,7 +164,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -192,7 +192,7 @@ class FetchAllTest extends TestCase
         $pdo = new PDOMock();
         $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -219,7 +219,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
@@ -248,7 +248,7 @@ class FetchAllTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared()
             ->andFetchRow([
                 'id' => 1,

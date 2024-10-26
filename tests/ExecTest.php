@@ -14,7 +14,7 @@ class ExecTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"');
+        $pdo->expect('select * from "users"');
 
         $result = $pdo->exec('select * from "users"');
 
@@ -26,7 +26,7 @@ class ExecTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"');
+        $pdo->expect('select * from "users"');
 
         $this->expectException(ExpectationFailedException::class);
 
@@ -38,7 +38,7 @@ class ExecTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"');
+        $pdo->expect('select * from "users"');
 
         $this->expectException(ExpectationFailedException::class);
 

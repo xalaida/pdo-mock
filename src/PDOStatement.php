@@ -4,11 +4,11 @@ namespace Xala\Elomock;
 
 use InvalidArgumentException;
 use PDO;
-use PDOStatement as BasePDOStatement;
+use PDOStatement as PDOStatementBase;
 use PHPUnit\Framework\TestCase;
 use ValueError;
 
-class PDOStatement extends BasePDOStatement
+class PDOStatement extends PDOStatementBase
 {
     public string $queryString;
 

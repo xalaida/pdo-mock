@@ -16,7 +16,7 @@ class QueryTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
                 ['id' => 2, 'name' => 'jane'],
@@ -40,7 +40,7 @@ class QueryTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('delete from "posts" where "status" = ?')
+        $pdo->expect('delete from "posts" where "status" = ?')
             ->withBindings(['draft']);
 
         $this->expectException(ExpectationFailedException::class);
@@ -54,7 +54,7 @@ class QueryTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from table "posts"')
+        $pdo->expect('select * from table "posts"')
             ->andFail('SQL syntax error');
 
         $this->expectException(PDOException::class);
@@ -68,7 +68,7 @@ class QueryTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "posts"')
+        $pdo->expect('select * from "posts"')
             ->toBePrepared();
 
         $statement = $pdo->query('select * from "posts"');
@@ -84,9 +84,9 @@ class QueryTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('delete from "users" limit 1');
+        $pdo->expect('delete from "users" limit 1');
 
-        $pdo->expectQuery('delete from "users" limit 1');
+        $pdo->expect('delete from "users" limit 1');
 
         $statement = $pdo->query('delete from "users" limit 1');
 

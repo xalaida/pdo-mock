@@ -14,7 +14,7 @@ class PreparedStatementTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"');
+        $pdo->expect('select * from "users"');
 
         $statement = $pdo->prepare('select * from "users"');
 
@@ -41,7 +41,7 @@ class PreparedStatementTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared();
 
         $statement = $pdo->prepare('select * from "users"');
@@ -56,7 +56,7 @@ class PreparedStatementTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared();
 
         $this->expectException(ExpectationFailedException::class);
@@ -70,7 +70,7 @@ class PreparedStatementTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "users"')
+        $pdo->expect('select * from "users"')
             ->toBePrepared();
 
         $this->expectException(ExpectationFailedException::class);

@@ -19,7 +19,7 @@ class TransactionTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expectBeginTransaction();
-        $pdo->expectQuery('insert into "users" ("name") values ("john")');
+        $pdo->expect('insert into "users" ("name") values ("john")');
         $pdo->expectCommit();
 
         static::assertFalse($pdo->inTransaction());
@@ -43,7 +43,7 @@ class TransactionTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expectBeginTransaction();
-        $pdo->expectQuery('insert into "users" ("name") values ("john")');
+        $pdo->expect('insert into "users" ("name") values ("john")');
         $pdo->expectRollback();
 
         $pdo->beginTransaction();
@@ -60,7 +60,7 @@ class TransactionTest extends TestCase
 
         $pdo->expectBeginTransaction();
 
-        $pdo->expectQuery('insert into "users" ("name") values ("john")');
+        $pdo->expect('insert into "users" ("name") values ("john")');
 
         $this->expectException(ExpectationFailedException::class);
 
@@ -73,8 +73,8 @@ class TransactionTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expectTransaction(function () use ($pdo) {
-            $pdo->expectQuery('insert into "users" ("name") values ("john")');
-            $pdo->expectQuery('insert into "users" ("name") values ("jane")');
+            $pdo->expect('insert into "users" ("name") values ("john")');
+            $pdo->expect('insert into "users" ("name") values ("jane")');
         });
 
         $pdo->beginTransaction();
@@ -91,8 +91,8 @@ class TransactionTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expectTransaction(function () use ($pdo) {
-            $pdo->expectQuery('insert into "users" ("name") values ("john")');
-            $pdo->expectQuery('insert into "users" ("name") values ("jane")');
+            $pdo->expect('insert into "users" ("name") values ("john")');
+            $pdo->expect('insert into "users" ("name") values ("jane")');
         });
 
         $this->expectException(ExpectationFailedException::class);
@@ -109,7 +109,7 @@ class TransactionTest extends TestCase
         $pdo = new PDOMock();
         $pdo->ignoreTransactions();
 
-        $pdo->expectQuery('insert into "users" ("name") values ("john")');
+        $pdo->expect('insert into "users" ("name") values ("john")');
 
         $pdo->beginTransaction();
         $pdo->exec('insert into "users" ("name") values ("john")');

@@ -14,7 +14,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
+        $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
             ->withBinding(1, 'active', $pdo::PARAM_STR)
             ->withBinding(2, 2024, $pdo::PARAM_INT)
@@ -36,7 +36,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
+        $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared();
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
@@ -55,7 +55,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ?')
+        $pdo->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
             ->withBinding(1, 'published', $pdo::PARAM_STR)
             ->withBinding(2, 2024, $pdo::PARAM_INT);
@@ -78,7 +78,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
+        $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
             ->withBinding(0, 'active', $pdo::PARAM_STR)
             ->withBinding(1, 2024, $pdo::PARAM_INT)
@@ -100,7 +100,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
+        $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
             ->withBindings(['active', 2024, true], true);
 
@@ -120,7 +120,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
+        $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
             ->withBindings([2024, 'active', true]);
 
@@ -140,7 +140,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "category_id" = :category_id and "published" = :published')
+        $pdo->expect('select * from "books" where "category_id" = :category_id and "published" = :published')
             ->toBePrepared()
             ->withBinding('category_id', 7, $pdo::PARAM_INT)
             ->withBinding('published', true, $pdo::PARAM_BOOL);
@@ -160,7 +160,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year and "published" = :published')
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year and "published" = :published')
             ->toBePrepared()
             ->withBindings([
                 'status' => 'active',
@@ -184,7 +184,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year and "published" = :published')
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year and "published" = :published')
             ->toBePrepared()
             ->withBindings([
                 'status' => 'active',
@@ -208,7 +208,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
             ->withBinding(1, 'published')
             ->withBinding(2, 2024);
@@ -225,7 +225,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
             ->withBindings(['published', 2024]);
 
@@ -241,7 +241,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
             ->withBindings(['published', 2024]);
 
@@ -260,7 +260,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->withBindingsUsing(function (array $bindings) use ($pdo) {
                 static::assertEquals('draft', $bindings[1]['value']);
                 static::assertEquals($pdo::PARAM_STR, $bindings[1]['type']);
@@ -284,7 +284,7 @@ class PreparedStatementBindingsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->withBindingsUsing(function () {
                return false;
             });

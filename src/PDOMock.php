@@ -57,7 +57,7 @@ class PDOMock extends PDO
         $this->ignoreTransactions = $ignoreTransactions;
     }
 
-    public function expectQuery(string $query): QueryExpectation
+    public function expect(string $query): QueryExpectation
     {
         $expectation = new QueryExpectation($query);
 

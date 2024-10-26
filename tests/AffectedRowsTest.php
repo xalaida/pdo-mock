@@ -13,7 +13,7 @@ class AffectedRowsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('insert into "users" ("name") values ("john")');
+        $pdo->expect('insert into "users" ("name") values ("john")');
 
         $result = $pdo->exec('insert into "users" ("name") values ("john")');
 
@@ -25,7 +25,7 @@ class AffectedRowsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('insert into "users" ("name") values ("john"), ("jane")')
+        $pdo->expect('insert into "users" ("name") values ("john"), ("jane")')
             ->affectRows(2);
 
         $result = $pdo->exec('insert into "users" ("name") values ("john"), ("jane")');
@@ -38,7 +38,7 @@ class AffectedRowsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('delete from "users"')
+        $pdo->expect('delete from "users"')
             ->toBePrepared();
 
         $statement = $pdo->prepare('delete from "users"');
@@ -51,7 +51,7 @@ class AffectedRowsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('insert into "users" ("name") values ("john"), ("jane")')
+        $pdo->expect('insert into "users" ("name") values ("john"), ("jane")')
             ->toBePrepared()
             ->affectRows(2);
 
@@ -65,7 +65,7 @@ class AffectedRowsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectQuery('insert into "users" ("name") values ("john"), ("jane")')
+        $pdo->expect('insert into "users" ("name") values ("john"), ("jane")')
             ->toBePrepared()
             ->affectRows(2);
 
