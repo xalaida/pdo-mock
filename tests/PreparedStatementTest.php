@@ -14,6 +14,33 @@ class PreparedStatementTest extends TestCase
     {
         $pdo = new FakePDO();
 
+        $pdo->expectQuery('select * from "users"');
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+    }
+
+    #[Test]
+    public function itShouldFailOnUnexpectedQuery(): void
+    {
+        $pdo = new FakePDO();
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query: select * from "users"');
+
+        $statement->execute();
+    }
+
+    #[Test]
+    public function itShouldVerifyIfStatementIsPrepared(): void
+    {
+        $pdo = new FakePDO();
+
         $pdo->expectQuery('select * from "users"')
             ->toBePrepared();
 
@@ -22,6 +49,20 @@ class PreparedStatementTest extends TestCase
         $result = $statement->execute();
 
         static::assertTrue($result);
+    }
+
+    #[Test]
+    public function itShouldFailWhenStatementIsNotPrepared(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared();
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Statement is not prepared');
+
+        $pdo->exec('select * from "users"');
     }
 
     #[Test]
@@ -38,19 +79,5 @@ class PreparedStatementTest extends TestCase
         $pdo->prepare('select * from "users"');
 
         $pdo->assertExpectationsFulfilled();
-    }
-
-    #[Test]
-    public function itShouldFailWhenStatementIsNotPrepared(): void
-    {
-        $pdo = new FakePDO();
-
-        $pdo->expectQuery('select * from "users"')
-            ->toBePrepared();
-
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Statement is not prepared');
-
-        $pdo->exec('select * from "users"');
     }
 }

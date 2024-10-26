@@ -14,7 +14,7 @@ use Xala\Elomock\FakePDO;
 class FetchAllTest extends TestCase
 {
     #[Test]
-    public function itShouldReturnEmptyRowsWhenStatementIsntExecuted(): void
+    public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted(): void
     {
         $pdo = new FakePDO();
 
@@ -200,6 +200,35 @@ class FetchAllTest extends TestCase
             ]);
 
         $statement = $pdo->prepare('select * from "users"');
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+
+        $rows = $statement->fetchAll();
+
+        static::assertCount(2, $rows);
+        static::assertIsObject($rows[0]);
+        static::assertEquals((object) ['id' => 1, 'name' => 'john'], $rows[0]);
+        static::assertIsObject($rows[1]);
+        static::assertEquals((object) ['id' => 2, 'name' => 'jane'], $rows[1]);
+    }
+
+    #[Test]
+    public function itShouldUseCustomDefaultFetchModeForStatement(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "users"')
+            ->toBePrepared()
+            ->andFetchRows([
+                ['id' => 1, 'name' => 'john'],
+                ['id' => 2, 'name' => 'jane'],
+            ]);
+
+        $statement = $pdo->prepare('select * from "users"');
+
+        $statement->setFetchMode($pdo::FETCH_OBJ);
 
         $result = $statement->execute();
 

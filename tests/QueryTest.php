@@ -17,7 +17,6 @@ class QueryTest extends TestCase
         $pdo = new FakePDO();
 
         $pdo->expectQuery('select * from "users"')
-            ->toBePrepared()
             ->andFetchRows([
                 ['id' => 1, 'name' => 'john'],
                 ['id' => 2, 'name' => 'jane'],
@@ -42,7 +41,6 @@ class QueryTest extends TestCase
         $pdo = new FakePDO();
 
         $pdo->expectQuery('delete from "posts" where "status" = ?')
-            ->toBePrepared()
             ->withBindings(['draft']);
 
         $this->expectException(ExpectationFailedException::class);
@@ -57,7 +55,6 @@ class QueryTest extends TestCase
         $pdo = new FakePDO();
 
         $pdo->expectQuery('select * from table "posts"')
-            ->toBePrepared()
             ->andFail('SQL syntax error');
 
         $this->expectException(PDOException::class);
@@ -67,16 +64,19 @@ class QueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenQueryIsNotPrepared()
+    public function itShouldHandleQueryAsPreparedStatement()
     {
         $pdo = new FakePDO();
 
-        $pdo->expectQuery('select * from "posts"');
+        $pdo->expectQuery('select * from "posts"')
+            ->toBePrepared();
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Statement is not prepared');
+        $statement = $pdo->query('select * from "posts"');
 
-        $pdo->query('select * from "posts"');
+        $this->assertInstanceOf(PDOStatement::class, $statement);
+        $this->assertSame(0, $statement->rowCount());
+
+        $pdo->assertExpectationsFulfilled();
     }
 
     #[Test]
@@ -84,11 +84,9 @@ class QueryTest extends TestCase
     {
         $pdo = new FakePDO();
 
-        $pdo->expectQuery('delete from "users" limit 1')
-            ->toBePrepared();
+        $pdo->expectQuery('delete from "users" limit 1');
 
-        $pdo->expectQuery('delete from "users" limit 1')
-            ->toBePrepared();
+        $pdo->expectQuery('delete from "users" limit 1');
 
         $statement = $pdo->query('delete from "users" limit 1');
 

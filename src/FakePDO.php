@@ -72,7 +72,10 @@ class FakePDO extends PDO
         // TODO: ensure there is expectation defined (not empty)
         $expectation = array_shift($this->expectations);
 
-        TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
+        if (! is_null($expectation->prepared)) {
+            TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
+        }
+
         TestCase::assertEquals($expectation->query, $statement);
 
         if ($expectation->exception) {
@@ -89,7 +92,11 @@ class FakePDO extends PDO
     // TODO: handle $options
     public function prepare($query, $options = [])
     {
-        return new FakePDOStatement($this, $query);
+        $statement = new FakePDOStatement($this, $query);
+
+        $statement->setFetchMode($this->getAttribute($this::ATTR_DEFAULT_FETCH_MODE));
+
+        return $statement;
     }
 
     // TODO: handle other arguments

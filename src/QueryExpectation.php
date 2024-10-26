@@ -10,7 +10,7 @@ class QueryExpectation
 {
     public string $query;
 
-    public bool $prepared = false;
+    public bool | null $prepared = null;
 
     public array $bindings = [];
 

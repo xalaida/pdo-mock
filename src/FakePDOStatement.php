@@ -12,6 +12,8 @@ class FakePDOStatement extends PDOStatement
 {
     public string $queryString;
 
+    protected int $fetchMode;
+
     protected FakePDO $pdo;
 
     protected array $bindings = [];
@@ -27,6 +29,11 @@ class FakePDOStatement extends PDOStatement
     {
         $this->queryString = $query;
         $this->pdo = $pdo;
+    }
+
+    public function setFetchMode($mode, $className = null, ...$params)
+    {
+        $this->fetchMode = $mode;
     }
 
     public function bindValue($param, $value, $type = PDO::PARAM_STR)
@@ -51,6 +58,8 @@ class FakePDOStatement extends PDOStatement
 
     public function execute(?array $params = null)
     {
+        TestCase::assertNotEmpty($this->pdo->expectations, 'Unexpected query: ' . $this->queryString);
+
         $this->expectation = array_shift($this->pdo->expectations);
 
         if (! is_null($params)) {
@@ -70,7 +79,10 @@ class FakePDOStatement extends PDOStatement
             $bindings = $this->bindings;
         }
 
-        TestCase::assertTrue($this->expectation->prepared, 'Statement is not prepared');
+        if (! is_null($this->expectation->prepared)) {
+            TestCase::assertTrue($this->expectation->prepared, 'Statement is not prepared');
+        }
+
         TestCase::assertEquals($this->expectation->query, $this->queryString, 'Query does not match');
         TestCase::assertEquals($this->expectation->bindings, $bindings, 'Bindings do not match');
 
@@ -129,7 +141,7 @@ class FakePDOStatement extends PDOStatement
     protected function applyFetchMode(array $row, int $mode): object | array
     {
         if ($mode === PDO::FETCH_DEFAULT) {
-            $mode = $this->pdo->getAttribute($this->pdo::ATTR_DEFAULT_FETCH_MODE);
+            $mode = $this->fetchMode;
         }
 
         switch ($mode) {

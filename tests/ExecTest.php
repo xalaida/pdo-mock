@@ -18,7 +18,7 @@ class ExecTest extends TestCase
 
         $result = $pdo->exec('select * from "users"');
 
-        static::assertTrue($result);
+        static::assertSame(0, $result);
     }
 
     #[Test]
