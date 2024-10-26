@@ -9,7 +9,6 @@ use Xala\Elomock\PDOMock;
 
 /**
  * @todo handle nested transactions
- * @todo add ability to ignore rolled back queries
  */
 class TransactionTest extends TestCase
 {

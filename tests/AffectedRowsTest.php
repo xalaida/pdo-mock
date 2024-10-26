@@ -26,7 +26,7 @@ class AffectedRowsTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('insert into "users" ("name") values ("john"), ("jane")')
-            ->affectRows(2);
+            ->affecting(2);
 
         $result = $pdo->exec('insert into "users" ("name") values ("john"), ("jane")');
 
@@ -53,7 +53,7 @@ class AffectedRowsTest extends TestCase
 
         $pdo->expect('insert into "users" ("name") values ("john"), ("jane")')
             ->toBePrepared()
-            ->affectRows(2);
+            ->affecting(2);
 
         $statement = $pdo->prepare('insert into "users" ("name") values ("john"), ("jane")');
 
@@ -67,7 +67,7 @@ class AffectedRowsTest extends TestCase
 
         $pdo->expect('insert into "users" ("name") values ("john"), ("jane")')
             ->toBePrepared()
-            ->affectRows(2);
+            ->affecting(2);
 
         $statement = $pdo->prepare('insert into "users" ("name") values ("john"), ("jane")');
 

@@ -81,7 +81,7 @@ class QueryExpectation
         return $this;
     }
 
-    public function affectRows(int $rowCount): static
+    public function affecting(int $rowCount): static
     {
         $this->rowCount = $rowCount;
 
