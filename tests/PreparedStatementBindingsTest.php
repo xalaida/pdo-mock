@@ -254,4 +254,49 @@ class PreparedStatementBindingsTest extends TestCase
 
         $statement->execute([]);
     }
+
+    #[Test]
+    public function itShouldVerifyBindingsUsingCallableSyntax(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+            ->withBindingsUsing(function (array $bindings) use ($pdo) {
+                static::assertEquals('draft', $bindings[1]['value']);
+                static::assertEquals($pdo::PARAM_STR, $bindings[1]['type']);
+                static::assertEquals(2024, $bindings[2]['value']);
+                static::assertEquals($pdo::PARAM_INT, $bindings[2]['type']);
+            });
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $statement->bindValue(1, 'draft', $pdo::PARAM_STR);
+        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+        $pdo->assertExpectationsFulfilled();
+    }
+
+    #[Test]
+    public function itShouldFailWhenBindingsCallbackReturnsFalse(): void
+    {
+        $pdo = new FakePDO();
+
+        $pdo->expectQuery('select * from "books" where "status" = :status and "year" = :year')
+            ->withBindingsUsing(function () {
+               return false;
+            });
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $statement->bindValue(1, 'draft', $pdo::PARAM_STR);
+        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Bindings do not match');
+
+        $statement->execute();
+    }
 }

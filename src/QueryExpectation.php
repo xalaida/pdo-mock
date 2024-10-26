@@ -2,6 +2,7 @@
 
 namespace Xala\Elomock;
 
+use Closure;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -12,7 +13,7 @@ class QueryExpectation
 
     public bool | null $prepared = null;
 
-    public array | null $bindings = null;
+    public array | Closure | null $bindings = null;
 
     public int $rowCount = 0;
 
@@ -34,7 +35,7 @@ class QueryExpectation
         return $this;
     }
 
-    public function withBinding(string $key, mixed $value, int $type = PDO::PARAM_STR): static
+    public function withBinding(string | int $key, mixed $value, int $type = PDO::PARAM_STR): static
     {
         $this->bindings[$key] = [
             'value' => $value,
@@ -60,6 +61,13 @@ class QueryExpectation
                 'type' => $type,
             ];
         }
+
+        return $this;
+    }
+
+    public function withBindingsUsing(Closure $callback): static
+    {
+        $this->bindings = $callback;
 
         return $this;
     }
