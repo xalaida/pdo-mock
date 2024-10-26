@@ -23,7 +23,7 @@ class QueryExpectation
 
     public ?PDOException $exception = null;
 
-    public ?PDOStatement $statement = null;
+    public ?PDOStatementMock $statement = null;
 
     public function __construct(string $query)
     {

@@ -92,7 +92,7 @@ class PDOMock extends PDO
     // TODO: handle $options
     public function prepare($query, $options = [])
     {
-        $statement = new PDOStatement($this, $query);
+        $statement = new PDOStatementMock($this, $query);
 
         $statement->setFetchMode($this->getAttribute($this::ATTR_DEFAULT_FETCH_MODE));
 

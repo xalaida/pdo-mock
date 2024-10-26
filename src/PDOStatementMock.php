@@ -5,11 +5,11 @@ namespace Xala\Elomock;
 use InvalidArgumentException;
 use Override;
 use PDO;
-use PDOStatement as PDOStatementBase;
+use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use ValueError;
 
-class PDOStatement extends PDOStatementBase
+class PDOStatementMock extends PDOStatement
 {
     public string $queryString;
 
