@@ -93,7 +93,7 @@ class PDOStatementMock extends PDOStatement
             TestCase::assertTrue($this->expectation->prepared, 'Statement is not prepared');
         }
 
-        TestCase::assertEquals($this->expectation->query, $this->queryString, 'Query does not match');
+        TestCase::assertSame($this->expectation->query, $this->queryString, 'Query does not match');
 
         if (! is_null($this->expectation->bindings)) {
             if (is_callable($this->expectation->bindings)) {

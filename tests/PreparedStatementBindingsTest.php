@@ -2,10 +2,9 @@
 
 namespace Tests\Xala\Elomock;
 
-use Cassandra\Uuid;
+use PDO;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class PreparedStatementBindingsTest extends TestCase
@@ -13,42 +12,51 @@ class PreparedStatementBindingsTest extends TestCase
     #[Test]
     public function itShouldHandleQueryBindings(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
-        $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
+            $statement->bindValue(1, 'active', $pdo::PARAM_STR);
+            $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+            $statement->bindValue(3, true, $pdo::PARAM_BOOL);
+
+            $result = $statement->execute();
+
+            static::assertTrue($result);
+        };
+
+        $scenario($this->sqlite());
+
+        $mock = new PDOMock();
+
+        $mock->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->withBinding(1, 'active', $pdo::PARAM_STR)
-            ->withBinding(2, 2024, $pdo::PARAM_INT)
-            ->withBinding(3, true, $pdo::PARAM_BOOL);
+            ->withBinding(1, 'active', $mock::PARAM_STR)
+            ->withBinding(2, 2024, $mock::PARAM_INT)
+            ->withBinding(3, true, $mock::PARAM_BOOL);
 
-        $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
-
-        $statement->bindValue(1, 'active', $pdo::PARAM_STR);
-        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
-        $statement->bindValue(3, true, $pdo::PARAM_BOOL);
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
+        $scenario($mock);
     }
 
     #[Test]
     public function itShouldHandleBindingsAsOptional(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
-        $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
-            ->toBePrepared();
+            $statement->bindValue(1, 'active', $pdo::PARAM_STR);
+            $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+            $statement->bindValue(3, true, $pdo::PARAM_BOOL);
 
-        $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
+            $result = $statement->execute();
 
-        $statement->bindValue(1, 'active', $pdo::PARAM_STR);
-        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
-        $statement->bindValue(3, true, $pdo::PARAM_BOOL);
+            static::assertTrue($result);
+        };
 
-        $result = $statement->execute();
+        $scenario($this->sqlite());
 
-        static::assertTrue($result);
+        $mock = new PDOMock();
+        $mock->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')->toBePrepared();
+        $scenario($mock);
     }
 
     #[Test]
@@ -263,10 +271,10 @@ class PreparedStatementBindingsTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->withBindingsUsing(function (array $bindings) use ($pdo) {
-                static::assertEquals('draft', $bindings[1]['value']);
-                static::assertEquals($pdo::PARAM_STR, $bindings[1]['type']);
-                static::assertEquals(2024, $bindings[2]['value']);
-                static::assertEquals($pdo::PARAM_INT, $bindings[2]['type']);
+                static::assertSame('draft', $bindings[1]['value']);
+                static::assertSame($pdo::PARAM_STR, $bindings[1]['type']);
+                static::assertSame(2024, $bindings[2]['value']);
+                static::assertSame($pdo::PARAM_INT, $bindings[2]['type']);
             });
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
@@ -310,8 +318,8 @@ class PreparedStatementBindingsTest extends TestCase
 
         $pdo->expect('update "books" set "status" = :status where "id" = :id')
             ->withBindingsUsing(function (array $bindings) use ($insertBookExpectation) {
-                static::assertEquals($insertBookExpectation->statement->bindings['id']['value'], $bindings['id']['value']);
-                static::assertEquals('published', $bindings['status']['value']);
+                static::assertSame($insertBookExpectation->statement->bindings['id']['value'], $bindings['id']['value']);
+                static::assertSame('published', $bindings['status']['value']);
             });
 
         $statement = $pdo->prepare('insert into "books" values ("id", "title") values (:id, :title)');

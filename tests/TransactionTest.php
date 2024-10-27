@@ -2,9 +2,9 @@
 
 namespace Tests\Xala\Elomock;
 
+use PDO;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 /**
@@ -15,41 +15,53 @@ class TransactionTest extends TestCase
     #[Test]
     public function itShouldExecuteQueryInTransaction(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            static::assertFalse($pdo->inTransaction());
 
-        $pdo->expectBeginTransaction();
-        $pdo->expect('insert into "users" ("name") values ("john")');
-        $pdo->expectCommit();
+            static::assertTrue($pdo->beginTransaction());
 
-        static::assertFalse($pdo->inTransaction());
+            $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
 
-        $pdo->beginTransaction();
+            static::assertTrue($pdo->inTransaction());
 
-        $pdo->exec('insert into "users" ("name") values ("john")');
+            static::assertTrue($pdo->commit());
 
-        static::assertTrue($pdo->inTransaction());
+            static::assertFalse($pdo->inTransaction());
+        };
 
-        $pdo->commit();
+        $scenario($this->sqlite());
 
-        static::assertFalse($pdo->inTransaction());
+        $mock = new PDOMock();
+        $mock->expectBeginTransaction();
+        $mock->expect('insert into "books" ("title") values ("Kaidash’s Family")');
+        $mock->expectCommit();
 
-        $pdo->assertExpectationsFulfilled();
+        $scenario($mock);
+
+        $mock->assertExpectationsFulfilled();
     }
 
     #[Test]
     public function itShouldRollbackTransaction(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            static::assertTrue($pdo->beginTransaction());
 
-        $pdo->expectBeginTransaction();
-        $pdo->expect('insert into "users" ("name") values ("john")');
-        $pdo->expectRollback();
+            $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
 
-        $pdo->beginTransaction();
-        $pdo->exec('insert into "users" ("name") values ("john")');
-        $pdo->rollBack();
+            static::assertTrue($pdo->rollBack());
+        };
 
-        $pdo->assertExpectationsFulfilled();
+        $scenario($this->sqlite());
+
+        $mock = new PDOMock();
+        $mock->expectBeginTransaction();
+        $mock->expect('insert into "books" ("title") values ("Kaidash’s Family")');
+        $mock->expectRollback();
+
+        $scenario($mock);
+
+        $mock->assertExpectationsFulfilled();
     }
 
     #[Test]
@@ -59,29 +71,35 @@ class TransactionTest extends TestCase
 
         $pdo->expectBeginTransaction();
 
-        $pdo->expect('insert into "users" ("name") values ("john")');
+        $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
 
         $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query: insert into "books" ("title") values ("Kaidash’s Family")');
 
-        $pdo->exec('insert into "users" ("name") values ("john")');
+        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
     }
 
     #[Test]
     public function itShouldExpectTransactionUsingCallableSyntax(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            $pdo->beginTransaction();
+            $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
+            $pdo->exec('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors")');
+            $pdo->commit();
+        };
 
-        $pdo->expectTransaction(function () use ($pdo) {
-            $pdo->expect('insert into "users" ("name") values ("john")');
-            $pdo->expect('insert into "users" ("name") values ("jane")');
+        $scenario($this->sqlite());
+
+        $mock = new PDOMock();
+        $mock->expectTransaction(function () use ($mock) {
+            $mock->expect('insert into "books" ("title") values ("Kaidash’s Family")');
+            $mock->expect('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors")');
         });
 
-        $pdo->beginTransaction();
-        $pdo->exec('insert into "users" ("name") values ("john")');
-        $pdo->exec('insert into "users" ("name") values ("jane")');
-        $pdo->commit();
+        $scenario($mock);
 
-        $pdo->assertExpectationsFulfilled();
+        $mock->assertExpectationsFulfilled();
     }
 
     #[Test]
@@ -90,30 +108,36 @@ class TransactionTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expectTransaction(function () use ($pdo) {
-            $pdo->expect('insert into "users" ("name") values ("john")');
-            $pdo->expect('insert into "users" ("name") values ("jane")');
+            $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
+            $pdo->expect('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors")');
         });
+
+        $pdo->beginTransaction();
+        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected PDO::commit()');
 
-        $pdo->beginTransaction();
-        $pdo->exec('insert into "users" ("name") values ("john")');
         $pdo->commit();
     }
 
     #[Test]
     public function itShouldHandleIgnoreTransactionsMode(): void
     {
-        $pdo = new PDOMock();
-        $pdo->ignoreTransactions();
+        $scenario = function (PDO $pdo) {
+            $pdo->beginTransaction();
+            $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
+            $pdo->commit();
+        };
 
-        $pdo->expect('insert into "users" ("name") values ("john")');
+        $scenario($this->sqlite());
 
-        $pdo->beginTransaction();
-        $pdo->exec('insert into "users" ("name") values ("john")');
-        $pdo->commit();
+        $mock = new PDOMock();
+        $mock->ignoreTransactions();
+        $mock->expect('insert into "books" ("title") values ("Kaidash’s Family")');
 
-        $pdo->assertExpectationsFulfilled();
+        $scenario($mock);
+
+        $mock->assertExpectationsFulfilled();
     }
 }

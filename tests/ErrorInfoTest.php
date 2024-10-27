@@ -33,7 +33,7 @@ class ErrorInfoTest extends TestCase
             static::assertNull($statement->errorCode());
             static::assertSame(['', null, null], $statement->errorInfo());
 
-            static::assertEquals('00000', $pdo->errorCode());
+            static::assertSame('00000', $pdo->errorCode());
             static::assertSame(['00000', null, null], $pdo->errorInfo());
         };
 

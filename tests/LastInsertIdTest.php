@@ -2,8 +2,8 @@
 
 namespace Tests\Xala\Elomock;
 
+use PDO;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class LastInsertIdTest extends TestCase
@@ -11,23 +11,30 @@ class LastInsertIdTest extends TestCase
     #[Test]
     public function itShouldReturnZeroAsLastInsertId(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            static::assertSame('0', $pdo->lastInsertId());
+            static::assertSame('0', $pdo->lastInsertId());
+        };
 
-        static::assertSame('0', $pdo->lastInsertId());
-        static::assertSame('0', $pdo->lastInsertId());
+        $scenario($this->sqlite());
+
+        $scenario(new PDOMock());
     }
 
     #[Test]
     public function itShouldUseLastInsertIdFromQuery(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            $pdo->exec('insert into "books" ("id", "title") values (777, "Kaidash’s Family")');
 
-        $pdo->expect('insert into "users" ("name") values ("john")')
-            ->withInsertId(777);
+            static::assertSame('777', $pdo->lastInsertId());
+            static::assertSame('777', $pdo->lastInsertId());
+        };
 
-        $pdo->exec('insert into "users" ("name") values ("john")');
+        $scenario($this->sqlite());
 
-        static::assertSame('777', $pdo->lastInsertId());
-        static::assertSame('777', $pdo->lastInsertId());
+        $mock = new PDOMock();
+        $mock->expect('insert into "books" ("id", "title") values (777, "Kaidash’s Family")')->withInsertId(777);
+        $scenario($mock);
     }
 }
