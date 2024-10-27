@@ -4,7 +4,6 @@ namespace Xala\Elomock;
 
 use Override;
 use PDO;
-use PDOException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -26,9 +25,6 @@ class PDOMock extends PDO
 
     public string $lastInsertId = '0';
 
-    // TODO: refactor this flag
-    protected bool $executed = false;
-
     private array $errorInfo;
 
     private string | null $errorCode;
@@ -39,7 +35,6 @@ class PDOMock extends PDO
     public function __construct()
     {
         $this->attributes = [
-            // TODO: define missing attributes
             $this::ATTR_ERRMODE => $this::ERRMODE_EXCEPTION,
             $this::ATTR_DEFAULT_FETCH_MODE => $this::FETCH_BOTH,
         ];
@@ -79,7 +74,6 @@ class PDOMock extends PDO
     #[Override]
     public function exec($statement): int | false
     {
-        // TODO: add test for this case
         TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $statement);
 
         $expectation = array_shift($this->expectations);
@@ -121,7 +115,6 @@ class PDOMock extends PDO
         return $expectation->rowCount;
     }
 
-    // TODO: handle $options
     public function prepare($query, $options = []): PDOStatementMock | false
     {
         TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $query);
@@ -161,7 +154,6 @@ class PDOMock extends PDO
         return $statement;
     }
 
-    // TODO: handle other arguments
     public function query($query, $fetchMode = null, ...$fetch_mode_args)
     {
         $statement = $this->prepare($query);

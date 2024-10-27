@@ -6,10 +6,6 @@ use PDO;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-/**
- * @todo handle different fetch modes in cursor mode
- * @todo handle other fetch modes
- */
 class FetchTest extends TestCase
 {
     #[Test]

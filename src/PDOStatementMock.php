@@ -213,8 +213,6 @@ class PDOStatementMock extends PDOStatement
         }
 
         switch ($mode) {
-            // TODO: handle other fetch mods
-
             case PDO::FETCH_ASSOC:
                 return (array) $row;
 
@@ -225,7 +223,7 @@ class PDOStatementMock extends PDOStatement
                 return (object) $row;
 
             case PDO::FETCH_BOTH:
-                return array_merge($row, array_values($row));
+                return $this->applyFetchModeBoth($row);
 
             case PDO::FETCH_BOUND:
                 return $this->applyFetchModeBound($row);
@@ -235,9 +233,14 @@ class PDOStatementMock extends PDOStatement
         }
     }
 
+    protected function applyFetchModeBoth(array $row): array
+    {
+        return array_merge($row, array_values($row));
+    }
+
     protected function applyFetchModeBound(array $row): bool
     {
-        $row = array_merge($row, array_values($row));
+        $row = $this->applyFetchModeBoth($row);
 
         foreach ($this->boundColumns as $column => $params) {
             $rowIndex = is_int($column)
@@ -263,8 +266,6 @@ class PDOStatementMock extends PDOStatement
     protected function applyParamType(int $type, mixed $value): mixed
     {
         switch ($type) {
-            // TODO: handle other types
-
             case $this->pdo::PARAM_NULL:
                 return null;
 

@@ -22,6 +22,17 @@ class ExecuteTest extends TestCase
     }
 
     #[Test]
+    public function itShouldFailOnUnexpectedQuery(): void
+    {
+        $pdo = new PDOMock();
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query: select * from "books"');
+
+        $pdo->exec('select * from "books"');
+    }
+
+    #[Test]
     public function itShouldFailWhenQueryDoesntMatch(): void
     {
         $pdo = new PDOMock();
