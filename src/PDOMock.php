@@ -4,6 +4,7 @@ namespace Xala\Elomock;
 
 use Override;
 use PDO;
+use PDOException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -201,12 +202,17 @@ class PDOMock extends PDO
 
     public function beginTransaction(): bool
     {
+        if ($this->inTransaction) {
+            throw new PDOException('There is already an active transaction');
+        }
+
         $this->inTransaction = true;
 
         if ($this->ignoreTransactions) {
             return true;
         }
 
+        // TODO: ensure transaction is expected
         $expectation = array_shift($this->expectations);
 
         TestCase::assertSame($expectation->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
@@ -216,12 +222,17 @@ class PDOMock extends PDO
 
     public function commit(): bool
     {
+        if (! $this->inTransaction) {
+            throw new PDOException('There is no active transaction');
+        }
+
         $this->inTransaction = false;
 
         if ($this->ignoreTransactions) {
             return true;
         }
 
+        // TODO: ensure transaction is expected
         $expectation = array_shift($this->expectations);
 
         TestCase::assertSame($expectation->query, 'PDO::commit()', 'Unexpected PDO::commit()');
@@ -231,12 +242,17 @@ class PDOMock extends PDO
 
     public function rollBack(): bool
     {
+        if (! $this->inTransaction) {
+            throw new PDOException('There is no active transaction');
+        }
+
         $this->inTransaction = false;
 
         if ($this->ignoreTransactions) {
             return true;
         }
 
+        // TODO: ensure transaction is expected
         $expectation = array_shift($this->expectations);
 
         TestCase::assertSame($expectation->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');

@@ -8,13 +8,10 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
-/**
- * @todo handle nested transactions
- */
 class TransactionTest extends TestCase
 {
     #[Test]
-    public function itShouldExecuteQueryInTransaction(): void
+    public function itShouldCommitTransaction(): void
     {
         $pdo = new PDOMock();
 
@@ -106,7 +103,7 @@ class TransactionTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleIgnoreTransactionsMode(): void
+    public function itShouldIgnoreTransactionsWhenModeIsEnabled(): void
     {
         $pdo = new PDOMock();
         $pdo->ignoreTransactions();
