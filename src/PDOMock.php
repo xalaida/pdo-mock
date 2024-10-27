@@ -4,6 +4,7 @@ namespace Xala\Elomock;
 
 use Override;
 use PDO;
+use PDOException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -24,6 +25,8 @@ class PDOMock extends PDO
     protected bool $inTransaction = false;
 
     public string $lastInsertId = '0';
+
+    protected PDOException | null $latestException = null;
 
     /**
      * @noinspection PhpMissingParentConstructorInspection
@@ -78,6 +81,8 @@ class PDOMock extends PDO
         TestCase::assertEquals($expectation->query, $statement);
 
         if ($expectation->exception) {
+            $this->latestException = $expectation->exception;
+
             throw $expectation->exception;
         }
 
@@ -201,11 +206,19 @@ class PDOMock extends PDO
 
     public function errorCode(): ?string
     {
+        if ($this->latestException) {
+            return $this->latestException->errorInfo[0];
+        }
+
         return null;
     }
 
     public function errorInfo(): array
     {
+        if ($this->latestException) {
+            return $this->latestException->errorInfo;
+        }
+
         return ['', null, null];
     }
 
