@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class FetchModeBoundTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchInBoundModeUsingColumns(PDO $pdo): void
     {
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
@@ -46,7 +46,7 @@ class FetchModeBoundTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchInBoundModeUsingNamedColumns(PDO $pdo): void
     {
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
@@ -84,7 +84,7 @@ class FetchModeBoundTest extends TestCase
         static::assertFalse($row);
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

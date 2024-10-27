@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class ExecuteDeleteTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldReturnAffectedRowsOnExecute(PDO $pdo): void
     {
         $result = $pdo->exec('delete from "books"');
@@ -18,7 +18,7 @@ class ExecuteDeleteTest extends TestCase
         static::assertSame(0, $result);
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

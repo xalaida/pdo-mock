@@ -11,7 +11,7 @@ use Xala\Elomock\PDOMock;
 class FetchAllTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -22,7 +22,7 @@ class FetchAllTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldFailOnFetchAllInLazyMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -37,7 +37,7 @@ class FetchAllTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchAllInAssocMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -56,7 +56,7 @@ class FetchAllTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchAllInNumMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -75,7 +75,7 @@ class FetchAllTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchAllInBothMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -94,7 +94,7 @@ class FetchAllTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchAllInObjMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -113,7 +113,7 @@ class FetchAllTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchAllInBothModeAsDefault(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -132,7 +132,7 @@ class FetchAllTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldUseCustomDefaultFetchMode(PDO $pdo): void
     {
         $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
@@ -153,7 +153,7 @@ class FetchAllTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldUseCustomDefaultFetchModeForStatement(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -173,7 +173,7 @@ class FetchAllTest extends TestCase
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

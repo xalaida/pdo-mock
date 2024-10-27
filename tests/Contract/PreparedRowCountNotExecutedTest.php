@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class PreparedRowCountNotExecutedTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldReturnRowCountUsingNotExecutedPreparedStatement(PDO $pdo): void
     {
         $statement = $pdo->prepare('delete from "books"');
@@ -18,7 +18,7 @@ class PreparedRowCountNotExecutedTest extends TestCase
         static::assertSame(0, $statement->rowCount());
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

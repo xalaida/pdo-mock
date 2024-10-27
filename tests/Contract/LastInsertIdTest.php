@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class LastInsertIdTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldUseLastInsertIdFromQuery(PDO $pdo): void
     {
         $pdo->exec('insert into "books" ("id", "title") values (777, "Kaidash’s Family")');
@@ -19,7 +19,7 @@ class LastInsertIdTest extends TestCase
         static::assertSame('777', $pdo->lastInsertId());
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

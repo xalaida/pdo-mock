@@ -11,7 +11,7 @@ use Xala\Elomock\PDOMock;
 class TransactionCommitWithoutBeginTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldFailOnCommitWithoutBeginTransaction(PDO $pdo): void
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
@@ -22,7 +22,7 @@ class TransactionCommitWithoutBeginTest extends TestCase
         $pdo->commit();
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

@@ -11,7 +11,7 @@ use Xala\Elomock\PDOMock;
 class FetchModeBoundInvalidColumnIndexTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldThrowValueExceptionWhenInvalidColumnIndex(PDO $pdo): void
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
@@ -37,7 +37,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
         }
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

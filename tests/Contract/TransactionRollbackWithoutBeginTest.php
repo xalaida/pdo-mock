@@ -11,7 +11,7 @@ use Xala\Elomock\PDOMock;
 class TransactionRollbackWithoutBeginTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldFailOnCRollbackWithoutBeginTransaction(PDO $pdo): void
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
@@ -22,7 +22,7 @@ class TransactionRollbackWithoutBeginTest extends TestCase
         $pdo->rollBack();
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

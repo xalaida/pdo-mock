@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class TransactionCommitTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldCommitTransaction(PDO $pdo): void
     {
         static::assertFalse(
@@ -36,7 +36,7 @@ class TransactionCommitTest extends TestCase
         );
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

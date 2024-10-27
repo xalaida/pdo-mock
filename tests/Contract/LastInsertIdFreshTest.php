@@ -10,14 +10,14 @@ use Xala\Elomock\PDOMock;
 class LastInsertIdFreshTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldReturnZeroAsLastInsertId(PDO $pdo): void
     {
         static::assertSame('0', $pdo->lastInsertId());
         static::assertSame('0', $pdo->lastInsertId());
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

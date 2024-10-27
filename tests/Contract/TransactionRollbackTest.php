@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class TransactionRollbackTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldRollbackTransaction(PDO $pdo): void
     {
         static::assertTrue(
@@ -24,7 +24,7 @@ class TransactionRollbackTest extends TestCase
         );
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

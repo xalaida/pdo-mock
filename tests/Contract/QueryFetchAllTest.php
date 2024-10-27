@@ -11,7 +11,7 @@ use Xala\Elomock\PDOMock;
 class QueryFetchAllTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldFetchRowsUsingQuery(PDO $pdo): void
     {
         $statement = $pdo->query('select * from "books"');
@@ -28,7 +28,7 @@ class QueryFetchAllTest extends TestCase
         static::assertSame(0, $statement->rowCount());
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

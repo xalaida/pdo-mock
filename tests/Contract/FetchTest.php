@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class FetchTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetch(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -35,7 +35,7 @@ class FetchTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldReturnFalseWhenStatementIsNotExecuted(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -46,7 +46,7 @@ class FetchTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchInAssocMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -71,7 +71,7 @@ class FetchTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchInNumMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -96,7 +96,7 @@ class FetchTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchInBothMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -121,7 +121,7 @@ class FetchTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleFetchInObjMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -145,7 +145,7 @@ class FetchTest extends TestCase
         static::assertFalse($row);
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

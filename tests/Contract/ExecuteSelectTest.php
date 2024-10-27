@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class ExecuteSelectTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldExecuteQuery(PDO $pdo): void
     {
         $result = $pdo->exec('select * from "books"');
@@ -18,7 +18,7 @@ class ExecuteSelectTest extends TestCase
         static::assertSame(2, $result);
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

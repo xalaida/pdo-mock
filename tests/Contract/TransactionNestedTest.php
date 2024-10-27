@@ -11,7 +11,7 @@ use Xala\Elomock\PDOMock;
 class TransactionNestedTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldHandleNestedTransactions(PDO $pdo): void
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
@@ -26,7 +26,7 @@ class TransactionNestedTest extends TestCase
         static::assertTrue($pdo->inTransaction());
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [

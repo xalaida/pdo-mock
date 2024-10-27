@@ -10,7 +10,7 @@ use Xala\Elomock\PDOMock;
 class PreparedRowCountExecutedTest extends TestCase
 {
     #[Test]
-    #[DataProvider('connections')]
+    #[DataProvider('contracts')]
     public function itShouldReturnAffectedRowsUsingPreparedStatement(PDO $pdo): void
     {
         $statement = $pdo->prepare('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
@@ -20,7 +20,7 @@ class PreparedRowCountExecutedTest extends TestCase
         static::assertSame(2, $statement->rowCount());
     }
 
-    public static function connections(): array
+    public static function contracts(): array
     {
         return [
             'SQLite' => [
