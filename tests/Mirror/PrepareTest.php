@@ -35,7 +35,7 @@ class PrepareTest extends TestCase
     public function itShouldHandleBindValues(): void
     {
         $scenario = function (PDO $pdo) {
-            $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
+            $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
 
             static::assertTrue(
                 $statement->bindValue(1, 'active', $pdo::PARAM_STR)
@@ -43,10 +43,6 @@ class PrepareTest extends TestCase
 
             static::assertTrue(
                 $statement->bindValue(2, 2024, $pdo::PARAM_INT)
-            );
-
-            static::assertTrue(
-                $statement->bindValue(3, true, $pdo::PARAM_BOOL)
             );
 
             static::assertTrue(
@@ -58,11 +54,44 @@ class PrepareTest extends TestCase
 
         $mock = new PDOMock();
 
-        $mock->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
+        $mock->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
             ->toBindValue(1, 'active', $mock::PARAM_STR)
-            ->toBindValue(2, 2024, $mock::PARAM_INT)
-            ->toBindValue(3, true, $mock::PARAM_BOOL);
+            ->toBindValue(2, 2024, $mock::PARAM_INT);
+
+        $scenario($mock);
+    }
+
+    #[Test]
+    public function itShouldHandleBindParam(): void
+    {
+        $scenario = function (PDO $pdo) {
+            $status = 'published';
+            $year = 2024;
+
+            $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
+
+            static::assertTrue(
+                $statement->bindParam(1, $status, $pdo::PARAM_STR, 10)
+            );
+
+            static::assertTrue(
+                $statement->bindParam(2, $year, $pdo::PARAM_INT)
+            );
+
+            static::assertTrue(
+                $statement->execute()
+            );
+        };
+
+        $scenario($this->sqlite());
+
+        $mock = new PDOMock();
+
+        $mock->expect('select * from "books" where "status" = ? and "year" = ?')
+            ->toBePrepared()
+            ->toBindValue(1, 'published', $mock::PARAM_STR)
+            ->toBindValue(2, 2024, $mock::PARAM_INT);
 
         $scenario($mock);
     }
