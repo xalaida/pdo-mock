@@ -3,29 +3,19 @@
 namespace Tests\Xala\Elomock\Mirror;
 
 use PDO;
-use PDOStatement;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class QueryFetchAllTest extends TestCase
+class ExecuteSelectTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldFetchRowsUsingQuery(PDO $pdo): void
+    public function itShouldExecuteQuery(PDO $pdo): void
     {
-        $statement = $pdo->query('select * from "books"');
+        $result = $pdo->exec('select * from "books"');
 
-        $rows = $statement->fetchAll($pdo::FETCH_OBJ);
-
-        static::assertCount(2, $rows);
-        static::assertIsObject($rows[0]);
-        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsObject($rows[1]);
-        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
-
-        $this->assertInstanceOf(PDOStatement::class, $statement);
-        static::assertSame(0, $statement->rowCount());
+        static::assertSame(2, $result);
     }
 
     public static function connections(): array

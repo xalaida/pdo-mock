@@ -7,13 +7,16 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
+    /**
+     * @deprecated
+     */
     protected function sqlite(): PDO
     {
-        $sqlite = new PDO('sqlite::memory:');
+        $pdo = new PDO('sqlite::memory:');
 
-        $sqlite->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
+        $pdo->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
 
-        return $sqlite;
+        return $pdo;
     }
 
     protected function expectTriggerWarning(callable $callback, string | null $message = null)

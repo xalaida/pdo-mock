@@ -44,13 +44,13 @@ class FailedQueryTest extends TestCase
     #[Test]
     public function itShouldFailUsingCustomErrorException(): void
     {
-        $mock = new PDOMock();
+        $pdo = new PDOMock();
 
-        $mock->expect('select table "books"')
+        $pdo->expect('select table "books"')
             ->andFailOnExecute(new PDOException('Invalid SQL'));
 
         try {
-            $mock->exec('select table "books"');
+            $pdo->exec('select table "books"');
 
             $this->fail('Exception was not thrown');
         } catch (PDOException $e) {

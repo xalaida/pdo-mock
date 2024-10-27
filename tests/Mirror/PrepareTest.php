@@ -21,14 +21,14 @@ class PrepareTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
+        $pdo = new PDOMock();
 
-        $mock->expect('select * from "books"')
+        $pdo->expect('select * from "books"')
             ->toBePrepared();
 
-        $scenario($mock);
+        $scenario($pdo);
 
-        $mock->assertExpectationsFulfilled();
+        $pdo->assertExpectationsFulfilled();
     }
 
     #[Test]
@@ -52,14 +52,14 @@ class PrepareTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
+        $pdo = new PDOMock();
 
-        $mock->expect('select * from "books" where "status" = ? and "year" = ?')
+        $pdo->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
-            ->withBound(1, 'active', $mock::PARAM_STR)
-            ->withBound(2, 2024, $mock::PARAM_INT);
+            ->withBound(1, 'active', $pdo::PARAM_STR)
+            ->withBound(2, 2024, $pdo::PARAM_INT);
 
-        $scenario($mock);
+        $scenario($pdo);
     }
 
     #[Test]
@@ -86,13 +86,13 @@ class PrepareTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
+        $pdo = new PDOMock();
 
-        $mock->expect('select * from "books" where "status" = ? and "year" = ?')
+        $pdo->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
-            ->withBound(1, 'published', $mock::PARAM_STR)
-            ->withBound(2, 2024, $mock::PARAM_INT);
+            ->withBound(1, 'published', $pdo::PARAM_STR)
+            ->withBound(2, 2024, $pdo::PARAM_INT);
 
-        $scenario($mock);
+        $scenario($pdo);
     }
 }

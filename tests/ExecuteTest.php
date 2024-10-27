@@ -22,6 +22,23 @@ class ExecuteTest extends TestCase
     }
 
     #[Test]
+    public function itShouldCalculatesRowCountUsingFetchRows(): void
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books"')
+            ->andFetchRows([
+                ['id' => 1],
+                ['id' => 2],
+                ['id' => 3],
+            ]);
+
+        $result = $pdo->exec('select * from "books"');
+
+        static::assertSame(3, $result);
+    }
+
+    #[Test]
     public function itShouldFailOnUnexpectedQuery(): void
     {
         $pdo = new PDOMock();

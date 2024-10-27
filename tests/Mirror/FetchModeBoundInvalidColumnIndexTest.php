@@ -41,16 +41,16 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
     {
         return [
             'SQLite' => [
-                static::prepareSqlite()
+                static::configureSqlite()
             ],
 
             'Mock' => [
-                static::prepareMock()
+                static::configureMock()
             ],
         ];
     }
 
-    protected static function prepareSqlite(): PDO
+    protected static function configureSqlite(): PDO
     {
         $pdo = new PDO('sqlite::memory:');
 
@@ -64,7 +64,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
         return $pdo;
     }
 
-    protected static function prepareMock(): PDOMock
+    protected static function configureMock(): PDOMock
     {
         $pdo = new PDOMock();
 

@@ -3,27 +3,21 @@
 namespace Tests\Xala\Elomock\Mirror;
 
 use PDO;
-use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class TransactionNestedTest extends TestCase
+class PreparedRowCountExecutedTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldHandleNestedTransactions(PDO $pdo): void
+    public function itShouldReturnAffectedRowsUsingPreparedStatement(PDO $pdo): void
     {
-        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
+        $statement = $pdo->prepare('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
 
-        $pdo->beginTransaction();
+        $statement->execute();
 
-        $this->expectException(PDOException::class);
-        $this->expectExceptionMessage('There is already an active transaction');
-
-        $pdo->beginTransaction();
-
-        static::assertTrue($pdo->inTransaction());
+        static::assertSame(2, $statement->rowCount());
     }
 
     public static function connections(): array
@@ -52,8 +46,8 @@ class TransactionNestedTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectBeginTransaction();
-        $pdo->expectBeginTransaction();
+        $pdo->expect('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")')
+            ->affecting(2);
 
         return $pdo;
     }

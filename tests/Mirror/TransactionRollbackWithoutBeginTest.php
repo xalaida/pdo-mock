@@ -26,21 +26,21 @@ class TransactionRollbackWithoutBeginTest extends TestCase
     {
         return [
             'SQLite' => [
-                static::prepareSqlite()
+                static::configureSqlite()
             ],
 
             'Mock' => [
-                static::prepareMock()
+                static::configureMock()
             ],
         ];
     }
 
-    protected static function prepareSqlite(): PDO
+    protected static function configureSqlite(): PDO
     {
         return new PDO('sqlite::memory:');
     }
 
-    protected static function prepareMock(): PDOMock
+    protected static function configureMock(): PDOMock
     {
         $pdo = new PDOMock();
 

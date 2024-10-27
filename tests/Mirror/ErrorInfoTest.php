@@ -20,8 +20,8 @@ class ErrorInfoTest extends TestCase
 
         $scenario(new PDO('sqlite::memory:'));
 
-        $mock = new PDOMock();
-        $scenario($mock);
+        $pdo = new PDOMock();
+        $scenario($pdo);
     }
 
     #[Test]
@@ -39,9 +39,9 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
-        $scenario($mock);
+        $pdo = new PDOMock();
+        $pdo->expect('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
+        $scenario($pdo);
     }
 
     #[Test]
@@ -61,9 +61,9 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
-        $scenario($mock);
+        $pdo = new PDOMock();
+        $pdo->expect('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
+        $scenario($pdo);
     }
 
     #[Test]
@@ -86,15 +86,15 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('select table "books"')
+        $pdo = new PDOMock();
+        $pdo->expect('select table "books"')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',
                 1
             ));
-        $scenario($mock);
+        $scenario($pdo);
     }
 
     #[Test]
@@ -117,15 +117,15 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('select table "books"')
+        $pdo = new PDOMock();
+        $pdo->expect('select table "books"')
             ->andFailOnPrepare(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',
                 1
             ));
-        $scenario($mock);
+        $scenario($pdo);
     }
 
     #[Test]
@@ -153,15 +153,15 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('insert into books (id, title) values (1, null)')
+        $pdo = new PDOMock();
+        $pdo->expect('insert into books (id, title) values (1, null)')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: books.title',
                 '23000',
                 'NOT NULL constraint failed: books.title',
                 19
             ));
-        $scenario($mock);
+        $scenario($pdo);
     }
 
     #[Test]
@@ -184,16 +184,16 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('select table "books"')
+        $pdo = new PDOMock();
+        $pdo->expect('select table "books"')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',
                 1
             ));
-        $mock->expect('select * from "books"');
-        $scenario($mock);
+        $pdo->expect('select * from "books"');
+        $scenario($pdo);
     }
 
     #[Test]
@@ -211,15 +211,15 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('select table "books"')
+        $pdo = new PDOMock();
+        $pdo->expect('select table "books"')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',
                 1
             ));
-        $scenario($mock);
+        $scenario($pdo);
     }
 
     #[Test]
@@ -239,15 +239,15 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('select table "books"')
+        $pdo = new PDOMock();
+        $pdo->expect('select table "books"')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',
                 1
             ));
-        $scenario($mock);
+        $scenario($pdo);
     }
 
     #[Test]
@@ -268,15 +268,15 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('select table "books"')
+        $pdo = new PDOMock();
+        $pdo->expect('select table "books"')
             ->andFailOnPrepare(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',
                 1
             ));
-        $scenario($mock);
+        $scenario($pdo);
     }
 
     #[Test]
@@ -302,14 +302,14 @@ class ErrorInfoTest extends TestCase
 
         $scenario($this->sqlite());
 
-        $mock = new PDOMock();
-        $mock->expect('insert into books (id, title) values (1, null)')
+        $pdo = new PDOMock();
+        $pdo->expect('insert into books (id, title) values (1, null)')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: books.title',
                 '23000',
                 'NOT NULL constraint failed: books.title',
                 19
             ));
-        $scenario($mock);
+        $scenario($pdo);
     }
 }

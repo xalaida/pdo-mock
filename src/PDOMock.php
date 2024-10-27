@@ -113,7 +113,7 @@ class PDOMock extends PDO
             $this->lastInsertId = $expectation->insertId;
         }
 
-        return $expectation->rowCount;
+        return count($expectation->rows) ?: $expectation->rowCount;
     }
 
     public function prepare($query, $options = []): PDOStatementMock | false
