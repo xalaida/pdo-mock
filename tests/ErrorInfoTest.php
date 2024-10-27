@@ -77,7 +77,7 @@ class ErrorInfoTest extends TestCase
     {
         $scenario = function (PDO $pdo) {
             try {
-                $pdo->exec('select table "users"');
+                $pdo->exec('select table "books"');
 
                 $this->fail('Exception was not thrown');
             } catch (PDOException $e) {
@@ -94,7 +94,7 @@ class ErrorInfoTest extends TestCase
         $scenario($sqlite);
 
         $mock = new PDOMock();
-        $mock->expect('select table "users"')
+        $mock->expect('select table "books"')
             ->andFail(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
@@ -109,7 +109,7 @@ class ErrorInfoTest extends TestCase
     {
         $scenario = function (PDO $pdo) {
             try {
-                $pdo->prepare('select table "users"');
+                $pdo->prepare('select table "books"');
 
                 $this->fail('Exception was not thrown');
             } catch (PDOException $e) {
@@ -126,7 +126,7 @@ class ErrorInfoTest extends TestCase
         $scenario($sqlite);
 
         $mock = new PDOMock();
-        $mock->expect('select table "users"')
+        $mock->expect('select table "books"')
             ->andFailOnPrepare(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
@@ -140,18 +140,18 @@ class ErrorInfoTest extends TestCase
     public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement(): void
     {
         $scenario = function (PDO $pdo) {
-            $statement = $pdo->prepare("insert into users (id, name) values (1, null)");
+            $statement = $pdo->prepare("insert into books (id, title) values (1, null)");
 
             try {
                 $statement->execute();
 
                 $this->fail('Exception was not thrown');
             } catch (PDOException $e) {
-                static::assertSame('SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: users.name', $e->getMessage());
+                static::assertSame('SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: books.title', $e->getMessage());
                 static::assertSame('23000', $e->getCode());
-                static::assertSame(['23000', 19, 'NOT NULL constraint failed: users.name'], $e->errorInfo);
+                static::assertSame(['23000', 19, 'NOT NULL constraint failed: books.title'], $e->errorInfo);
 
-                static::assertSame(['23000', 19, 'NOT NULL constraint failed: users.name'], $statement->errorInfo());
+                static::assertSame(['23000', 19, 'NOT NULL constraint failed: books.title'], $statement->errorInfo());
                 static::assertSame('23000', $statement->errorCode());
 
                 static::assertSame(['00000', null, null], $pdo->errorInfo());
@@ -160,15 +160,15 @@ class ErrorInfoTest extends TestCase
         };
 
         $sqlite = new PDO('sqlite::memory:');
-        $sqlite->exec("create table users (id integer primary key, name text not null)");
+        $sqlite->exec("create table books (id integer primary key, title text not null)");
         $scenario($sqlite);
 
         $mock = new PDOMock();
-        $mock->expect('insert into users (id, name) values (1, null)')
+        $mock->expect('insert into books (id, title) values (1, null)')
             ->andFail(PDOExceptionMock::fromErrorInfo(
-                'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: users.name',
+                'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: books.title',
                 '23000',
-                'NOT NULL constraint failed: users.name',
+                'NOT NULL constraint failed: books.title',
                 19
             ));
         $scenario($mock);
@@ -179,11 +179,11 @@ class ErrorInfoTest extends TestCase
     {
         $mock = new PDOMock();
 
-        $mock->expect('select table "users"')
+        $mock->expect('select table "books"')
             ->andFail(new PDOException('Invalid SQL'));
 
         try {
-            $mock->exec('select table "users"');
+            $mock->exec('select table "books"');
 
             $this->fail('Exception was not thrown');
         } catch (PDOException $e) {
@@ -193,6 +193,39 @@ class ErrorInfoTest extends TestCase
         }
     }
 
+    #[Test]
+    public function itShouldClearPreviousErrorInfoOnSuccessfulQuery(): void
+    {
+        $scenario = function (PDO $pdo) {
+            try {
+                $pdo->exec('select table "books"');
+
+                $this->fail('Exception was not thrown');
+            } catch (PDOException $e) {
+                static::assertSame('SQLSTATE[HY000]: General error: 1 near "table": syntax error', $e->getMessage());
+            }
+
+            $pdo->exec('select * from "books"');
+
+            static::assertSame(['00000', null, null], $pdo->errorInfo());
+            static::assertSame('00000', $pdo->errorCode());
+        };
+
+        $sqlite = new PDO('sqlite::memory:');
+        $sqlite->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
+        $scenario($sqlite);
+
+        $mock = new PDOMock();
+        $mock->expect('select table "books"')
+            ->andFail(PDOExceptionMock::fromErrorInfo(
+                'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
+                'HY000',
+                'near "table": syntax error',
+                1
+            ));
+        $mock->expect('select * from "books"');
+        $scenario($mock);
+    }
+
     // TODO: test different error modes (silent, etc)
-    // TODO: check if next success execution resets previous error on PDO instance...
 }

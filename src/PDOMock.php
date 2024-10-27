@@ -80,6 +80,9 @@ class PDOMock extends PDO
     #[Override]
     public function exec($statement): int | false
     {
+        // TODO: add test for this case
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $statement);
+
         $expectation = array_shift($this->expectations);
 
         if (! is_null($expectation->prepared)) {

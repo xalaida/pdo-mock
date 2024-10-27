@@ -16,4 +16,6 @@ class PDOExceptionMock extends PDOException
 
         return $exception;
     }
+
+    // TODO: add constructor fromSQLState(string | int $code, string $driverErrorType, string $driverErrorMessage)
 }
