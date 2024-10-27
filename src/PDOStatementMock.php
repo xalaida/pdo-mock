@@ -107,14 +107,28 @@ class PDOStatementMock extends PDOStatement
 
         $this->executed = true;
 
-        $this->errorInfo = ['00000', null, null];
-        $this->errorCode = $this->errorInfo[0];
-
-        if ($this->expectation->exceptionOnExecute) {
+        if ($this->expectation->exceptionOnExecute && $this->expectation->exceptionOnExecute->errorInfo) {
             $this->errorInfo = $this->expectation->exceptionOnExecute->errorInfo;
             $this->errorCode = $this->expectation->exceptionOnExecute->errorInfo[0];
+        } else {
+            $this->errorInfo = ['00000', null, null];
+            $this->errorCode = $this->errorInfo[0];
+        }
 
-            throw $this->expectation->exceptionOnExecute;
+        if ($this->expectation->exceptionOnExecute) {
+            if ($this->pdo->getAttribute($this->pdo::ATTR_ERRMODE) === $this->pdo::ERRMODE_SILENT) {
+                return false;
+            }
+
+            if ($this->pdo->getAttribute($this->pdo::ATTR_ERRMODE) === $this->pdo::ERRMODE_WARNING) {
+                trigger_error('PDOStatement::execute(): ' . $this->expectation->exceptionOnExecute->getMessage(), E_USER_WARNING);
+
+                return false;
+            }
+
+            if ($this->pdo->getAttribute($this->pdo::ATTR_ERRMODE) === $this->pdo::ERRMODE_EXCEPTION) {
+                throw $this->expectation->exceptionOnExecute;
+            }
         }
 
         if (! is_null($this->expectation->insertId)) {

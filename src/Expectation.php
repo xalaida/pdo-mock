@@ -113,7 +113,7 @@ class Expectation
         return $this;
     }
 
-    public function andFail(PDOException $exception): static
+    public function andFailOnExecute(PDOException $exception): static
     {
         $this->exceptionOnExecute = $exception;
 

@@ -40,7 +40,8 @@ class PDOMock extends PDO
     {
         $this->attributes = [
             // TODO: define missing attributes
-            self::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
+            $this::ATTR_ERRMODE => $this::ERRMODE_EXCEPTION,
+            $this::ATTR_DEFAULT_FETCH_MODE => $this::FETCH_BOTH,
         ];
 
         $this->errorInfo = ['', null, null];
@@ -58,8 +59,6 @@ class PDOMock extends PDO
     #[Override]
     public function getAttribute($attribute)
     {
-        // TODO: handle unknown attributes
-
         return $this->attributes[$attribute];
     }
 
@@ -91,17 +90,28 @@ class PDOMock extends PDO
 
         TestCase::assertEquals($expectation->query, $statement);
 
-        $this->errorInfo = ['00000', null, null];
-        $this->errorCode = $this->errorInfo[0];
+        if ($expectation->exceptionOnExecute && $expectation->exceptionOnExecute->errorInfo) {
+            $this->errorInfo = $expectation->exceptionOnExecute->errorInfo;
+            $this->errorCode = $expectation->exceptionOnExecute->errorInfo[0];
+        } else {
+            $this->errorInfo = ['00000', null, null];
+            $this->errorCode = $this->errorInfo[0];
+        }
 
         if ($expectation->exceptionOnExecute) {
-            // TODO: refactor
-            if ($expectation->exceptionOnExecute->errorInfo) {
-                $this->errorInfo = $expectation->exceptionOnExecute->errorInfo;
-                $this->errorCode = $expectation->exceptionOnExecute->errorInfo[0];
+            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_SILENT) {
+                return false;
             }
 
-            throw $expectation->exceptionOnExecute;
+            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_WARNING) {
+                trigger_error('PDO::exec(): ' . $expectation->exceptionOnExecute->getMessage(), E_USER_WARNING);
+
+                return false;
+            }
+
+            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_EXCEPTION) {
+                throw $expectation->exceptionOnExecute;
+            }
         }
 
         if (! is_null($expectation->insertId)) {
@@ -112,29 +122,41 @@ class PDOMock extends PDO
     }
 
     // TODO: handle $options
-    public function prepare($query, $options = []): PDOStatementMock
+    public function prepare($query, $options = []): PDOStatementMock | false
     {
         TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $query);
 
         $expectation = array_shift($this->expectations);
 
-        // TODO: refactor...
-        $this->errorInfo = ['00000', null, null];
-        $this->errorCode = $this->errorInfo[0];
+        if ($expectation->exceptionOnPrepare && $expectation->exceptionOnPrepare->errorInfo) {
+            $this->errorInfo = $expectation->exceptionOnPrepare->errorInfo;
+            $this->errorCode = $expectation->exceptionOnPrepare->errorInfo[0];
+        } else {
+            $this->errorInfo = ['00000', null, null];
+            $this->errorCode = $this->errorInfo[0];
+        }
 
         if ($expectation->exceptionOnPrepare) {
-            // TODO: refactor
-            if ($expectation->exceptionOnPrepare->errorInfo) {
-                $this->errorInfo = $expectation->exceptionOnPrepare->errorInfo;
-                $this->errorCode = $expectation->exceptionOnPrepare->errorInfo[0];
+            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_SILENT) {
+                return false;
             }
 
-            throw $expectation->exceptionOnPrepare;
+            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_WARNING) {
+                trigger_error('PDO::prepare(): ' . $expectation->exceptionOnPrepare->getMessage(), E_USER_WARNING);
+
+                return false;
+            }
+
+            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_EXCEPTION) {
+                throw $expectation->exceptionOnPrepare;
+            }
         }
 
         $statement = new PDOStatementMock($this, $expectation, $query);
 
-        $statement->setFetchMode($this->getAttribute($this::ATTR_DEFAULT_FETCH_MODE));
+        $statement->setFetchMode(
+            $this->getAttribute($this::ATTR_DEFAULT_FETCH_MODE)
+        );
 
         return $statement;
     }
