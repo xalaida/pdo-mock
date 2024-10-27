@@ -1,27 +1,29 @@
 <?php
 
-namespace Tests\Xala\Elomock\Mirror;
+namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
+use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class TransactionRollbackTest extends TestCase
+class TransactionNestedTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldRollbackTransaction(PDO $pdo): void
+    public function itShouldHandleNestedTransactions(PDO $pdo): void
     {
-        static::assertTrue(
-            $pdo->beginTransaction()
-        );
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
 
-        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
+        $pdo->beginTransaction();
 
-        static::assertTrue(
-            $pdo->rollBack()
-        );
+        $this->expectException(PDOException::class);
+        $this->expectExceptionMessage('There is already an active transaction');
+
+        $pdo->beginTransaction();
+
+        static::assertTrue($pdo->inTransaction());
     }
 
     public static function connections(): array
@@ -51,10 +53,7 @@ class TransactionRollbackTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expectBeginTransaction();
-
-        $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
-
-        $pdo->expectRollback();
+        $pdo->expectBeginTransaction();
 
         return $pdo;
     }

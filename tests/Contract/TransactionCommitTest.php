@@ -1,23 +1,39 @@
 <?php
 
-namespace Tests\Xala\Elomock\Mirror;
+namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class PreparedRowCountExecutedTest extends TestCase
+class TransactionCommitTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldReturnAffectedRowsUsingPreparedStatement(PDO $pdo): void
+    public function itShouldCommitTransaction(PDO $pdo): void
     {
-        $statement = $pdo->prepare('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
+        static::assertFalse(
+            $pdo->inTransaction()
+        );
 
-        $statement->execute();
+        static::assertTrue(
+            $pdo->beginTransaction()
+        );
 
-        static::assertSame(2, $statement->rowCount());
+        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
+
+        static::assertTrue(
+            $pdo->inTransaction()
+        );
+
+        static::assertTrue(
+            $pdo->commit()
+        );
+
+        static::assertFalse(
+            $pdo->inTransaction()
+        );
     }
 
     public static function connections(): array
@@ -46,8 +62,11 @@ class PreparedRowCountExecutedTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")')
-            ->affecting(2);
+        $pdo->expectBeginTransaction();
+
+        $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
+
+        $pdo->expectCommit();
 
         return $pdo;
     }

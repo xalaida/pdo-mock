@@ -1,39 +1,21 @@
 <?php
 
-namespace Tests\Xala\Elomock\Mirror;
+namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class TransactionCommitTest extends TestCase
+class ExecuteSelectTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldCommitTransaction(PDO $pdo): void
+    public function itShouldExecuteQuery(PDO $pdo): void
     {
-        static::assertFalse(
-            $pdo->inTransaction()
-        );
+        $result = $pdo->exec('select * from "books"');
 
-        static::assertTrue(
-            $pdo->beginTransaction()
-        );
-
-        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
-
-        static::assertTrue(
-            $pdo->inTransaction()
-        );
-
-        static::assertTrue(
-            $pdo->commit()
-        );
-
-        static::assertFalse(
-            $pdo->inTransaction()
-        );
+        static::assertSame(2, $result);
     }
 
     public static function connections(): array
@@ -55,6 +37,8 @@ class TransactionCommitTest extends TestCase
 
         $pdo->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
 
+        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family"), ("Shadows of the Forgotten Ancestors")');
+
         return $pdo;
     }
 
@@ -62,11 +46,11 @@ class TransactionCommitTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectBeginTransaction();
-
-        $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
-
-        $pdo->expectCommit();
+        $pdo->expect('select * from "books"')
+            ->andFetchRows([
+                ['id' => 1, 'title' => 'Kaidash’s Family'],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
+            ]);
 
         return $pdo;
     }

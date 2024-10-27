@@ -1,21 +1,27 @@
 <?php
 
-namespace Tests\Xala\Elomock\Mirror;
+namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class PreparedRowCountNotExecutedTest extends TestCase
+class TransactionRollbackTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldReturnRowCountUsingNotExecutedPreparedStatement(PDO $pdo): void
+    public function itShouldRollbackTransaction(PDO $pdo): void
     {
-        $statement = $pdo->prepare('delete from "books"');
+        static::assertTrue(
+            $pdo->beginTransaction()
+        );
 
-        static::assertSame(0, $statement->rowCount());
+        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
+
+        static::assertTrue(
+            $pdo->rollBack()
+        );
     }
 
     public static function connections(): array
@@ -44,8 +50,11 @@ class PreparedRowCountNotExecutedTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('delete from "books"')
-            ->affecting(2);
+        $pdo->expectBeginTransaction();
+
+        $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
+
+        $pdo->expectRollback();
 
         return $pdo;
     }

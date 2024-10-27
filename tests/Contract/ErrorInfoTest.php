@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock\Mirror;
+namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PDOException;

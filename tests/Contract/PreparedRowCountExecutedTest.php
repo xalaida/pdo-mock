@@ -1,21 +1,23 @@
 <?php
 
-namespace Tests\Xala\Elomock\Mirror;
+namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class ExecuteInsertTest extends TestCase
+class PreparedRowCountExecutedTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldReturnAffectedRowsOnExecute(PDO $pdo): void
+    public function itShouldReturnAffectedRowsUsingPreparedStatement(PDO $pdo): void
     {
-        $result = $pdo->exec('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
+        $statement = $pdo->prepare('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
 
-        static::assertSame(2, $result);
+        $statement->execute();
+
+        static::assertSame(2, $statement->rowCount());
     }
 
     public static function connections(): array

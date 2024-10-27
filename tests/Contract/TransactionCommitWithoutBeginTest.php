@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock\Mirror;
+namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PDOException;
@@ -8,18 +8,18 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class TransactionRollbackWithoutBeginTest extends TestCase
+class TransactionCommitWithoutBeginTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldFailOnCRollbackWithoutBeginTransaction(PDO $pdo): void
+    public function itShouldFailOnCommitWithoutBeginTransaction(PDO $pdo): void
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
 
         $this->expectException(PDOException::class);
         $this->expectExceptionMessage('There is no active transaction');
 
-        $pdo->rollBack();
+        $pdo->commit();
     }
 
     public static function connections(): array
@@ -44,7 +44,7 @@ class TransactionRollbackWithoutBeginTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expectRollback();
+        $pdo->expectCommit();
 
         return $pdo;
     }

@@ -1,19 +1,19 @@
 <?php
 
-namespace Tests\Xala\Elomock\Mirror;
+namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-class ExecuteSelectTest extends TestCase
+class ExecuteInsertTest extends TestCase
 {
     #[Test]
     #[DataProvider('connections')]
-    public function itShouldExecuteQuery(PDO $pdo): void
+    public function itShouldReturnAffectedRowsOnExecute(PDO $pdo): void
     {
-        $result = $pdo->exec('select * from "books"');
+        $result = $pdo->exec('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
 
         static::assertSame(2, $result);
     }
@@ -37,8 +37,6 @@ class ExecuteSelectTest extends TestCase
 
         $pdo->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
 
-        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family"), ("Shadows of the Forgotten Ancestors")');
-
         return $pdo;
     }
 
@@ -46,11 +44,8 @@ class ExecuteSelectTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('select * from "books"')
-            ->andFetchRows([
-                ['id' => 1, 'title' => 'Kaidash’s Family'],
-                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
-            ]);
+        $pdo->expect('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")')
+            ->affecting(2);
 
         return $pdo;
     }
