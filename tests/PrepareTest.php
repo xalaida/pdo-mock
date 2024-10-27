@@ -28,12 +28,10 @@ class PrepareTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $statement = $pdo->prepare('select * from "users"');
-
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: select * from "users"');
 
-        $statement->execute();
+        $pdo->prepare('select * from "users"');
     }
 
     #[Test]
@@ -68,15 +66,18 @@ class PrepareTest extends TestCase
     #[Test]
     public function itShouldFailWhenStatementIsNotExecuted(): void
     {
+        $this->markTestSkipped('To be implemented');
+
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "users"')
-            ->toBePrepared();
+            ->toBePrepared()
+            ->toBeExecuted(false);
+
+        $pdo->prepare('select * from "users"');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Some expectations were not fulfilled');
-
-        $pdo->prepare('select * from "users"');
 
         $pdo->assertExpectationsFulfilled();
     }

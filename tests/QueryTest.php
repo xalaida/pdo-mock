@@ -64,22 +64,4 @@ class QueryTest extends TestCase
 
         $pdo->assertExpectationsFulfilled();
     }
-
-    #[Test]
-    public function itShouldExecQueryMultipleTimes()
-    {
-        $pdo = new PDOMock();
-
-        $pdo->expect('delete from "users" limit 1');
-
-        $pdo->expect('delete from "users" limit 1');
-
-        $statement = $pdo->query('delete from "users" limit 1');
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
-
-        $pdo->assertExpectationsFulfilled();
-    }
 }

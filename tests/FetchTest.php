@@ -53,6 +53,8 @@ class FetchTest extends TestCase
     {
         $pdo = new PDOMock();
 
+        $pdo->expect('select * from "users"');
+
         $statement = $pdo->prepare('select * from "users"');
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);

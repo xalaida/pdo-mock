@@ -23,18 +23,18 @@ class PDOStatementMock extends PDOStatement
 
     protected int $cursor = 0;
 
-    protected bool $executed = false;
-
     protected array $errorInfo;
 
     protected string | null $errorCode;
+
+    private bool $executed;
 
     public function __construct(PDOMock $pdo, Expectation $expectation, string $query)
     {
         $this->pdo = $pdo;
         $this->expectation = $expectation;
         $this->queryString = $query;
-
+        $this->executed = false;
         $this->errorInfo = ['', null, null];
         $this->errorCode = null;
     }
@@ -105,6 +105,8 @@ class PDOStatementMock extends PDOStatement
             }
         }
 
+        $this->executed = true;
+
         $this->errorInfo = ['00000', null, null];
         $this->errorCode = $this->errorInfo[0];
 
@@ -125,6 +127,10 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function rowCount(): int
     {
+        if (! $this->executed) {
+            return 0;
+        }
+
         return $this->expectation->rowCount;
     }
 
@@ -141,8 +147,6 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
-        // TODO: ensure statement is executed
-
         if (isset($this->expectation->rows[$this->cursor])) {
             $row = $this->applyFetchMode($this->expectation->rows[$this->cursor], $mode);
 
@@ -161,7 +165,6 @@ class PDOStatementMock extends PDOStatement
             throw new ValueError('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()');
         }
 
-        // TODO: consider removing this part and the $executed flag as well
         if (! $this->executed) {
             return [];
         }

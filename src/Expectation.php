@@ -11,6 +11,8 @@ class Expectation
 {
     public string $query;
 
+    public bool $executed = true;
+
     public bool | null $prepared = null;
 
     public array | Closure | null $bindings = null;
@@ -30,6 +32,13 @@ class Expectation
     public function __construct(string $query)
     {
         $this->query = $query;
+    }
+
+    public function toBeExecuted(bool $executed = true): static
+    {
+        $this->executed = $executed;
+
+        return $this;
     }
 
     public function toBePrepared(bool $prepared = true): static
