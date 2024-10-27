@@ -3,38 +3,51 @@
 namespace Tests\Xala\Elomock\Mirror;
 
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
 class LastInsertIdTest extends TestCase
 {
     #[Test]
-    public function itShouldReturnZeroAsLastInsertId(): void
+    #[DataProvider('connections')]
+    public function itShouldUseLastInsertIdFromQuery(PDO $pdo): void
     {
-        $scenario = function (PDO $pdo) {
-            static::assertSame('0', $pdo->lastInsertId());
-            static::assertSame('0', $pdo->lastInsertId());
-        };
+        $pdo->exec('insert into "books" ("id", "title") values (777, "Kaidash’s Family")');
 
-        $scenario($this->sqlite());
-
-        $scenario(new PDOMock());
+        static::assertSame('777', $pdo->lastInsertId());
+        static::assertSame('777', $pdo->lastInsertId());
     }
 
-    #[Test]
-    public function itShouldUseLastInsertIdFromQuery(): void
+    public static function connections(): array
     {
-        $scenario = function (PDO $pdo) {
-            $pdo->exec('insert into "books" ("id", "title") values (777, "Kaidash’s Family")');
+        return [
+            'SQLite' => [
+                static::prepareSqlite()
+            ],
 
-            static::assertSame('777', $pdo->lastInsertId());
-            static::assertSame('777', $pdo->lastInsertId());
-        };
+            'Mock' => [
+                static::prepareMock()
+            ],
+        ];
+    }
 
-        $scenario($this->sqlite());
+    protected static function prepareSqlite(): PDO
+    {
+        $pdo = new PDO('sqlite::memory:');
 
-        $mock = new PDOMock();
-        $mock->expect('insert into "books" ("id", "title") values (777, "Kaidash’s Family")')->withInsertId(777);
-        $scenario($mock);
+        $pdo->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
+
+        return $pdo;
+    }
+
+    protected static function prepareMock(): PDOMock
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('insert into "books" ("id", "title") values (777, "Kaidash’s Family")')
+            ->withInsertId(777);
+
+        return $pdo;
     }
 }
