@@ -88,7 +88,7 @@ class PDOMock extends PDO
             TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
         }
 
-        TestCase::assertEquals($expectation->query, $statement);
+        TestCase::assertEquals($expectation->query, $statement, 'Unexpected query: ' . $statement);
 
         if ($expectation->exceptionOnExecute && $expectation->exceptionOnExecute->errorInfo) {
             $this->errorInfo = $expectation->exceptionOnExecute->errorInfo;

@@ -2,9 +2,9 @@
 
 namespace Tests\Xala\Elomock;
 
+use PDO;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class PrepareTest extends TestCase
@@ -12,15 +12,19 @@ class PrepareTest extends TestCase
     #[Test]
     public function itShouldHandlePreparedStatement(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            $statement = $pdo->prepare('select * from "books"');
 
-        $pdo->expect('select * from "users"');
+            $result = $statement->execute();
 
-        $statement = $pdo->prepare('select * from "users"');
+            static::assertTrue($result);
+        };
 
-        $result = $statement->execute();
+        $scenario($this->sqlite());
 
-        static::assertTrue($result);
+        $mock = new PDOMock();
+        $mock->expect('select * from "books"')->toBePrepared();
+        $scenario($mock);
     }
 
     #[Test]
@@ -35,27 +39,10 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldVerifyIfStatementIsPrepared(): void
-    {
-        $pdo = new PDOMock();
-
-        $pdo->expect('select * from "users"')
-            ->toBePrepared();
-
-        $statement = $pdo->prepare('select * from "users"');
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
-    }
-
-    #[Test]
     public function itShouldFailWhenStatementIsNotPrepared(): void
     {
         $pdo = new PDOMock();
-
-        $pdo->expect('select * from "users"')
-            ->toBePrepared();
+        $pdo->expect('select * from "users"')->toBePrepared();
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Statement is not prepared');

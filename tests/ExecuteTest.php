@@ -2,33 +2,37 @@
 
 namespace Tests\Xala\Elomock;
 
+use PDO;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
-class ExecTest extends TestCase
+class ExecuteTest extends TestCase
 {
     #[Test]
     public function itShouldExecuteQuery(): void
     {
-        $pdo = new PDOMock();
+        $scenario = function (PDO $pdo) {
+            $result = $pdo->exec('select * from "books"');
 
-        $pdo->expect('select * from "users"');
+            static::assertSame(0, $result);
+        };
 
-        $result = $pdo->exec('select * from "users"');
+        $scenario($this->sqlite());
 
-        static::assertSame(0, $result);
+        $mock = new PDOMock();
+        $mock->expect('select * from "books"');
+        $scenario($mock);
     }
 
     #[Test]
     public function itShouldFailWhenQueryDoesntMatch(): void
     {
         $pdo = new PDOMock();
-
         $pdo->expect('select * from "users"');
 
         $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Unexpected query: select * from "books"');
 
         $pdo->exec('select * from "books"');
     }
@@ -37,10 +41,10 @@ class ExecTest extends TestCase
     public function itShouldFailWhenQueryIsNotExecuted(): void
     {
         $pdo = new PDOMock();
-
-        $pdo->expect('select * from "users"');
+        $pdo->expect('select * from "books"');
 
         $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Some expectations were not fulfilled.');
 
         $pdo->assertExpectationsFulfilled();
     }

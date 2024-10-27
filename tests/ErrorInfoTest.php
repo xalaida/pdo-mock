@@ -5,7 +5,6 @@ namespace Tests\Xala\Elomock;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOExceptionMock;
 use Xala\Elomock\PDOMock;
 
@@ -19,8 +18,7 @@ class ErrorInfoTest extends TestCase
             static::assertSame(['', null, null], $pdo->errorInfo());
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $scenario($sqlite);
+        $scenario(new PDO('sqlite::memory:'));
 
         $mock = new PDOMock();
         $scenario($mock);
@@ -39,9 +37,7 @@ class ErrorInfoTest extends TestCase
             static::assertSame(['00000', null, null], $pdo->errorInfo());
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $sqlite->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
@@ -63,9 +59,7 @@ class ErrorInfoTest extends TestCase
             static::assertSame(['00000', null, null], $pdo->errorInfo());
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $sqlite->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
@@ -90,8 +84,7 @@ class ErrorInfoTest extends TestCase
             }
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('select table "books"')
@@ -122,8 +115,7 @@ class ErrorInfoTest extends TestCase
             }
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('select table "books"')
@@ -159,9 +151,7 @@ class ErrorInfoTest extends TestCase
             }
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $sqlite->exec("create table books (id integer primary key, title text not null)");
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('insert into books (id, title) values (1, null)')
@@ -211,9 +201,7 @@ class ErrorInfoTest extends TestCase
             static::assertSame('00000', $pdo->errorCode());
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $sqlite->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('select table "books"')
@@ -242,8 +230,7 @@ class ErrorInfoTest extends TestCase
             static::assertSame('HY000', $pdo->errorCode());
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('select table "books"')
@@ -271,8 +258,7 @@ class ErrorInfoTest extends TestCase
             static::assertSame('HY000', $pdo->errorCode());
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('select table "books"')
@@ -301,8 +287,7 @@ class ErrorInfoTest extends TestCase
             static::assertSame('HY000', $pdo->errorCode());
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('select table "books"')
@@ -336,9 +321,7 @@ class ErrorInfoTest extends TestCase
             static::assertSame('00000', $pdo->errorCode());
         };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $sqlite->exec("create table books (id integer primary key, title text not null)");
-        $scenario($sqlite);
+        $scenario($this->sqlite());
 
         $mock = new PDOMock();
         $mock->expect('insert into books (id, title) values (1, null)')
@@ -349,28 +332,5 @@ class ErrorInfoTest extends TestCase
                 19
             ));
         $scenario($mock);
-    }
-
-    protected function expectTriggerWarning(callable $callback, string | null $message = null)
-    {
-        $warningTriggered = false;
-
-        set_error_handler(function ($errno, $errstr) use (&$warningTriggered, $message) {
-            $warningTriggered = true;
-
-            static::assertTrue(E_WARNING === $errno || E_USER_WARNING === $errno);
-
-            if ($message !== null) {
-                static::assertSame($message, $errstr);
-            }
-        });
-
-        $result = $callback();
-
-        restore_error_handler();
-
-        static::assertTrue($warningTriggered,'Warning was not triggered');
-
-        return $result;
     }
 }
