@@ -52,27 +52,27 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
 
     protected static function prepareSqlite(): PDO
     {
-        $sqlite = new PDO('sqlite::memory:');
+        $pdo = new PDO('sqlite::memory:');
 
-        $sqlite->exec('create table "books" (
+        $pdo->exec('create table "books" (
             "id" integer primary key autoincrement not null, 
             "title" varchar not null
         )');
 
-        $sqlite->exec('insert into "books" ("title") values ("Kaidash’s Family")');
+        $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
 
-        return $sqlite;
+        return $pdo;
     }
 
     protected static function prepareMock(): PDOMock
     {
-        $mock = new PDOMock();
+        $pdo = new PDOMock();
 
-        $mock->expect('select "title" from "books"')
+        $pdo->expect('select "title" from "books"')
             ->andFetchRows([
                 ['title' => 'Kaidash’s Family'],
             ]);
 
-        return $mock;
+        return $pdo;
     }
 }

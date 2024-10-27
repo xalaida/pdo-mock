@@ -99,35 +99,35 @@ class FetchModeBoundTest extends TestCase
 
     protected static function prepareSqlite(): PDO
     {
-        $sqlite = new PDO('sqlite::memory:');
+        $pdo = new PDO('sqlite::memory:');
 
-        $sqlite->exec('create table "books" (
+        $pdo->exec('create table "books" (
             "id" integer primary key autoincrement not null, 
             "title" varchar not null, 
             "status" varchar default "published", 
             "deleted" integer default 0
         )');
 
-        $sqlite->exec('insert into "books"
+        $pdo->exec('insert into "books"
             ("title", "status", "deleted") values 
             ("Kaidash’s Family", "published", 0),
             ("Shadows of the Forgotten Ancestors", "draft", 0)'
         );
 
-        return $sqlite;
+        return $pdo;
     }
 
     protected static function prepareMock(): PDOMock
     {
-        $mock = new PDOMock();
+        $pdo = new PDOMock();
 
-        $mock->expect('select "id", "title", "status", "deleted" from "books" where "deleted" = ?')
-            ->withBound(1, 0, $mock::PARAM_BOOL)
+        $pdo->expect('select "id", "title", "status", "deleted" from "books" where "deleted" = ?')
+            ->withBound(1, 0, $pdo::PARAM_BOOL)
             ->andFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family', 'status' => 'published', 'deleted' => false],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors', 'status' => 'draft', 'deleted' => false],
             ]);
 
-        return $mock;
+        return $pdo;
     }
 }
