@@ -7,6 +7,7 @@ use Override;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use ValueError;
 
 class PDOStatementMock extends PDOStatement
@@ -28,6 +29,8 @@ class PDOStatementMock extends PDOStatement
     protected string | null $errorCode;
 
     private bool $executed;
+
+    private array $boundColumns = [];
 
     public function __construct(PDOMock $pdo, Expectation $expectation, string $query)
     {
@@ -61,6 +64,17 @@ class PDOStatementMock extends PDOStatement
     {
         $this->bindings[$param] = [
             'value' => $var,
+            'type' => $type
+        ];
+
+        return true;
+    }
+
+    #[Override]
+    public function bindColumn($column, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null): bool
+    {
+        $this->boundColumns[$column] = [
+            'value' => &$var,
             'type' => $type
         ];
 
@@ -192,7 +206,7 @@ class PDOStatementMock extends PDOStatement
         }, $this->expectation->rows);
     }
 
-    protected function applyFetchMode(array $row, int $mode): object | array
+    protected function applyFetchMode(array $row, int $mode): object | array | true
     {
         if ($mode === PDO::FETCH_DEFAULT) {
             $mode = $this->fetchMode;
@@ -211,8 +225,50 @@ class PDOStatementMock extends PDOStatement
             case PDO::FETCH_BOTH:
                 return array_merge($row, array_values($row));
 
+            case PDO::FETCH_BOUND:
+                return $this->applyFetchModeBound($row);
+
             default:
                 throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
         }
+    }
+
+    protected function applyFetchModeBound(array $row): bool
+    {
+        $row = array_merge($row, array_values($row));
+
+        foreach ($this->boundColumns as $column => $params) {
+            $rowIndex = is_int($column)
+                ? $column - 1
+                : $column;
+
+            if (! isset($row[$rowIndex])) {
+                if (is_int($rowIndex)) {
+                    throw new ValueError('Invalid column index');
+                }
+
+                $params['value'] = null;
+
+                return true;
+            }
+
+            $value = $row[$rowIndex];
+
+            if ($params['type'] === $this->pdo::PARAM_NULL) {
+                $value = null;
+            } else if ($params['type'] === $this->pdo::PARAM_INT) {
+                $value = (int) $value;
+            } else if ($params['type'] === $this->pdo::PARAM_STR) {
+                $value = (string) $value;
+            } else if ($params['type'] === $this->pdo::PARAM_BOOL) {
+                $value = (bool) $value;
+            } else {
+                throw new RuntimeException('Unsupported column type: ' . $params['type']);
+            }
+
+            $params['value'] = $value;
+        }
+
+        return true;
     }
 }
