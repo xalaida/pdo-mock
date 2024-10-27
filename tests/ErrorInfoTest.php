@@ -12,7 +12,7 @@ use Xala\Elomock\PDOMock;
 class ErrorInfoTest extends TestCase
 {
     #[Test]
-    public function itShouldDisplayErrorInformation(): void
+    public function itShouldDisplayErrorInformationForPDOInstance(): void
     {
         $scenario = function (PDO $pdo) {
             static::assertNull($pdo->errorCode());
@@ -34,6 +34,9 @@ class ErrorInfoTest extends TestCase
 
             static::assertNull($statement->errorCode());
             static::assertSame(['', null, null], $statement->errorInfo());
+
+            static::assertEquals('00000', $pdo->errorCode());
+            static::assertSame(['00000', null, null], $pdo->errorInfo());
         };
 
         $sqlite = new PDO('sqlite::memory:');
@@ -55,6 +58,9 @@ class ErrorInfoTest extends TestCase
 
             static::assertSame('00000', $statement->errorCode());
             static::assertSame(['00000', null, null], $statement->errorInfo());
+
+            static::assertSame('00000', $pdo->errorCode());
+            static::assertSame(['00000', null, null], $pdo->errorInfo());
         };
 
         $sqlite = new PDO('sqlite::memory:');
@@ -78,91 +84,7 @@ class ErrorInfoTest extends TestCase
                 static::assertSame('SQLSTATE[HY000]: General error: 1 near "table": syntax error', $e->getMessage());
                 static::assertSame('HY000', $e->getCode());
                 static::assertSame(['HY000', 1, 'near "table": syntax error'], $e->errorInfo);
-            }
-        };
 
-        $sqlite = new PDO('sqlite::memory:');
-        $scenario($sqlite);
-
-        $mock = new PDOMock();
-        $mock->expect('select table "users"')
-            ->andFail(PDOExceptionMock::fromErrorInfo(
-                'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
-                'HY000',
-                'near "table": syntax error',
-                1
-            ));
-        $scenario($mock);
-    }
-
-    #[Test]
-    public function itShouldFailWithSyntaxErrorExceptionUsingQueryMethod(): void
-    {
-        $scenario = function (PDO $pdo) {
-            try {
-                $pdo->query('select table "users"');
-
-                $this->fail('Exception was not thrown');
-            } catch (PDOException $e) {
-                static::assertSame('SQLSTATE[HY000]: General error: 1 near "table": syntax error', $e->getMessage());
-                static::assertSame('HY000', $e->getCode());
-                static::assertSame(['HY000', 1, 'near "table": syntax error'], $e->errorInfo);
-            }
-        };
-
-        $sqlite = new PDO('sqlite::memory:');
-        $scenario($sqlite);
-
-        $mock = new PDOMock();
-        $mock->expect('select table "users"')
-            ->andFail(PDOExceptionMock::fromErrorInfo(
-                'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
-                'HY000',
-                'near "table": syntax error',
-                1
-            ));
-        $scenario($mock);
-    }
-
-    #[Test]
-    public function itShouldFailWithIntegrityConstraintErrorException(): void
-    {
-        $scenario = function (PDO $pdo) {
-            try {
-                $pdo->exec("insert into users (id, name) values (1, null)");
-
-                $this->fail('Exception was not thrown');
-            } catch (PDOException $e) {
-                static::assertSame('SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: users.name', $e->getMessage());
-                static::assertSame('23000', $e->getCode());
-                static::assertSame(['23000', 19, 'NOT NULL constraint failed: users.name'], $e->errorInfo);
-            }
-        };
-
-        $sqlite = new PDO('sqlite::memory:');
-        $sqlite->exec("create table users (id integer primary key, name text not null)");
-        $scenario($sqlite);
-
-        $mock = new PDOMock();
-        $mock->expect('insert into users (id, name) values (1, null)')
-            ->andFail(PDOExceptionMock::fromErrorInfo(
-                'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: users.name',
-                '23000',
-                'NOT NULL constraint failed: users.name',
-                19
-            ));
-        $scenario($mock);
-    }
-
-    #[Test]
-    public function itShouldDisplayErrorInformationUsingPDOInstance(): void
-    {
-        $scenario = function (PDO $pdo) {
-            try {
-                $pdo->exec('select table "users"');
-
-                $this->fail('Exception was not thrown');
-            } catch (PDOException $e) {
                 static::assertSame(['HY000', 1, 'near "table": syntax error'], $pdo->errorInfo());
                 static::assertSame('HY000', $pdo->errorCode());
             }
@@ -183,41 +105,7 @@ class ErrorInfoTest extends TestCase
     }
 
     #[Test]
-    public function itShouldDisplayErrorInformationUsingPDOStatementInstance(): void
-    {
-        $scenario = function (PDO $pdo) {
-            $statement = $pdo->prepare("insert into users (id, name) values (1, null)");
-
-            try {
-                $statement->execute();
-
-                $this->fail('Exception was not thrown');
-            } catch (PDOException $e) {
-                static::assertSame(['23000', 19, 'NOT NULL constraint failed: users.name'], $statement->errorInfo());
-                static::assertSame('23000', $statement->errorCode());
-
-                static::assertSame(['00000', null, null], $pdo->errorInfo());
-                static::assertSame('00000', $pdo->errorCode());
-            }
-        };
-
-        $sqlite = new PDO('sqlite::memory:');
-        $sqlite->exec("create table users (id integer primary key, name text not null)");
-        $scenario($sqlite);
-
-        $mock = new PDOMock();
-        $mock->expect('insert into users (id, name) values (1, null)')
-            ->andFail(PDOExceptionMock::fromErrorInfo(
-                'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: users.name',
-                '23000',
-                'NOT NULL constraint failed: users.name',
-                19
-            ));
-        $scenario($mock);
-    }
-
-    #[Test]
-    public function itShouldFailOnPrepare(): void
+    public function itShouldFailWithSyntaxErrorExceptionOnPrepare(): void
     {
         $scenario = function (PDO $pdo) {
             try {
@@ -249,6 +137,44 @@ class ErrorInfoTest extends TestCase
     }
 
     #[Test]
+    public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement(): void
+    {
+        $scenario = function (PDO $pdo) {
+            $statement = $pdo->prepare("insert into users (id, name) values (1, null)");
+
+            try {
+                $statement->execute();
+
+                $this->fail('Exception was not thrown');
+            } catch (PDOException $e) {
+                static::assertSame('SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: users.name', $e->getMessage());
+                static::assertSame('23000', $e->getCode());
+                static::assertSame(['23000', 19, 'NOT NULL constraint failed: users.name'], $e->errorInfo);
+
+                static::assertSame(['23000', 19, 'NOT NULL constraint failed: users.name'], $statement->errorInfo());
+                static::assertSame('23000', $statement->errorCode());
+
+                static::assertSame(['00000', null, null], $pdo->errorInfo());
+                static::assertSame('00000', $pdo->errorCode());
+            }
+        };
+
+        $sqlite = new PDO('sqlite::memory:');
+        $sqlite->exec("create table users (id integer primary key, name text not null)");
+        $scenario($sqlite);
+
+        $mock = new PDOMock();
+        $mock->expect('insert into users (id, name) values (1, null)')
+            ->andFail(PDOExceptionMock::fromErrorInfo(
+                'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: users.name',
+                '23000',
+                'NOT NULL constraint failed: users.name',
+                19
+            ));
+        $scenario($mock);
+    }
+
+    #[Test]
     public function itShouldFailUsingCustomErrorException(): void
     {
         $mock = new PDOMock();
@@ -267,7 +193,6 @@ class ErrorInfoTest extends TestCase
         }
     }
 
-    // TODO: merge similar test into one test with all verifications
     // TODO: test different error modes (silent, etc)
     // TODO: check if next success execution resets previous error on PDO instance...
 }
