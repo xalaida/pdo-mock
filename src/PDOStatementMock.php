@@ -161,6 +161,10 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
+        if (! $this->executed) {
+            return false;
+        }
+
         if (isset($this->expectation->rows[$this->cursor])) {
             $row = $this->applyFetchMode($this->expectation->rows[$this->cursor], $mode);
 

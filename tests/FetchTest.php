@@ -6,11 +6,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
-/**
- * @todo handle rewriting default fetch mode
- * @todo handle different fetch modes in cursor mode
- * @todo handle other fetch modes
- * @todo ensure query is executed before fetching
+/*
  * @todo add ability to fetch from different sources (csv file, generator, from class objects, etc)
  */
 class FetchTest extends TestCase
@@ -20,14 +16,14 @@ class FetchTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('select * from "users"')
+        $pdo->expect('select * from "books"')
             ->toBePrepared()
             ->andFetchRows([
-                ['id' => 1, 'name' => 'john'],
-                ['id' => 2, 'name' => 'jane'],
+                ['id' => 1, 'title' => 'Kaidash’s Family'],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
-        $statement = $pdo->prepare('select * from "users"');
+        $statement = $pdo->prepare('select * from "books"');
 
         $result = $statement->execute();
 
@@ -36,12 +32,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch();
 
         static::assertIsArray($row);
-        static::assertEquals([0 => 1, 'id' => 1, 1 => 'john', 'name' => 'john'], $row);
+        static::assertEquals([0 => 1, 'id' => 1, 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch();
 
         static::assertIsArray($row);
-        static::assertEquals([0 => 2, 'id' => 2, 1 => 'jane', 'name' => 'jane'], $row);
+        static::assertEquals([0 => 2, 'id' => 2, 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch();
 
@@ -53,9 +49,9 @@ class FetchTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('select * from "users"');
+        $pdo->expect('select * from "books"');
 
-        $statement = $pdo->prepare('select * from "users"');
+        $statement = $pdo->prepare('select * from "books"');
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
@@ -67,14 +63,14 @@ class FetchTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('select * from "users"')
+        $pdo->expect('select * from "books"')
             ->toBePrepared()
             ->andFetchRows([
-                ['id' => 1, 'name' => 'john'],
-                ['id' => 2, 'name' => 'jane'],
+                ['id' => 1, 'title' => 'Kaidash’s Family'],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
-        $statement = $pdo->prepare('select * from "users"');
+        $statement = $pdo->prepare('select * from "books"');
 
         $result = $statement->execute();
 
@@ -83,12 +79,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArray($row);
-        static::assertSame(['id' => 1, 'name' => 'john'], $row);
+        static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArray($row);
-        static::assertSame(['id' => 2, 'name' => 'jane'], $row);
+        static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
@@ -100,14 +96,14 @@ class FetchTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('select * from "users"')
+        $pdo->expect('select * from "books"')
             ->toBePrepared()
             ->andFetchRows([
-                ['id' => 1, 'name' => 'john'],
-                ['id' => 2, 'name' => 'jane'],
+                ['id' => 1, 'title' => 'Kaidash’s Family'],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
-        $statement = $pdo->prepare('select * from "users"');
+        $statement = $pdo->prepare('select * from "books"');
 
         $result = $statement->execute();
 
@@ -116,12 +112,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArray($row);
-        static::assertSame([1, 'john'], $row);
+        static::assertSame([1, 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArray($row);
-        static::assertSame([2,'jane'], $row);
+        static::assertSame([2,'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
@@ -133,14 +129,14 @@ class FetchTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('select * from "users"')
+        $pdo->expect('select * from "books"')
             ->toBePrepared()
             ->andFetchRows([
-                ['id' => 1, 'name' => 'john'],
-                ['id' => 2, 'name' => 'jane'],
+                ['id' => 1, 'title' => 'Kaidash’s Family'],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
-        $statement = $pdo->prepare('select * from "users"');
+        $statement = $pdo->prepare('select * from "books"');
 
         $result = $statement->execute();
 
@@ -149,12 +145,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
         static::assertIsArray($row);
-        static::assertEquals([0 => 1, 'id' => 1, 1 => 'john', 'name' => 'john'], $row);
+        static::assertEquals([0 => 1, 'id' => 1, 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
         static::assertIsArray($row);
-        static::assertEquals([0 => 2, 'id' => 2, 1 => 'jane', 'name' => 'jane'], $row);
+        static::assertEquals([0 => 2, 'id' => 2, 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
@@ -166,14 +162,14 @@ class FetchTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('select * from "users"')
+        $pdo->expect('select * from "books"')
             ->toBePrepared()
             ->andFetchRows([
-                ['id' => 1, 'name' => 'john'],
-                ['id' => 2, 'name' => 'jane'],
+                ['id' => 1, 'title' => 'Kaidash’s Family'],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
-        $statement = $pdo->prepare('select * from "users"');
+        $statement = $pdo->prepare('select * from "books"');
 
         $result = $statement->execute();
 
@@ -182,12 +178,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
         static::assertIsObject($row);
-        static::assertEquals((object) ['id' => 1, 'name' => 'john'], $row);
+        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
         static::assertIsObject($row);
-        static::assertEquals((object) ['id' => 2, 'name' => 'jane'], $row);
+        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 

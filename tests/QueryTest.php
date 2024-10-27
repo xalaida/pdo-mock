@@ -52,7 +52,9 @@ class QueryTest extends TestCase
     public function itShouldHandleQueryAsPreparedStatement(): void
     {
         $pdo = new PDOMock();
-        $pdo->expect('select * from "books"')->toBePrepared();
+
+        $pdo->expect('select * from "books"')
+            ->toBePrepared();
 
         $statement = $pdo->query('select * from "books"');
 
