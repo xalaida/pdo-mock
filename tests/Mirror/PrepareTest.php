@@ -32,7 +32,7 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleBindValues(): void
+    public function itShouldHandleBindValue(): void
     {
         $scenario = function (PDO $pdo) {
             $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
@@ -56,8 +56,8 @@ class PrepareTest extends TestCase
 
         $mock->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
-            ->toBindValue(1, 'active', $mock::PARAM_STR)
-            ->toBindValue(2, 2024, $mock::PARAM_INT);
+            ->withBound(1, 'active', $mock::PARAM_STR)
+            ->withBound(2, 2024, $mock::PARAM_INT);
 
         $scenario($mock);
     }
@@ -90,8 +90,8 @@ class PrepareTest extends TestCase
 
         $mock->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
-            ->toBindValue(1, 'published', $mock::PARAM_STR)
-            ->toBindValue(2, 2024, $mock::PARAM_INT);
+            ->withBound(1, 'published', $mock::PARAM_STR)
+            ->withBound(2, 2024, $mock::PARAM_INT);
 
         $scenario($mock);
     }

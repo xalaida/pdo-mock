@@ -69,14 +69,14 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleQueryBindingsUsingBindParam(): void
+    public function itShouldHandleQueryParamsUsingBindParam(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
-            ->toBindValue(1, 'published', $pdo::PARAM_STR)
-            ->toBindValue(2, 2024, $pdo::PARAM_INT);
+            ->withBound(1, 'published', $pdo::PARAM_STR)
+            ->withBound(2, 2024, $pdo::PARAM_INT);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
 
@@ -92,15 +92,15 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenQueryBindingsDontMatch(): void
+    public function itShouldFailWhenQueryParamsDontMatch(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->toBindValue(0, 'active', $pdo::PARAM_STR)
-            ->toBindValue(1, 2024, $pdo::PARAM_INT)
-            ->toBindValue(2, true, $pdo::PARAM_BOOL);
+            ->withBound(0, 'active', $pdo::PARAM_STR)
+            ->withBound(1, 2024, $pdo::PARAM_INT)
+            ->withBound(2, true, $pdo::PARAM_BOOL);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
@@ -114,13 +114,13 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleQueryBindingsUsingAssociativeArray(): void
+    public function itShouldHandleQueryParamsUsingAssociativeArray(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->withBindings(['active', 2024, true], true);
+            ->with(['active', 2024, true], true);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
@@ -134,13 +134,13 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenQueryBindingsUsingAssociativeArrayDontMatch(): void
+    public function itShouldFailWhenQueryParamsUsingAssociativeArrayDontMatch(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->withBindings([2024, 'active', true]);
+            ->with([2024, 'active', true]);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
@@ -154,14 +154,14 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleQueryNamedBindings(): void
+    public function itShouldHandleQueryNamedParams(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "category_id" = :category_id and "published" = :published')
             ->toBePrepared()
-            ->toBindValue('category_id', 7, $pdo::PARAM_INT)
-            ->toBindValue('published', true, $pdo::PARAM_BOOL);
+            ->withBound('category_id', 7, $pdo::PARAM_INT)
+            ->withBound('published', true, $pdo::PARAM_BOOL);
 
         $statement = $pdo->prepare('select * from "books" where "category_id" = :category_id and "published" = :published');
 
@@ -174,13 +174,13 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleQueryNamedBindingsUsingSingleAssociativeArray(): void
+    public function itShouldHandleQueryNamedParamsUsingSingleAssociativeArray(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year and "published" = :published')
             ->toBePrepared()
-            ->withBindings([
+            ->with([
                 'status' => 'active',
                 'year' => 2024,
                 'published' => true,
@@ -198,13 +198,13 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenQueryNamedBindingsUsingSingleAssociativeArrayDontMatch(): void
+    public function itShouldFailWhenQueryNamedParamsUsingSingleAssociativeArrayDontMatch(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year and "published" = :published')
             ->toBePrepared()
-            ->withBindings([
+            ->with([
                 'status' => 'active',
                 'year' => 2023,
                 'published' => false,
@@ -222,14 +222,14 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleExecBindings(): void
+    public function itShouldHandleExecParams(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->toBindValue(1, 'published')
-            ->toBindValue(2, 2024);
+            ->withBound(1, 'published')
+            ->withBound(2, 2024);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
@@ -239,13 +239,13 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleExecBindingsTypes(): void
+    public function itShouldHandleExecParamsTypes(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->withBindings(['published', 2024]);
+            ->with(['published', 2024]);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
@@ -261,7 +261,7 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->withBindings(['published', 2024]);
+            ->with(['published', 2024]);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
@@ -274,16 +274,16 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldVerifyBindingsUsingCallableSyntax(): void
+    public function itShouldVerifyParamsUsingCallableSyntax(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
-            ->withBindingsUsing(function (array $bindings) use ($pdo) {
-                static::assertSame('draft', $bindings[1]['value']);
-                static::assertSame($pdo::PARAM_STR, $bindings[1]['type']);
-                static::assertSame(2024, $bindings[2]['value']);
-                static::assertSame($pdo::PARAM_INT, $bindings[2]['type']);
+            ->with(function (array $params) use ($pdo) {
+                static::assertSame('draft', $params[1]['value']);
+                static::assertSame($pdo::PARAM_STR, $params[1]['type']);
+                static::assertSame(2024, $params[2]['value']);
+                static::assertSame($pdo::PARAM_INT, $params[2]['type']);
             });
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
@@ -298,12 +298,12 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenBindingsCallbackReturnsFalse(): void
+    public function itShouldFailWhenParamsCallbackReturnsFalse(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
-            ->withBindingsUsing(function () {
+            ->with(function () {
                 return false;
             });
 
@@ -313,7 +313,7 @@ class PrepareTest extends TestCase
         $statement->bindValue(2, 2024, $pdo::PARAM_INT);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Bindings do not match');
+        $this->expectExceptionMessage('Params do not match');
 
         $statement->execute();
     }
@@ -326,9 +326,9 @@ class PrepareTest extends TestCase
         $insertBookExpectation = $pdo->expect('insert into "books" values ("id", "title") values (:id, :title)');
 
         $pdo->expect('update "books" set "status" = :status where "id" = :id')
-            ->withBindingsUsing(function (array $bindings) use ($insertBookExpectation) {
-                static::assertSame($insertBookExpectation->statement->bindings['id']['value'], $bindings['id']['value']);
-                static::assertSame('published', $bindings['status']['value']);
+            ->with(function (array $params) use ($insertBookExpectation) {
+                static::assertSame($insertBookExpectation->statement->params['id']['value'], $params['id']['value']);
+                static::assertSame('published', $params['status']['value']);
             });
 
         $statement = $pdo->prepare('insert into "books" values ("id", "title") values (:id, :title)');

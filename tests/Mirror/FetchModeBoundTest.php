@@ -122,7 +122,7 @@ class FetchModeBoundTest extends TestCase
         $mock = new PDOMock();
 
         $mock->expect('select "id", "title", "status", "deleted" from "books" where "deleted" = ?')
-            ->toBindValue(1, 0, $mock::PARAM_BOOL)
+            ->withBound(1, 0, $mock::PARAM_BOOL)
             ->andFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family', 'status' => 'published', 'deleted' => false],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors', 'status' => 'draft', 'deleted' => false],

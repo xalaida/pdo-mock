@@ -18,7 +18,9 @@ class PDOStatementMock extends PDOStatement
 
     public string $queryString;
 
-    public array $bindings = [];
+    public array $params = [];
+
+    public array $columns = [];
 
     protected int $fetchMode;
 
@@ -28,9 +30,7 @@ class PDOStatementMock extends PDOStatement
 
     protected string | null $errorCode;
 
-    private bool $executed;
-
-    private array $boundColumns = [];
+    public bool $executed;
 
     public function __construct(PDOMock $pdo, Expectation $expectation, string $query)
     {
@@ -51,7 +51,7 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function bindValue($param, $value, $type = PDO::PARAM_STR): bool
     {
-        $this->bindings[$param] = [
+        $this->params[$param] = [
             'value' => $value,
             'type' => $type
         ];
@@ -62,7 +62,7 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null): bool
     {
-        $this->bindings[$param] = [
+        $this->params[$param] = [
             'value' => $var,
             'type' => $type
         ];
@@ -73,7 +73,7 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function bindColumn($column, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null): bool
     {
-        $this->boundColumns[$column] = [
+        $this->columns[$column] = [
             'value' => &$var,
             'type' => $type
         ];
@@ -87,20 +87,20 @@ class PDOStatementMock extends PDOStatement
         $this->expectation->statement = $this;
 
         if (! is_null($params)) {
-            $bindings = [];
+            $boundParams = [];
 
             foreach ($params as $key => $value) {
                 $param = is_int($key)
                     ? $key + 1
                     : $key;
 
-                $bindings[$param] = [
+                $boundParams[$param] = [
                     'value' => $value,
                     'type' => PDO::PARAM_STR,
                 ];
             }
         } else {
-            $bindings = $this->bindings;
+            $boundParams = $this->params;
         }
 
         if (! is_null($this->expectation->prepared)) {
@@ -109,13 +109,13 @@ class PDOStatementMock extends PDOStatement
 
         TestCase::assertSame($this->expectation->query, $this->queryString, 'Query does not match');
 
-        if (! is_null($this->expectation->bindings)) {
-            if (is_callable($this->expectation->bindings)) {
-                $result = call_user_func($this->expectation->bindings, $bindings);
+        if (! is_null($this->expectation->params)) {
+            if (is_callable($this->expectation->params)) {
+                $result = call_user_func($this->expectation->params, $boundParams);
 
-                TestCase::assertNotFalse($result, 'Bindings do not match');
+                TestCase::assertNotFalse($result, 'Params do not match');
             } else {
-                TestCase::assertEquals($this->expectation->bindings, $bindings, 'Bindings do not match');
+                TestCase::assertEquals($this->expectation->params, $boundParams, 'Params do not match');
             }
         }
 
@@ -242,7 +242,7 @@ class PDOStatementMock extends PDOStatement
     {
         $row = $this->applyFetchModeBoth($row);
 
-        foreach ($this->boundColumns as $column => $params) {
+        foreach ($this->columns as $column => $params) {
             $rowIndex = is_int($column)
                 ? $column - 1
                 : $column;

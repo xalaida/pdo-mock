@@ -11,11 +11,11 @@ class Expectation
 {
     public string $query;
 
+    public array | Closure | null $params = null;
+
     public bool $executed = true;
 
     public bool | null $prepared = null;
-
-    public array | Closure | null $bindings = null;
 
     public int $rowCount = 0;
 
@@ -48,9 +48,9 @@ class Expectation
         return $this;
     }
 
-    public function toBindValue(string | int $key, mixed $value, int $type = PDO::PARAM_STR): static
+    public function withBound(string | int $param, mixed $value, int $type = PDO::PARAM_STR): static
     {
-        $this->bindings[$key] = [
+        $this->params[$param] = [
             'value' => $value,
             'type' => $type,
         ];
@@ -58,29 +58,28 @@ class Expectation
         return $this;
     }
 
-    public function withBindings(array $bindings, bool $shouldUseValueType = false): static
+    public function with(array | Closure $params, bool $useParamValueType = false): static
     {
-        foreach ($bindings as $key => $value) {
+        if (is_callable($params)) {
+            $this->params = $params;
+
+            return $this;
+        }
+
+        foreach ($params as $key => $value) {
             $param = is_int($key)
                 ? $key + 1
                 : $key;
 
-            $type = $shouldUseValueType
+            $type = $useParamValueType
                 ? $this->getTypeFromValue($value)
                 : PDO::PARAM_STR;
 
-            $this->bindings[$param] = [
+            $this->params[$param] = [
                 'value' => $value,
                 'type' => $type,
             ];
         }
-
-        return $this;
-    }
-
-    public function withBindingsUsing(Closure $callback): static
-    {
-        $this->bindings = $callback;
 
         return $this;
     }
@@ -129,18 +128,20 @@ class Expectation
 
     protected function getTypeFromValue(mixed $value): int
     {
-        if (is_string($value)) {
-            return PDO::PARAM_STR;
-        }
+        $type = gettype($value);
 
-        if (is_int($value)) {
-            return PDO::PARAM_INT;
-        }
+        switch ($type) {
+            case 'string':
+                return PDO::PARAM_STR;
 
-        if (is_bool($value)) {
-            return PDO::PARAM_BOOL;
-        }
+            case 'integer':
+                return PDO::PARAM_INT;
 
-        throw new InvalidArgumentException('Unsupported type: ' . gettype($value));
+            case 'boolean':
+                return PDO::PARAM_BOOL;
+
+            default:
+                throw new InvalidArgumentException('Unsupported type: ' . $type);
+        }
     }
 }

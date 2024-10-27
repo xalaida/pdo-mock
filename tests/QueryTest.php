@@ -35,15 +35,15 @@ class QueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenExpectBindingsUsingQuery(): void
+    public function itShouldFailWhenExpectParamsUsingQueryMethod(): void
     {
         $pdo = new PDOMock();
 
         $pdo->expect('delete from "posts" where "status" = ?')
-            ->withBindings(['draft']);
+            ->with(['draft']);
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Bindings do not match');
+        $this->expectExceptionMessage('Params do not match');
 
         $pdo->query('delete from "posts" where "status" = ?');
     }
