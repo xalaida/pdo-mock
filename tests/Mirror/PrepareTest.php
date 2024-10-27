@@ -32,18 +32,26 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleQueryBindings(): void
+    public function itShouldHandleBindValues(): void
     {
         $scenario = function (PDO $pdo) {
             $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
-            $statement->bindValue(1, 'active', $pdo::PARAM_STR);
-            $statement->bindValue(2, 2024, $pdo::PARAM_INT);
-            $statement->bindValue(3, true, $pdo::PARAM_BOOL);
+            static::assertTrue(
+                $statement->bindValue(1, 'active', $pdo::PARAM_STR)
+            );
 
-            $result = $statement->execute();
+            static::assertTrue(
+                $statement->bindValue(2, 2024, $pdo::PARAM_INT)
+            );
 
-            static::assertTrue($result);
+            static::assertTrue(
+                $statement->bindValue(3, true, $pdo::PARAM_BOOL)
+            );
+
+            static::assertTrue(
+                $statement->execute()
+            );
         };
 
         $scenario($this->sqlite());
@@ -52,9 +60,9 @@ class PrepareTest extends TestCase
 
         $mock->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->withBinding(1, 'active', $mock::PARAM_STR)
-            ->withBinding(2, 2024, $mock::PARAM_INT)
-            ->withBinding(3, true, $mock::PARAM_BOOL);
+            ->toBindValue(1, 'active', $mock::PARAM_STR)
+            ->toBindValue(2, 2024, $mock::PARAM_INT)
+            ->toBindValue(3, true, $mock::PARAM_BOOL);
 
         $scenario($mock);
     }

@@ -75,8 +75,8 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
-            ->withBinding(1, 'published', $pdo::PARAM_STR)
-            ->withBinding(2, 2024, $pdo::PARAM_INT);
+            ->toBindValue(1, 'published', $pdo::PARAM_STR)
+            ->toBindValue(2, 2024, $pdo::PARAM_INT);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
 
@@ -98,9 +98,9 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->withBinding(0, 'active', $pdo::PARAM_STR)
-            ->withBinding(1, 2024, $pdo::PARAM_INT)
-            ->withBinding(2, true, $pdo::PARAM_BOOL);
+            ->toBindValue(0, 'active', $pdo::PARAM_STR)
+            ->toBindValue(1, 2024, $pdo::PARAM_INT)
+            ->toBindValue(2, true, $pdo::PARAM_BOOL);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
@@ -160,8 +160,8 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "category_id" = :category_id and "published" = :published')
             ->toBePrepared()
-            ->withBinding('category_id', 7, $pdo::PARAM_INT)
-            ->withBinding('published', true, $pdo::PARAM_BOOL);
+            ->toBindValue('category_id', 7, $pdo::PARAM_INT)
+            ->toBindValue('published', true, $pdo::PARAM_BOOL);
 
         $statement = $pdo->prepare('select * from "books" where "category_id" = :category_id and "published" = :published');
 
@@ -228,8 +228,8 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->withBinding(1, 'published')
-            ->withBinding(2, 2024);
+            ->toBindValue(1, 'published')
+            ->toBindValue(2, 2024);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 

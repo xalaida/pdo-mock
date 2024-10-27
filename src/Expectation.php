@@ -48,7 +48,7 @@ class Expectation
         return $this;
     }
 
-    public function withBinding(string | int $key, mixed $value, int $type = PDO::PARAM_STR): static
+    public function toBindValue(string | int $key, mixed $value, int $type = PDO::PARAM_STR): static
     {
         $this->bindings[$key] = [
             'value' => $value,
