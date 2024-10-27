@@ -238,7 +238,6 @@ class ErrorInfoTest extends TestCase
             $result = $pdo->exec('select table "books"');
 
             static::assertFalse($result);
-
             static::assertSame(['HY000', 1, 'near "table": syntax error'], $pdo->errorInfo());
             static::assertSame('HY000', $pdo->errorCode());
         };
@@ -263,25 +262,13 @@ class ErrorInfoTest extends TestCase
         $scenario = function (PDO $pdo) {
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 
-            $warningTriggered = false;
-
-            set_error_handler(function ($errno, $errstr) use (&$warningTriggered) {
-                $warningTriggered = true;
-
-                static::assertTrue(E_WARNING === $errno || E_USER_WARNING === $errno);
-                static::assertSame('PDO::exec(): SQLSTATE[HY000]: General error: 1 near "table": syntax error', $errstr);
-            });
-
-            $result = $pdo->exec('select table "books"');
+            $result = $this->expectTriggerWarning(function () use ($pdo) {
+                return $pdo->exec('select table "books"');
+            }, 'PDO::exec(): SQLSTATE[HY000]: General error: 1 near "table": syntax error');
 
             static::assertFalse($result);
-
             static::assertSame(['HY000', 1, 'near "table": syntax error'], $pdo->errorInfo());
             static::assertSame('HY000', $pdo->errorCode());
-
-            static::assertTrue($warningTriggered);
-
-            restore_error_handler();
         };
 
         $sqlite = new PDO('sqlite::memory:');
@@ -304,25 +291,14 @@ class ErrorInfoTest extends TestCase
         $scenario = function (PDO $pdo) {
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 
-            $warningTriggered = false;
-
-            set_error_handler(function ($errno, $errstr) use (&$warningTriggered) {
-                $warningTriggered = true;
-
-                static::assertTrue(E_WARNING === $errno || E_USER_WARNING === $errno);
-                static::assertSame('PDO::prepare(): SQLSTATE[HY000]: General error: 1 near "table": syntax error', $errstr);
-            });
-
-            $result = $pdo->prepare('select table "books"');
+            $result = $this->expectTriggerWarning(function () use ($pdo) {
+                return $pdo->prepare('select table "books"');
+            }, 'PDO::prepare(): SQLSTATE[HY000]: General error: 1 near "table": syntax error');
 
             static::assertFalse($result);
 
             static::assertSame(['HY000', 1, 'near "table": syntax error'], $pdo->errorInfo());
             static::assertSame('HY000', $pdo->errorCode());
-
-            static::assertTrue($warningTriggered);
-
-            restore_error_handler();
         };
 
         $sqlite = new PDO('sqlite::memory:');
@@ -347,20 +323,9 @@ class ErrorInfoTest extends TestCase
 
             $statement = $pdo->prepare('insert into books (id, title) values (1, null)');
 
-            $warningTriggered = false;
-
-            set_error_handler(function ($errno, $errstr) use (&$warningTriggered) {
-                $warningTriggered = true;
-
-                static::assertTrue(E_WARNING === $errno || E_USER_WARNING === $errno);
-                static::assertSame('PDOStatement::execute(): SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: books.title', $errstr);
-            });
-
-            $result = $statement->execute();
-
-            restore_error_handler();
-
-            static::assertTrue($warningTriggered);
+            $result = $this->expectTriggerWarning(function () use ($statement) {
+                return $statement->execute();
+            }, 'PDOStatement::execute(): SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: books.title');
 
             static::assertFalse($result);
 
@@ -384,5 +349,28 @@ class ErrorInfoTest extends TestCase
                 19
             ));
         $scenario($mock);
+    }
+
+    protected function expectTriggerWarning(callable $callback, string | null $message = null)
+    {
+        $warningTriggered = false;
+
+        set_error_handler(function ($errno, $errstr) use (&$warningTriggered, $message) {
+            $warningTriggered = true;
+
+            static::assertTrue(E_WARNING === $errno || E_USER_WARNING === $errno);
+
+            if ($message !== null) {
+                static::assertSame($message, $errstr);
+            }
+        });
+
+        $result = $callback();
+
+        restore_error_handler();
+
+        static::assertTrue($warningTriggered,'Warning was not triggered');
+
+        return $result;
     }
 }
