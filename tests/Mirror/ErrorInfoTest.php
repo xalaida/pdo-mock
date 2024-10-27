@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Mirror;
 
 use PDO;
 use PDOException;
@@ -165,25 +165,6 @@ class ErrorInfoTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailUsingCustomErrorException(): void
-    {
-        $mock = new PDOMock();
-
-        $mock->expect('select table "books"')
-            ->andFailOnExecute(new PDOException('Invalid SQL'));
-
-        try {
-            $mock->exec('select table "books"');
-
-            $this->fail('Exception was not thrown');
-        } catch (PDOException $e) {
-            static::assertSame('Invalid SQL', $e->getMessage());
-            static::assertSame(0, $e->getCode());
-            static::assertNull($e->errorInfo);
-        }
-    }
-
-    #[Test]
     public function itShouldClearPreviousErrorInfoOnSuccessfulQuery(): void
     {
         $scenario = function (PDO $pdo) {
@@ -214,8 +195,6 @@ class ErrorInfoTest extends TestCase
         $mock->expect('select * from "books"');
         $scenario($mock);
     }
-
-    // TODO: test different error modes (silent, etc)
 
     #[Test]
     public function itShouldFailWithSyntaxErrorUsingSilentErrorMode(): void

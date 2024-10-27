@@ -2,10 +2,10 @@
 
 namespace Tests\Xala\Elomock;
 
-use PDO;
 use PDOStatement;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class QueryTest extends TestCase
@@ -13,31 +13,25 @@ class QueryTest extends TestCase
     #[Test]
     public function itShouldFetchRowsUsingQuery(): void
     {
-        $scenario = function (PDO $pdo) {
-            $statement = $pdo->query('select * from "books"');
+        $pdo = new PDOMock();
 
-            $this->assertInstanceOf(PDOStatement::class, $statement);
-
-            $rows = $statement->fetchAll($pdo::FETCH_OBJ);
-
-            static::assertCount(2, $rows);
-            static::assertIsObject($rows[0]);
-            static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
-            static::assertIsObject($rows[1]);
-            static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
-        };
-
-        $sqlite = $this->sqlite();
-        $sqlite->exec('insert into "books" ("title") values ("Kaidash’s Family"), ("Shadows of the Forgotten Ancestors")');
-        $scenario($sqlite);
-
-        $mock = new PDOMock();
-        $mock->expect('select * from "books"')
+        $pdo->expect('select * from "books"')
             ->andFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
-        $scenario($mock);
+
+        $statement = $pdo->query('select * from "books"');
+
+        $this->assertInstanceOf(PDOStatement::class, $statement);
+
+        $rows = $statement->fetchAll($pdo::FETCH_OBJ);
+
+        static::assertCount(2, $rows);
+        static::assertIsObject($rows[0]);
+        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
+        static::assertIsObject($rows[1]);
+        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
     #[Test]
@@ -55,22 +49,16 @@ class QueryTest extends TestCase
     }
 
     #[Test]
-    public function itShouldHandleQueryAsPreparedStatement()
+    public function itShouldHandleQueryAsPreparedStatement(): void
     {
-        $scenario = function (PDO $pdo) {
-            $statement = $pdo->query('select * from "books"');
+        $pdo = new PDOMock();
+        $pdo->expect('select * from "books"')->toBePrepared();
 
-            $this->assertInstanceOf(PDOStatement::class, $statement);
-            $this->assertSame(0, $statement->rowCount());
-        };
+        $statement = $pdo->query('select * from "books"');
 
-        $scenario($this->sqlite());
+        $this->assertInstanceOf(PDOStatement::class, $statement);
+        $this->assertSame(0, $statement->rowCount());
 
-        $mock = new PDOMock();
-        $mock->expect('select * from "books"')->toBePrepared();
-
-        $scenario($mock);
-
-        $mock->assertExpectationsFulfilled();
+        $pdo->assertExpectationsFulfilled();
     }
 }

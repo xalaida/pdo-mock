@@ -2,9 +2,9 @@
 
 namespace Tests\Xala\Elomock;
 
-use PDO;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class PrepareTest extends TestCase
@@ -12,19 +12,16 @@ class PrepareTest extends TestCase
     #[Test]
     public function itShouldHandlePreparedStatement(): void
     {
-        $scenario = function (PDO $pdo) {
-            $statement = $pdo->prepare('select * from "books"');
+        $pdo = new PDOMock();
 
-            $result = $statement->execute();
+        $pdo->expect('select * from "books"')
+            ->toBePrepared();
 
-            static::assertTrue($result);
-        };
+        $statement = $pdo->prepare('select * from "books"');
 
-        $scenario($this->sqlite());
+        $result = $statement->execute();
 
-        $mock = new PDOMock();
-        $mock->expect('select * from "books"')->toBePrepared();
-        $scenario($mock);
+        static::assertTrue($result);
     }
 
     #[Test]

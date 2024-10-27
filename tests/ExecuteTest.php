@@ -2,9 +2,9 @@
 
 namespace Tests\Xala\Elomock;
 
-use PDO;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class ExecuteTest extends TestCase
@@ -12,17 +12,13 @@ class ExecuteTest extends TestCase
     #[Test]
     public function itShouldExecuteQuery(): void
     {
-        $scenario = function (PDO $pdo) {
-            $result = $pdo->exec('select * from "books"');
+        $pdo = new PDOMock();
 
-            static::assertSame(0, $result);
-        };
+        $pdo->expect('select * from "books"');
 
-        $scenario($this->sqlite());
+        $result = $pdo->exec('select * from "books"');
 
-        $mock = new PDOMock();
-        $mock->expect('select * from "books"');
-        $scenario($mock);
+        static::assertSame(0, $result);
     }
 
     #[Test]

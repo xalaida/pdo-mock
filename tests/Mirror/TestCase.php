@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xala\Elomock\Mirror;
 
 use PDO;
 use PHPUnit\Framework\TestCase as BaseTestCase;
