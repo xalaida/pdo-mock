@@ -213,6 +213,8 @@ class PDOStatementMock extends PDOStatement
         }
 
         switch ($mode) {
+            // TODO: handle other fetch mods
+
             case PDO::FETCH_ASSOC:
                 return (array) $row;
 
@@ -252,23 +254,31 @@ class PDOStatementMock extends PDOStatement
                 return true;
             }
 
-            $value = $row[$rowIndex];
-
-            if ($params['type'] === $this->pdo::PARAM_NULL) {
-                $value = null;
-            } else if ($params['type'] === $this->pdo::PARAM_INT) {
-                $value = (int) $value;
-            } else if ($params['type'] === $this->pdo::PARAM_STR) {
-                $value = (string) $value;
-            } else if ($params['type'] === $this->pdo::PARAM_BOOL) {
-                $value = (bool) $value;
-            } else {
-                throw new RuntimeException('Unsupported column type: ' . $params['type']);
-            }
-
-            $params['value'] = $value;
+            $params['value'] = $this->applyParamType($params['type'], $row[$rowIndex]);
         }
 
         return true;
+    }
+
+    protected function applyParamType(int $type, mixed $value): mixed
+    {
+        switch ($type) {
+            // TODO: handle other types
+
+            case $this->pdo::PARAM_NULL:
+                return null;
+
+            case $this->pdo::PARAM_INT:
+                return (int) $value;
+
+            case $this->pdo::PARAM_STR:
+                return (string) $value;
+
+            case $this->pdo::PARAM_BOOL:
+                return (bool) $value;
+
+            default:
+                throw new RuntimeException('Unsupported column type: ' . $type);
+        }
     }
 }
