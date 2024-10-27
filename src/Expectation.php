@@ -21,7 +21,9 @@ class Expectation
 
     public ?string $insertId = null;
 
-    public ?PDOException $exception = null;
+    public ?PDOException $exceptionOnExecute = null;
+
+    public ?PDOException $exceptionOnPrepare = null;
 
     public ?PDOStatementMock $statement = null;
 
@@ -104,7 +106,14 @@ class Expectation
 
     public function andFail(PDOException $exception): static
     {
-        $this->exception = $exception;
+        $this->exceptionOnExecute = $exception;
+
+        return $this;
+    }
+
+    public function andFailOnPrepare(PDOException $exception): static
+    {
+        $this->exceptionOnPrepare = $exception;
 
         return $this;
     }

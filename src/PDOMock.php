@@ -26,7 +26,12 @@ class PDOMock extends PDO
 
     public string $lastInsertId = '0';
 
-    protected PDOException | null $latestException = null;
+    // TODO: refactor this flag
+    protected bool $executed = false;
+
+    private array $errorInfo;
+
+    private string | null $errorCode;
 
     /**
      * @noinspection PhpMissingParentConstructorInspection
@@ -37,6 +42,9 @@ class PDOMock extends PDO
             // TODO: define missing attributes
             self::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
         ];
+
+        $this->errorInfo = ['', null, null];
+        $this->errorCode = null;
     }
 
     #[Override]
@@ -80,10 +88,17 @@ class PDOMock extends PDO
 
         TestCase::assertEquals($expectation->query, $statement);
 
-        if ($expectation->exception) {
-            $this->latestException = $expectation->exception;
+        $this->errorInfo = ['00000', null, null];
+        $this->errorCode = $this->errorInfo[0];
 
-            throw $expectation->exception;
+        if ($expectation->exceptionOnExecute) {
+            // TODO: refactor
+            if ($expectation->exceptionOnExecute->errorInfo) {
+                $this->errorInfo = $expectation->exceptionOnExecute->errorInfo;
+                $this->errorCode = $expectation->exceptionOnExecute->errorInfo[0];
+            }
+
+            throw $expectation->exceptionOnExecute;
         }
 
         if (! is_null($expectation->insertId)) {
@@ -94,9 +109,27 @@ class PDOMock extends PDO
     }
 
     // TODO: handle $options
-    public function prepare($query, $options = [])
+    public function prepare($query, $options = []): PDOStatementMock
     {
-        $statement = new PDOStatementMock($this, $query);
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $query);
+
+        $expectation = array_shift($this->expectations);
+
+        // TODO: refactor...
+        $this->errorInfo = ['00000', null, null];
+        $this->errorCode = $this->errorInfo[0];
+
+        if ($expectation->exceptionOnPrepare) {
+            // TODO: refactor
+            if ($expectation->exceptionOnPrepare->errorInfo) {
+                $this->errorInfo = $expectation->exceptionOnPrepare->errorInfo;
+                $this->errorCode = $expectation->exceptionOnPrepare->errorInfo[0];
+            }
+
+            throw $expectation->exceptionOnPrepare;
+        }
+
+        $statement = new PDOStatementMock($this, $expectation, $query);
 
         $statement->setFetchMode($this->getAttribute($this::ATTR_DEFAULT_FETCH_MODE));
 
@@ -206,20 +239,12 @@ class PDOMock extends PDO
 
     public function errorCode(): ?string
     {
-        if ($this->latestException) {
-            return $this->latestException->errorInfo[0];
-        }
-
-        return null;
+        return $this->errorCode;
     }
 
     public function errorInfo(): array
     {
-        if ($this->latestException) {
-            return $this->latestException->errorInfo;
-        }
-
-        return ['', null, null];
+        return $this->errorInfo;
     }
 
     public function assertExpectationsFulfilled(): void

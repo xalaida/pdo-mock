@@ -11,25 +11,32 @@ use ValueError;
 
 class PDOStatementMock extends PDOStatement
 {
+    protected PDOMock $pdo;
+
+    protected Expectation $expectation;
+
     public string $queryString;
 
     public array $bindings = [];
 
     protected int $fetchMode;
 
-    protected PDOMock $pdo;
-
-    // TODO: consider passing this with constructor
-    protected ?Expectation $expectation = null;
-
     protected int $cursor = 0;
 
     protected bool $executed = false;
 
-    public function __construct(PDOMock $pdo, string $query)
+    protected array $errorInfo;
+
+    protected string | null $errorCode;
+
+    public function __construct(PDOMock $pdo, Expectation $expectation, string $query)
     {
-        $this->queryString = $query;
         $this->pdo = $pdo;
+        $this->expectation = $expectation;
+        $this->queryString = $query;
+
+        $this->errorInfo = ['', null, null];
+        $this->errorCode = null;
     }
 
     #[Override]
@@ -63,10 +70,6 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function execute(?array $params = null): bool
     {
-        TestCase::assertNotEmpty($this->pdo->expectations, 'Unexpected query: ' . $this->queryString);
-
-        $this->expectation = array_shift($this->pdo->expectations);
-
         $this->expectation->statement = $this;
 
         if (! is_null($params)) {
@@ -102,11 +105,15 @@ class PDOStatementMock extends PDOStatement
             }
         }
 
-        if ($this->expectation->exception) {
-            throw $this->expectation->exception;
-        }
+        $this->errorInfo = ['00000', null, null];
+        $this->errorCode = $this->errorInfo[0];
 
-        $this->executed = true;
+        if ($this->expectation->exceptionOnExecute) {
+            $this->errorInfo = $this->expectation->exceptionOnExecute->errorInfo;
+            $this->errorCode = $this->expectation->exceptionOnExecute->errorInfo[0];
+
+            throw $this->expectation->exceptionOnExecute;
+        }
 
         if (! is_null($this->expectation->insertId)) {
             $this->pdo->lastInsertId = $this->expectation->insertId;
@@ -118,27 +125,17 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function rowCount(): int
     {
-        if (is_null($this->expectation)) {
-            return 0;
-        }
-
         return $this->expectation->rowCount;
     }
 
     public function errorCode(): ?string
     {
-        return $this->executed
-            ? '00000'
-            : null;
+        return $this->errorCode;
     }
 
     public function errorInfo(): array
     {
-        $code = $this->executed
-            ? $this->errorCode()
-            : '';
-
-        return [$code, null, null];
+        return $this->errorInfo;
     }
 
     #[Override]
@@ -164,6 +161,7 @@ class PDOStatementMock extends PDOStatement
             throw new ValueError('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()');
         }
 
+        // TODO: consider removing this part and the $executed flag as well
         if (! $this->executed) {
             return [];
         }
