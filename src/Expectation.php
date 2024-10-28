@@ -48,7 +48,7 @@ class Expectation
         return $this;
     }
 
-    public function withBound(string | int $param, mixed $value, int $type = PDO::PARAM_STR): static
+    public function withParam(string | int $param, mixed $value, int $type = PDO::PARAM_STR): static
     {
         $this->params[$param] = [
             'value' => $value,
