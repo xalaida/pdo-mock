@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
-class PrepareParamsNamedTest extends TestCase
+class PrepareParamsNamedPrefixedTest extends TestCase
 {
     #[Test]
     #[DataProvider('contracts')]
@@ -17,11 +17,11 @@ class PrepareParamsNamedTest extends TestCase
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
         static::assertTrue(
-            $statement->bindValue('year', 2024, $pdo::PARAM_INT)
+            $statement->bindValue(':year', 2024, $pdo::PARAM_INT)
         );
 
         static::assertTrue(
-            $statement->bindValue('status', 'published', $pdo::PARAM_STR)
+            $statement->bindValue(':status', 'published', $pdo::PARAM_STR)
         );
 
         static::assertTrue(
@@ -41,11 +41,11 @@ class PrepareParamsNamedTest extends TestCase
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
         static::assertTrue(
-            $statement->bindParam('year', $year, $pdo::PARAM_INT)
+            $statement->bindParam(':year', $year, $pdo::PARAM_INT)
         );
 
         static::assertTrue(
-            $statement->bindParam('status', $status, $pdo::PARAM_STR)
+            $statement->bindParam(':status', $status, $pdo::PARAM_STR)
         );
 
         static::assertTrue(
@@ -85,8 +85,8 @@ class PrepareParamsNamedTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->withParam('status', 'published', $pdo::PARAM_STR)
-            ->withParam('year', 2024, $pdo::PARAM_INT)
+            ->withParam(':status', 'published', $pdo::PARAM_STR)
+            ->withParam(':year', 2024, $pdo::PARAM_INT)
             ->andFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
