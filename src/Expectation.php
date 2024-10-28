@@ -9,6 +9,8 @@ use PDOException;
 
 class Expectation
 {
+    public ?PDOStatementMock $statement = null;
+
     public string $query;
 
     public array | Closure | null $params = null;
@@ -19,15 +21,13 @@ class Expectation
 
     public int $rowCount = 0;
 
-    public array $rows = [];
+    public ?ResultSet $resultSet = null;
 
     public ?string $insertId = null;
 
     public ?PDOException $exceptionOnExecute = null;
 
     public ?PDOException $exceptionOnPrepare = null;
-
-    public ?PDOStatementMock $statement = null;
 
     public function __construct(string $query)
     {
@@ -95,18 +95,25 @@ class Expectation
         return $this;
     }
 
-    public function andFetchRows(array $rows): static
+    public function andFetch(ResultSet $resultSet): static
     {
-        $this->rows = $rows;
+        $this->resultSet = $resultSet;
 
         return $this;
     }
 
-    public function andFetchRow(array $row): static
+    public function andFetchRecords(array $records): static
     {
-        $this->rows = [$row];
+        return $this->andFetch(
+            ResultSet::fromRecords($records)
+        );
+    }
 
-        return $this;
+    public function andFetchRecord(array $row): static
+    {
+        return $this->andFetch(
+            ResultSet::fromRecords([$row])
+        );
     }
 
     public function andFailOnExecute(PDOException $exception): static

@@ -34,8 +34,8 @@ class PDOMock extends PDO
     public function __construct(array $attributes = [])
     {
         $this->attributes = [
-            $this::ATTR_ERRMODE => $this::ERRMODE_EXCEPTION,
-            $this::ATTR_DEFAULT_FETCH_MODE => $this::FETCH_BOTH,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
         ] + $attributes;
     }
 
@@ -89,17 +89,17 @@ class PDOMock extends PDO
         }
 
         if ($expectation->exceptionOnExecute) {
-            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_SILENT) {
+            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
                 return false;
             }
 
-            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_WARNING) {
+            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
                 trigger_error('PDO::exec(): ' . $expectation->exceptionOnExecute->getMessage(), E_USER_WARNING);
 
                 return false;
             }
 
-            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_EXCEPTION) {
+            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
                 throw $expectation->exceptionOnExecute;
             }
         }
@@ -108,7 +108,11 @@ class PDOMock extends PDO
             $this->lastInsertId = $expectation->insertId;
         }
 
-        return count($expectation->rows) ?: $expectation->rowCount;
+        if ($expectation->resultSet !== null) {
+            return count($expectation->resultSet->rows);
+        }
+
+        return $expectation->rowCount;
     }
 
     public function prepare($query, $options = []): PDOStatementMock | false
@@ -126,17 +130,17 @@ class PDOMock extends PDO
         }
 
         if ($expectation->exceptionOnPrepare) {
-            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_SILENT) {
+            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
                 return false;
             }
 
-            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_WARNING) {
+            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
                 trigger_error('PDO::prepare(): ' . $expectation->exceptionOnPrepare->getMessage(), E_USER_WARNING);
 
                 return false;
             }
 
-            if ($this->getAttribute($this::ATTR_ERRMODE) === $this::ERRMODE_EXCEPTION) {
+            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
                 throw $expectation->exceptionOnPrepare;
             }
         }
@@ -144,7 +148,7 @@ class PDOMock extends PDO
         $statement = new PDOStatementMock($this, $expectation, $query);
 
         $statement->setFetchMode(
-            $this->getAttribute($this::ATTR_DEFAULT_FETCH_MODE)
+            $this->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE)
         );
 
         return $statement;

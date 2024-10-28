@@ -132,17 +132,17 @@ class PDOStatementMock extends PDOStatement
         }
 
         if ($this->expectation->exceptionOnExecute) {
-            if ($this->pdo->getAttribute($this->pdo::ATTR_ERRMODE) === $this->pdo::ERRMODE_SILENT) {
+            if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
                 return false;
             }
 
-            if ($this->pdo->getAttribute($this->pdo::ATTR_ERRMODE) === $this->pdo::ERRMODE_WARNING) {
+            if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
                 trigger_error('PDOStatement::execute(): ' . $this->expectation->exceptionOnExecute->getMessage(), E_USER_WARNING);
 
                 return false;
             }
 
-            if ($this->pdo->getAttribute($this->pdo::ATTR_ERRMODE) === $this->pdo::ERRMODE_EXCEPTION) {
+            if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
                 throw $this->expectation->exceptionOnExecute;
             }
         }
@@ -185,12 +185,8 @@ class PDOStatementMock extends PDOStatement
     #[Override]
     public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
-        if (! $this->executed) {
-            return false;
-        }
-
-        if (isset($this->expectation->rows[$this->cursor])) {
-            $row = $this->applyFetchMode($this->expectation->rows[$this->cursor], $mode);
+        if ($this->executed && isset($this->expectation->resultSet->rows[$this->cursor])) {
+            $row = $this->applyFetchMode($this->expectation->resultSet->cols, $this->expectation->resultSet->rows[$this->cursor], $mode);
 
             $this->cursor++;
 
@@ -212,62 +208,59 @@ class PDOStatementMock extends PDOStatement
         }
 
         return array_map(function ($row) use ($mode) {
-            return $this->applyFetchMode($row, $mode);
-        }, $this->expectation->rows);
+            return $this->applyFetchMode($this->expectation->resultSet->cols, $row, $mode);
+        }, $this->expectation->resultSet->rows);
     }
 
-    protected function applyFetchMode(array $row, int $mode): object | array | true
+    protected function applyFetchMode(array $cols, array $row, int $mode): object | array | true
     {
         if ($mode === PDO::FETCH_DEFAULT) {
             $mode = $this->fetchMode;
         }
 
-        switch ($mode) {
-            case PDO::FETCH_ASSOC:
-                return (array) $row;
+        if ($mode !== PDO::FETCH_NUM && empty($cols)) {
+            throw new RuntimeException('Specify columns to result set');
+        }
 
+        switch ($mode) {
             case PDO::FETCH_NUM:
-                return array_values($row);
+                return $row;
+
+            case PDO::FETCH_ASSOC:
+                return array_combine($cols, $row);
 
             case PDO::FETCH_OBJ:
-                return (object) $row;
+                return (object) array_combine($cols, $row);
 
             case PDO::FETCH_BOTH:
-                return $this->applyFetchModeBoth($row);
+                return array_merge($row, array_combine($cols, $row));
 
             case PDO::FETCH_BOUND:
-                return $this->applyFetchModeBound($row);
+                return $this->applyFetchModeBound($cols, $row);
 
             default:
                 throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
         }
     }
 
-    protected function applyFetchModeBoth(array $row): array
+    protected function applyFetchModeBound(array $columns, array $row): bool
     {
-        return array_merge($row, array_values($row));
-    }
-
-    protected function applyFetchModeBound(array $row): bool
-    {
-        $row = $this->applyFetchModeBoth($row);
-
         foreach ($this->columns as $column => $params) {
-            $rowIndex = is_int($column)
-                ? $column - 1
-                : $column;
+            if (is_int($column)) {
+                $index = $column - 1;
 
-            if (! isset($row[$rowIndex])) {
-                if (is_int($rowIndex)) {
+                if (! isset($row[$index])) {
                     throw new ValueError('Invalid column index');
                 }
-
-                $params['value'] = null;
-
-                return true;
+            } else {
+                $index = array_search($column, $columns, true);
             }
 
-            $params['value'] = $this->applyParamType($params['type'], $row[$rowIndex]);
+            if ($index === false) {
+                $params['value'] = null;
+            } else {
+                $params['value'] = $this->applyParamType($params['type'], $row[$index]);
+            }
         }
 
         return true;
@@ -276,16 +269,16 @@ class PDOStatementMock extends PDOStatement
     protected function applyParamType(int $type, mixed $value): mixed
     {
         switch ($type) {
-            case $this->pdo::PARAM_NULL:
+            case PDO::PARAM_NULL:
                 return null;
 
-            case $this->pdo::PARAM_INT:
+            case PDO::PARAM_INT:
                 return (int) $value;
 
-            case $this->pdo::PARAM_STR:
+            case PDO::PARAM_STR:
                 return (string) $value;
 
-            case $this->pdo::PARAM_BOOL:
+            case PDO::PARAM_BOOL:
                 return (bool) $value;
 
             default:

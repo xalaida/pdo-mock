@@ -5,9 +5,6 @@ namespace Tests\Xala\Elomock;
 use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
-/*
- * @todo add ability to fetch from different sources (csv file, generator, from class objects, etc)
- */
 class FetchTest extends TestCase
 {
     #[Test]
@@ -17,7 +14,7 @@ class FetchTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -64,7 +61,7 @@ class FetchTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -97,7 +94,7 @@ class FetchTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -130,7 +127,7 @@ class FetchTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -163,7 +160,7 @@ class FetchTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);

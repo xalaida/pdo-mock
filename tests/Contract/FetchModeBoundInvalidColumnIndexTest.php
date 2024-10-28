@@ -70,7 +70,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select "title" from "books"')
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['title' => 'Kaidash’s Family'],
             ]);
 

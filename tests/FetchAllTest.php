@@ -3,16 +3,12 @@
 namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 use Xala\Elomock\PDOMock;
+use Xala\Elomock\ResultSet;
 
-/**
- * @todo handle other fetch modes
- * @todo add ability to fetch from different sources (csv file, generator, from class objects, etc)
- * @todo add ability to fetch by building result table using oop syntax
- */
 class FetchAllTest extends TestCase
 {
-
     #[Test]
     public function itShouldHandleFetchAllInBothModeAsDefault(): void
     {
@@ -20,7 +16,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -47,7 +43,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -74,7 +70,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -102,7 +98,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -129,7 +125,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -158,7 +154,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRow([
+            ->andFetchRecord([
                 'id' => 1,
                 'title' => 'Kaidash’s Family',
             ]);
@@ -174,5 +170,57 @@ class FetchAllTest extends TestCase
         static::assertCount(1, $rows);
         static::assertIsArray($rows[0]);
         static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
+    }
+
+    #[Test]
+    public function itShouldHandleFetchUsingResultSetInstance(): void
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books"')
+            ->toBePrepared()
+            ->andFetch(
+                (new ResultSet())
+                    ->setCols(['id', 'title'])
+                    ->addRow([1, 'Kaidash’s Family'])
+                    ->addRow([2, 'Shadows of the Forgotten Ancestors'])
+            );
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+
+        $rows = $statement->fetchAll($pdo::FETCH_ASSOC);
+
+        static::assertCount(2, $rows);
+        static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
+        static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
+    }
+
+    #[Test]
+    public function itShouldFailWhenColumnsAreMissingForAssocMode(): void
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books"')
+            ->toBePrepared()
+            ->andFetch(
+                (new ResultSet())
+                    ->addRow([1, 'Kaidash’s Family'])
+                    ->addRow([2, 'Shadows of the Forgotten Ancestors'])
+            );
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Specify columns to result set');
+
+        $statement->fetchAll($pdo::FETCH_ASSOC);
     }
 }

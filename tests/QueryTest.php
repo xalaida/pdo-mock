@@ -15,7 +15,7 @@ class QueryTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books"')
-            ->andFetchRows([
+            ->andFetchRecords([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
