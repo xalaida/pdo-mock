@@ -2,6 +2,8 @@
 
 namespace Tests\Xala\Elomock\Contract;
 
+use Iterator;
+use IteratorAggregate;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -144,6 +146,38 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
         static::assertFalse($row);
+    }
+
+    #[Test]
+    #[DataProvider('contracts')]
+    public function itShouldUseFetchAsIterator(PDO $pdo): void
+    {
+        $statement = $pdo->prepare('select * from "books"');
+
+        $statement->setFetchMode($pdo::FETCH_OBJ);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+
+        static::assertInstanceOf(IteratorAggregate::class, $statement);
+
+        $iterator = $statement->getIterator();
+
+        static::assertInstanceOf(Iterator::class, $iterator);
+
+        static::assertEquals(0, $iterator->key());
+        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $iterator->current());
+
+        $iterator->next();
+
+        static::assertEquals(1, $iterator->key());
+        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $iterator->current());
+
+        $iterator->next();
+
+        static::assertNull($iterator->current());
+        static::assertFalse($iterator->valid());
     }
 
     public static function contracts(): array

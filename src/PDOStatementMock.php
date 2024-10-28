@@ -2,7 +2,9 @@
 
 namespace Xala\Elomock;
 
+use ArrayIterator;
 use InvalidArgumentException;
+use Iterator;
 use Override;
 use PDO;
 use PDOStatement;
@@ -162,14 +164,22 @@ class PDOStatementMock extends PDOStatement
         return $this->expectation->rowCount;
     }
 
+    #[Override]
     public function errorCode(): ?string
     {
         return $this->errorCode;
     }
 
+    #[Override]
     public function errorInfo(): array
     {
         return $this->errorInfo;
+    }
+
+    #[Override]
+    public function getIterator(): Iterator
+    {
+        return new ArrayIterator($this->fetchAll());
     }
 
     #[Override]
