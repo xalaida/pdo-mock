@@ -33,10 +33,10 @@ class PDOMock extends PDO
 
     public function __construct(array $attributes = [])
     {
-        $this->attributes = array_merge([
+        $this->attributes = [
             $this::ATTR_ERRMODE => $this::ERRMODE_EXCEPTION,
             $this::ATTR_DEFAULT_FETCH_MODE => $this::FETCH_BOTH,
-        ], $attributes);
+        ] + $attributes;
     }
 
     #[Override]
@@ -48,7 +48,7 @@ class PDOMock extends PDO
     }
 
     #[Override]
-    public function getAttribute($attribute): bool
+    public function getAttribute($attribute): mixed
     {
         return $this->attributes[$attribute];
     }

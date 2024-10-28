@@ -75,10 +75,7 @@ class Expectation
                 ? $this->getTypeFromValue($value)
                 : PDO::PARAM_STR;
 
-            $this->params[$param] = [
-                'value' => $value,
-                'type' => $type,
-            ];
+            $this->withParam($param, $value, $type);
         }
 
         return $this;

@@ -8,20 +8,20 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
-class PrepareParamsTest extends TestCase
+class PrepareParamsNamedTest extends TestCase
 {
     #[Test]
     #[DataProvider('contracts')]
     public function itShouldHandleBindValue(PDO $pdo): void
     {
-        $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
         static::assertTrue(
-            $statement->bindValue(1, 'published', $pdo::PARAM_STR)
+            $statement->bindValue(':year', 2024, $pdo::PARAM_INT)
         );
 
         static::assertTrue(
-            $statement->bindValue(2, 2024, $pdo::PARAM_INT)
+            $statement->bindValue(':status', 'published', $pdo::PARAM_STR)
         );
 
         static::assertTrue(
@@ -38,14 +38,14 @@ class PrepareParamsTest extends TestCase
         $status = 'published';
         $year = 2024;
 
-        $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
         static::assertTrue(
-            $statement->bindParam(1, $status, $pdo::PARAM_STR, 10)
+            $statement->bindParam(':year', $year, $pdo::PARAM_INT)
         );
 
         static::assertTrue(
-            $statement->bindParam(2, $year, $pdo::PARAM_INT)
+            $statement->bindParam(':status', $status, $pdo::PARAM_STR)
         );
 
         static::assertTrue(
@@ -83,10 +83,10 @@ class PrepareParamsTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $pdo->expect('select * from "books" where "status" = ? and "year" = ?')
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->withParam(1, 'published', $pdo::PARAM_STR)
-            ->withParam(2, 2024, $pdo::PARAM_INT)
+            ->withParam(':status', 'published', $pdo::PARAM_STR)
+            ->withParam(':year', 2024, $pdo::PARAM_INT)
             ->andFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
