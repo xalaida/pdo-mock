@@ -5,6 +5,7 @@ namespace Xala\Elomock;
 use Override;
 use PDO;
 use PDOException;
+use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -26,26 +27,20 @@ class PDOMock extends PDO
 
     public string $lastInsertId = '0';
 
-    private array $errorInfo;
+    private array $errorInfo = ['', null, null];
 
-    private string | null $errorCode;
+    private string | null $errorCode = null;
 
-    /**
-     * @noinspection PhpMissingParentConstructorInspection
-     */
-    public function __construct()
+    public function __construct(array $attributes = [])
     {
-        $this->attributes = [
+        $this->attributes = array_merge([
             $this::ATTR_ERRMODE => $this::ERRMODE_EXCEPTION,
             $this::ATTR_DEFAULT_FETCH_MODE => $this::FETCH_BOTH,
-        ];
-
-        $this->errorInfo = ['', null, null];
-        $this->errorCode = null;
+        ], $attributes);
     }
 
     #[Override]
-    public function setAttribute($attribute, $value)
+    public function setAttribute($attribute, $value): bool
     {
         $this->attributes[$attribute] = $value;
 
@@ -53,7 +48,7 @@ class PDOMock extends PDO
     }
 
     #[Override]
-    public function getAttribute($attribute)
+    public function getAttribute($attribute): bool
     {
         return $this->attributes[$attribute];
     }
@@ -155,7 +150,7 @@ class PDOMock extends PDO
         return $statement;
     }
 
-    public function query($query, $fetchMode = null, ...$fetch_mode_args)
+    public function query($query, $fetchMode = null, ...$fetch_mode_args): PDOStatement
     {
         $statement = $this->prepare($query);
 
