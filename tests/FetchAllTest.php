@@ -3,7 +3,6 @@
 namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 /**

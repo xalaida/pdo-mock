@@ -1,24 +1,11 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xala\Elomock;
 
-use PDO;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
-    /**
-     * @deprecated
-     */
-    protected function sqlite(): PDO
-    {
-        $pdo = new PDO('sqlite::memory:');
-
-        $pdo->exec('create table "books" ("id" integer primary key autoincrement not null, "title" varchar not null)');
-
-        return $pdo;
-    }
-
     protected function expectTriggerWarning(callable $callback, string | null $message = null)
     {
         $warningTriggered = false;

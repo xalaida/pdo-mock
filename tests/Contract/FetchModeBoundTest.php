@@ -5,6 +5,7 @@ namespace Tests\Xala\Elomock\Contract;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class FetchModeBoundTest extends TestCase
@@ -122,7 +123,7 @@ class FetchModeBoundTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select "id", "title", "status", "deleted" from "books" where "deleted" = ?')
-            ->withBound(1, 0, $pdo::PARAM_BOOL)
+            ->withParam(1, 0, $pdo::PARAM_BOOL)
             ->andFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family', 'status' => 'published', 'deleted' => false],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors', 'status' => 'draft', 'deleted' => false],

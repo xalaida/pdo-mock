@@ -3,24 +3,19 @@
 namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
-use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
-class TransactionRollbackWithoutBeginTest extends TestCase
+class ErrorInfoFreshTest extends TestCase
 {
     #[Test]
     #[DataProvider('contracts')]
-    public function itShouldFailOnCRollbackWithoutBeginTransaction(PDO $pdo): void
+    public function itShouldDisplayErrorInformationForPDOInstance(PDO $pdo): void
     {
-        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
-
-        $this->expectException(PDOException::class);
-        $this->expectExceptionMessage('There is no active transaction');
-
-        $pdo->rollBack();
+        static::assertNull($pdo->errorCode());
+        static::assertSame(['', null, null], $pdo->errorInfo());
     }
 
     public static function contracts(): array
@@ -43,10 +38,6 @@ class TransactionRollbackWithoutBeginTest extends TestCase
 
     protected static function configureMock(): PDOMock
     {
-        $pdo = new PDOMock();
-
-        $pdo->expectRollback();
-
-        return $pdo;
+        return new PDOMock();
     }
 }

@@ -6,6 +6,7 @@ use PDO;
 use PDOStatement;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class QueryFetchAllTest extends TestCase

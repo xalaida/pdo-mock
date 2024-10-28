@@ -4,7 +4,6 @@ namespace Tests\Xala\Elomock;
 
 use PDOException;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOExceptionMock;
 use Xala\Elomock\PDOMock;
 

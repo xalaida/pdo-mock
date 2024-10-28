@@ -4,7 +4,6 @@ namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class ExecuteTest extends TestCase

@@ -5,6 +5,7 @@ namespace Tests\Xala\Elomock\Contract;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class ExecuteDeleteTest extends TestCase

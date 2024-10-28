@@ -4,7 +4,6 @@ namespace Tests\Xala\Elomock;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class PrepareTest extends TestCase
@@ -75,8 +74,8 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()
-            ->withBound(1, 'published', $pdo::PARAM_STR)
-            ->withBound(2, 2024, $pdo::PARAM_INT);
+            ->withParam(1, 'published', $pdo::PARAM_STR)
+            ->withParam(2, 2024, $pdo::PARAM_INT);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
 
@@ -98,9 +97,9 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->withBound(0, 'active', $pdo::PARAM_STR)
-            ->withBound(1, 2024, $pdo::PARAM_INT)
-            ->withBound(2, true, $pdo::PARAM_BOOL);
+            ->withParam(0, 'active', $pdo::PARAM_STR)
+            ->withParam(1, 2024, $pdo::PARAM_INT)
+            ->withParam(2, true, $pdo::PARAM_BOOL);
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
@@ -109,6 +108,7 @@ class PrepareTest extends TestCase
         $statement->bindValue(3, true, $pdo::PARAM_BOOL);
 
         $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Params do not match');
 
         $statement->execute();
     }
@@ -149,6 +149,7 @@ class PrepareTest extends TestCase
         $statement->bindValue(3, true, $pdo::PARAM_BOOL);
 
         $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Params do not match');
 
         $statement->execute();
     }
@@ -160,8 +161,8 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "category_id" = :category_id and "published" = :published')
             ->toBePrepared()
-            ->withBound('category_id', 7, $pdo::PARAM_INT)
-            ->withBound('published', true, $pdo::PARAM_BOOL);
+            ->withParam('category_id', 7, $pdo::PARAM_INT)
+            ->withParam('published', true, $pdo::PARAM_BOOL);
 
         $statement = $pdo->prepare('select * from "books" where "category_id" = :category_id and "published" = :published');
 
@@ -217,6 +218,7 @@ class PrepareTest extends TestCase
         $statement->bindValue('published', true, $pdo::PARAM_BOOL);
 
         $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Params do not match');
 
         $statement->execute();
     }
@@ -228,8 +230,8 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->withBound(1, 'published')
-            ->withBound(2, 2024);
+            ->withParam(1, 'published')
+            ->withParam(2, 2024);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
@@ -269,6 +271,7 @@ class PrepareTest extends TestCase
         $statement->bindValue(2, 2024, $pdo::PARAM_INT);
 
         $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Params do not match');
 
         $statement->execute([]);
     }

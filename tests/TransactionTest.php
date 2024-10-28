@@ -5,7 +5,6 @@ namespace Tests\Xala\Elomock;
 use PDO;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use Xala\Elomock\PDOMock;
 
 class TransactionTest extends TestCase
