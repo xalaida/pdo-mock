@@ -148,7 +148,7 @@ class PDOMock extends PDO
         $statement = new PDOStatementMock($this, $expectation, $query);
 
         $statement->setFetchMode(
-            $this->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE)
+            $this->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE),
         );
 
         return $statement;

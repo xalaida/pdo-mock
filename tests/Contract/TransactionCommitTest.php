@@ -15,25 +15,25 @@ class TransactionCommitTest extends TestCase
     public function itShouldCommitTransaction(PDO $pdo): void
     {
         static::assertFalse(
-            $pdo->inTransaction()
+            $pdo->inTransaction(),
         );
 
         static::assertTrue(
-            $pdo->beginTransaction()
+            $pdo->beginTransaction(),
         );
 
         $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
 
         static::assertTrue(
-            $pdo->inTransaction()
+            $pdo->inTransaction(),
         );
 
         static::assertTrue(
-            $pdo->commit()
+            $pdo->commit(),
         );
 
         static::assertFalse(
-            $pdo->inTransaction()
+            $pdo->inTransaction(),
         );
     }
 
@@ -41,11 +41,11 @@ class TransactionCommitTest extends TestCase
     {
         return [
             'SQLite' => [
-                static::configureSqlite()
+                static::configureSqlite(),
             ],
 
             'Mock' => [
-                static::configureMock()
+                static::configureMock(),
             ],
         ];
     }

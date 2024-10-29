@@ -60,11 +60,11 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
     {
         return [
             'SQLite' => [
-                static::configureSqlite()
+                static::configureSqlite(),
             ],
 
             'Mock' => [
-                static::configureMock()
+                static::configureMock(),
             ],
         ];
     }
@@ -87,7 +87,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
                 'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: books.title',
                 '23000',
                 'NOT NULL constraint failed: books.title',
-                19
+                19,
             ));
 
         return $pdo;

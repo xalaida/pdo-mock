@@ -17,15 +17,15 @@ class PrepareParamsTest extends TestCase
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
 
         static::assertTrue(
-            $statement->bindValue(1, 'published', $pdo::PARAM_STR)
+            $statement->bindValue(1, 'published', $pdo::PARAM_STR),
         );
 
         static::assertTrue(
-            $statement->bindValue(2, 2024, $pdo::PARAM_INT)
+            $statement->bindValue(2, 2024, $pdo::PARAM_INT),
         );
 
         static::assertTrue(
-            $statement->execute()
+            $statement->execute(),
         );
 
         static::assertCount(2, $statement->fetchAll());
@@ -41,15 +41,15 @@ class PrepareParamsTest extends TestCase
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ?');
 
         static::assertTrue(
-            $statement->bindParam(1, $status, $pdo::PARAM_STR, 10)
+            $statement->bindParam(1, $status, $pdo::PARAM_STR, 10),
         );
 
         static::assertTrue(
-            $statement->bindParam(2, $year, $pdo::PARAM_INT)
+            $statement->bindParam(2, $year, $pdo::PARAM_INT),
         );
 
         static::assertTrue(
-            $statement->execute()
+            $statement->execute(),
         );
 
         static::assertCount(2, $statement->fetchAll());
@@ -59,11 +59,11 @@ class PrepareParamsTest extends TestCase
     {
         return [
             'SQLite' => [
-                static::configureSqlite()
+                static::configureSqlite(),
             ],
 
             'Mock' => [
-                static::configureMock()
+                static::configureMock(),
             ],
         ];
     }

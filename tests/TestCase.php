@@ -24,7 +24,7 @@ class TestCase extends BaseTestCase
 
         restore_error_handler();
 
-        static::assertTrue($warningTriggered,'Warning was not triggered');
+        static::assertTrue($warningTriggered, 'Warning was not triggered');
 
         return $result;
     }

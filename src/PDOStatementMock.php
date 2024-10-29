@@ -55,7 +55,7 @@ class PDOStatementMock extends PDOStatement
     {
         $this->params[$param] = [
             'value' => $value,
-            'type' => $type
+            'type' => $type,
         ];
 
         return true;
@@ -66,7 +66,7 @@ class PDOStatementMock extends PDOStatement
     {
         $this->params[$param] = [
             'value' => $var,
-            'type' => $type
+            'type' => $type,
         ];
 
         return true;
@@ -77,7 +77,7 @@ class PDOStatementMock extends PDOStatement
     {
         $this->columns[$column] = [
             'value' => &$var,
-            'type' => $type
+            'type' => $type,
         ];
 
         return true;

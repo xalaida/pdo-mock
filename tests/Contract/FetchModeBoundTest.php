@@ -89,11 +89,11 @@ class FetchModeBoundTest extends TestCase
     {
         return [
             'SQLite' => [
-                static::configureSqlite()
+                static::configureSqlite(),
             ],
 
             'Mock' => [
-                static::configureMock()
+                static::configureMock(),
             ],
         ];
     }
@@ -109,10 +109,11 @@ class FetchModeBoundTest extends TestCase
             "deleted" integer default 0
         )');
 
-        $pdo->exec('insert into "books"
+        $pdo->exec(
+            'insert into "books"
             ("title", "status", "deleted") values 
             ("Kaidash’s Family", "published", 0),
-            ("Shadows of the Forgotten Ancestors", "draft", 0)'
+            ("Shadows of the Forgotten Ancestors", "draft", 0)',
         );
 
         return $pdo;

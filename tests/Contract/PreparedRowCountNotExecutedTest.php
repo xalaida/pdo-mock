@@ -23,11 +23,11 @@ class PreparedRowCountNotExecutedTest extends TestCase
     {
         return [
             'SQLite' => [
-                static::configureSqlite()
+                static::configureSqlite(),
             ],
 
             'Mock' => [
-                static::configureMock()
+                static::configureMock(),
             ],
         ];
     }
