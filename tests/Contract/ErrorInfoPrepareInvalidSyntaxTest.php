@@ -16,6 +16,8 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
      */
     public function itShouldFailWithSyntaxErrorExceptionOnPrepare(PDO $pdo): void
     {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         try {
             $pdo->prepare('select table "books"');
 

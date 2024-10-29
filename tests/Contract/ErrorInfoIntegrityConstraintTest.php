@@ -16,6 +16,8 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
      */
     public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement(PDO $pdo): void
     {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         $statement = $pdo->prepare("insert into books (id, title) values (1, null)");
 
         try {

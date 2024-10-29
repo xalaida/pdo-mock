@@ -16,6 +16,8 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      */
     public function itShouldFailWithSyntaxErrorException(PDO $pdo): void
     {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         try {
             $pdo->exec('select table "books"');
 
@@ -36,6 +38,8 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      */
     public function itShouldClearPreviousErrorInfoOnSuccessfulQuery(PDO $pdo): void
     {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         try {
             $pdo->exec('select table "books"');
 
