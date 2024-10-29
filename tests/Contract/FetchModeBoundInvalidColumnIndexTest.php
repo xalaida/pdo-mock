@@ -4,7 +4,6 @@ namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use Tests\Xala\Elomock\TestCase;
-use ValueError;
 use Xala\Elomock\PDOMock;
 
 class FetchModeBoundInvalidColumnIndexTest extends TestCase
@@ -15,7 +14,8 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
      */
     public function itShouldThrowValueExceptionWhenInvalidColumnIndex(PDO $pdo): void
     {
-        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
+        // TODO: it throws even with silent mode in php >= 8 but not in < 8
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
 
         $statement = $pdo->prepare('select "title" from "books"');
 
@@ -32,9 +32,16 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
             $statement->fetch();
 
             $this->fail('Expected exception was not thrown');
-        } catch (ValueError $e) {
-            static::assertSame('Kaidash’s Family', $title);
-            static::assertSame('Invalid column index', $e->getMessage());
+        } catch (\Throwable $e) {
+            if (PHP_VERSION_ID >= 80000) {
+                static::assertInstanceOf(\ValueError::class, $e);
+                static::assertSame('Kaidash’s Family', $title);
+                static::assertSame('Invalid column index', $e->getMessage());
+            } else {
+                static::assertInstanceOf(\PDOException::class, $e);
+                static::assertSame('Kaidash’s Family', $title);
+                static::assertSame('SQLSTATE[HY000]: General error: Invalid column index', $e->getMessage());
+            }
         }
     }
 
