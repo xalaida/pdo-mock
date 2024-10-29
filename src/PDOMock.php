@@ -56,13 +56,13 @@ class PDOMock extends PDO
         ] + $attributes;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @param $attribute
      * @param $value
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function setAttribute($attribute, $value)
     {
         $this->attributes[$attribute] = $value;
@@ -70,12 +70,12 @@ class PDOMock extends PDO
         return true;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @param $attribute
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function getAttribute($attribute)
     {
         return $this->attributes[$attribute];
@@ -103,12 +103,12 @@ class PDOMock extends PDO
         return $expectation;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @param string $statement
      * @return int|false
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function exec($statement)
     {
         TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $statement);
@@ -156,13 +156,13 @@ class PDOMock extends PDO
         return $expectation->rowCount;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @param string $query
      * @param array $options
      * @return PDOStatementMock|false
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function prepare($query, $options = [])
     {
         TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $query);
@@ -202,14 +202,14 @@ class PDOMock extends PDO
         return $statement;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @param string $query
      * @param $fetchMode
      * @param ...$fetch_mode_args
      * @return PDOStatement
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function query($query, $fetchMode = null, ...$fetch_mode_args)
     {
         $statement = $this->prepare($query);
@@ -268,11 +268,11 @@ class PDOMock extends PDO
         $this->expectCommit();
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function beginTransaction()
     {
         if ($this->inTransaction) {
@@ -294,11 +294,11 @@ class PDOMock extends PDO
         return true;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function commit()
     {
         if (! $this->inTransaction) {
@@ -320,11 +320,11 @@ class PDOMock extends PDO
         return true;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function rollBack()
     {
         if (! $this->inTransaction) {
@@ -346,42 +346,42 @@ class PDOMock extends PDO
         return true;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function inTransaction()
     {
         return $this->inTransaction;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @param $name
      * @return string
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function lastInsertId($name = null)
     {
         return $this->lastInsertId;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @return string|null
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function errorCode()
     {
         return $this->errorCode;
     }
 
-    #[\ReturnTypeWillChange]
-    #[\Override]
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function errorInfo()
     {
         return $this->errorInfo;
