@@ -2,22 +2,20 @@
 
 namespace Xala\Elomock;
 
-use Generator;
-
 class ResultSet
 {
     public array $cols = [];
 
     public array $rows = [];
 
-    public static function fromRecords(array $records): static
+    public static function fromArray(array $results): static
     {
         $resultSet = new static();
 
-        $resultSet->setCols(array_keys($records[0]));
+        $resultSet->setCols(array_keys($results[0]));
 
-        foreach ($records as $record) {
-            $resultSet->addRow(array_values($record));
+        foreach ($results as $result) {
+            $resultSet->addRow(array_values($result));
         }
 
         return $resultSet;

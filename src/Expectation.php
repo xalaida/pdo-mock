@@ -102,17 +102,19 @@ class Expectation
         return $this;
     }
 
-    public function andFetchRecords(array $records): static
+    public function andFetchRows(array $rows): static
     {
         return $this->andFetch(
-            ResultSet::fromRecords($records)
+            ResultSet::fromArray($rows)
         );
     }
 
     public function andFetchRecord(array $row): static
     {
         return $this->andFetch(
-            ResultSet::fromRecords([$row])
+            ResultSet::fromArray([
+                $row
+            ])
         );
     }
 

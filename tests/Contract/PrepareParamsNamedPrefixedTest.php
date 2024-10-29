@@ -87,7 +87,7 @@ class PrepareParamsNamedPrefixedTest extends TestCase
             ->toBePrepared()
             ->withParam(':status', 'published', $pdo::PARAM_STR)
             ->withParam(':year', 2024, $pdo::PARAM_INT)
-            ->andFetchRecords([
+            ->andFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);

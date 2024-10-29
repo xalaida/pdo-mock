@@ -26,7 +26,7 @@ class ExecuteTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books"')
-            ->andFetchRecords([
+            ->andFetchRows([
                 ['id' => 1],
                 ['id' => 2],
                 ['id' => 3],
