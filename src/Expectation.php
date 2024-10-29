@@ -9,6 +9,8 @@ use PDOException;
 
 class Expectation
 {
+    public PDO $pdo;
+
     public ?PDOStatementMock $statement = null;
 
     public string $query;
@@ -29,8 +31,9 @@ class Expectation
 
     public ?PDOException $exceptionOnPrepare = null;
 
-    public function __construct(string $query)
+    public function __construct(PDO $pdo, string $query)
     {
+        $this->pdo = $pdo;
         $this->query = $query;
     }
 
@@ -130,6 +133,11 @@ class Expectation
         $this->exceptionOnPrepare = $exception;
 
         return $this;
+    }
+
+    public function then(): PDO
+    {
+        return $this->pdo;
     }
 
     protected function getTypeFromValue(mixed $value): int

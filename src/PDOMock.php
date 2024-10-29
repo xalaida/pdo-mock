@@ -60,7 +60,7 @@ class PDOMock extends PDO
 
     public function expect(string $query): Expectation
     {
-        $expectation = new Expectation($query);
+        $expectation = new Expectation($this, $query);
 
         $this->expectations[] = $expectation;
 
@@ -169,7 +169,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation('PDO::beginTransaction()');
+        $this->expectations[] = new Expectation($this, 'PDO::beginTransaction()');
     }
 
     public function expectCommit(): void
@@ -178,7 +178,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation('PDO::commit()');
+        $this->expectations[] = new Expectation($this, 'PDO::commit()');
     }
 
     public function expectRollback(): void
@@ -187,7 +187,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation('PDO::rollback()');
+        $this->expectations[] = new Expectation($this, 'PDO::rollback()');
     }
 
     public function expectTransaction(callable $callback): void
