@@ -1,3 +1,4 @@
-.idea
+.idea/
 var/
 vendor/
+.php-cs-fixer.php
