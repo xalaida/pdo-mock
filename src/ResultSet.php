@@ -4,11 +4,21 @@ namespace Xala\Elomock;
 
 class ResultSet
 {
-    public array $cols = [];
+    /**
+     * @var array
+     */
+    public $cols = [];
 
-    public array $rows = [];
+    /**
+     * @var array
+     */
+    public $rows = [];
 
-    public static function fromArray(array $results): static
+    /**
+     * @param array $results
+     * @return static
+     */
+    public static function fromArray($results)
     {
         $resultSet = new static();
 
@@ -21,21 +31,33 @@ class ResultSet
         return $resultSet;
     }
 
-    public function setCols(array $cols): static
+    /**
+     * @param array $cols
+     * @return $this
+     */
+    public function setCols($cols)
     {
         $this->cols = $cols;
 
         return $this;
     }
 
-    public function setRows(array $rows): static
+    /**
+     * @param array $rows
+     * @return $this
+     */
+    public function setRows($rows)
     {
         $this->rows = $rows;
 
         return $this;
     }
 
-    public function addRow(array $row): static
+    /**
+     * @param array $row
+     * @return $this
+     */
+    public function addRow($row)
     {
         $this->rows[] = $row;
 

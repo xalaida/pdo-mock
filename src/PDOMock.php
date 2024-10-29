@@ -2,7 +2,6 @@
 
 namespace Xala\Elomock;
 
-use Override;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -14,24 +13,42 @@ class PDOMock extends PDO
     /**
      * @var array<int, Expectation>
      */
-    public array $expectations = [];
+    public $expectations = [];
 
-    public bool $ignoreTransactions = false;
+    /**
+     * @var bool
+     */
+    public $ignoreTransactions = false;
 
     /**
      * @var array<int, int>
      */
-    public array $attributes = [];
+    public $attributes = [];
 
-    protected bool $inTransaction = false;
+    /**
+     * @var bool
+     */
+    protected $inTransaction = false;
 
-    public string $lastInsertId = '0';
+    /**
+     * @var string
+     */
+    public $lastInsertId = '0';
 
-    private array $errorInfo = ['', null, null];
+    /**
+     * @var array
+     */
+    private $errorInfo = ['', null, null];
 
-    private string | null $errorCode = null;
+    /**
+     * @var string|null
+     */
+    private $errorCode = null;
 
-    public function __construct(array $attributes = [])
+    /**
+     * @param array $attributes
+     */
+    public function __construct($attributes = [])
     {
         $this->attributes = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -39,26 +56,45 @@ class PDOMock extends PDO
         ] + $attributes;
     }
 
-    #[Override]
-    public function setAttribute($attribute, $value): bool
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @param $attribute
+     * @param $value
+     * @return bool
+     */
+    public function setAttribute($attribute, $value)
     {
         $this->attributes[$attribute] = $value;
 
         return true;
     }
 
-    #[Override]
-    public function getAttribute($attribute): mixed
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @param $attribute
+     * @return mixed
+     */
+    public function getAttribute($attribute)
     {
         return $this->attributes[$attribute];
     }
 
-    public function ignoreTransactions(bool $ignoreTransactions = true): void
+    /**
+     * @param bool $ignoreTransactions
+     * @return void
+     */
+    public function ignoreTransactions($ignoreTransactions = true)
     {
         $this->ignoreTransactions = $ignoreTransactions;
     }
 
-    public function expect(string $query): Expectation
+    /**
+     * @param string $query
+     * @return Expectation
+     */
+    public function expect($query)
     {
         $expectation = new Expectation($this, $query);
 
@@ -67,8 +103,13 @@ class PDOMock extends PDO
         return $expectation;
     }
 
-    #[Override]
-    public function exec($statement): int | false
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @param string $statement
+     * @return int|false
+     */
+    public function exec($statement)
     {
         TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $statement);
 
@@ -115,7 +156,14 @@ class PDOMock extends PDO
         return $expectation->rowCount;
     }
 
-    public function prepare($query, $options = []): PDOStatementMock | false
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @param string $query
+     * @param array $options
+     * @return PDOStatementMock|false
+     */
+    public function prepare($query, $options = [])
     {
         TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $query);
 
@@ -154,7 +202,15 @@ class PDOMock extends PDO
         return $statement;
     }
 
-    public function query($query, $fetchMode = null, ...$fetch_mode_args): PDOStatement
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @param string $query
+     * @param $fetchMode
+     * @param ...$fetch_mode_args
+     * @return PDOStatement
+     */
+    public function query($query, $fetchMode = null, ...$fetch_mode_args)
     {
         $statement = $this->prepare($query);
 
@@ -163,7 +219,10 @@ class PDOMock extends PDO
         return $statement;
     }
 
-    public function expectBeginTransaction(): void
+    /**
+     * @return void
+     */
+    public function expectBeginTransaction()
     {
         if ($this->ignoreTransactions) {
             throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
@@ -172,7 +231,10 @@ class PDOMock extends PDO
         $this->expectations[] = new Expectation($this, 'PDO::beginTransaction()');
     }
 
-    public function expectCommit(): void
+    /**
+     * @return void
+     */
+    public function expectCommit()
     {
         if ($this->ignoreTransactions) {
             throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
@@ -181,7 +243,10 @@ class PDOMock extends PDO
         $this->expectations[] = new Expectation($this, 'PDO::commit()');
     }
 
-    public function expectRollback(): void
+    /**
+     * @return void
+     */
+    public function expectRollback()
     {
         if ($this->ignoreTransactions) {
             throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
@@ -190,7 +255,11 @@ class PDOMock extends PDO
         $this->expectations[] = new Expectation($this, 'PDO::rollback()');
     }
 
-    public function expectTransaction(callable $callback): void
+    /**
+     * @param callable $callback
+     * @return void
+     */
+    public function expectTransaction($callback)
     {
         $this->expectBeginTransaction();
 
@@ -199,7 +268,12 @@ class PDOMock extends PDO
         $this->expectCommit();
     }
 
-    public function beginTransaction(): bool
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @return bool
+     */
+    public function beginTransaction()
     {
         if ($this->inTransaction) {
             throw new PDOException('There is already an active transaction');
@@ -220,7 +294,12 @@ class PDOMock extends PDO
         return true;
     }
 
-    public function commit(): bool
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @return bool
+     */
+    public function commit()
     {
         if (! $this->inTransaction) {
             throw new PDOException('There is no active transaction');
@@ -241,7 +320,12 @@ class PDOMock extends PDO
         return true;
     }
 
-    public function rollBack(): bool
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @return bool
+     */
+    public function rollBack()
     {
         if (! $this->inTransaction) {
             throw new PDOException('There is no active transaction');
@@ -262,27 +346,51 @@ class PDOMock extends PDO
         return true;
     }
 
-    public function inTransaction(): bool
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @return bool
+     */
+    public function inTransaction()
     {
         return $this->inTransaction;
     }
 
-    public function lastInsertId($name = null): string
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @param $name
+     * @return string
+     */
+    public function lastInsertId($name = null)
     {
         return $this->lastInsertId;
     }
 
-    public function errorCode(): ?string
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @return string|null
+     */
+    public function errorCode()
     {
         return $this->errorCode;
     }
 
-    public function errorInfo(): array
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    /**
+     * @return array
+     */
+    public function errorInfo()
     {
         return $this->errorInfo;
     }
 
-    public function assertExpectationsFulfilled(): void
+    /**
+     * @return void
+     */
+    public function assertExpectationsFulfilled()
     {
         TestCase::assertEmpty($this->expectations, 'Some expectations were not fulfilled.');
     }

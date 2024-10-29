@@ -9,49 +9,84 @@ use PDOException;
 
 class Expectation
 {
-    public PDO $pdo;
+    /**
+     * @var PDO
+     */
+    public $pdo;
 
-    public ?PDOStatementMock $statement = null;
+    /**
+     * @var PDOStatementMock|null
+     */
+    public $statement = null;
 
-    public string $query;
+    /**
+     * @var string
+     */
+    public $query;
 
-    public array | Closure | null $params = null;
+    /**
+     * @var array|Closure|null
+     */
+    public $params = null;
 
-    public bool $executed = true;
+    /**
+     * @var bool|null
+     */
+    public $prepared = null;
 
-    public bool | null $prepared = null;
+    /**
+     * @var int
+     */
+    public $rowCount = 0;
 
-    public int $rowCount = 0;
+    /**
+     * @var ResultSet|null
+     */
+    public $resultSet = null;
 
-    public ?ResultSet $resultSet = null;
+    /**
+     * @var string|null
+     */
+    public $insertId = null;
 
-    public ?string $insertId = null;
+    /**
+     * @var PDOException|null
+     */
+    public $exceptionOnExecute = null;
 
-    public ?PDOException $exceptionOnExecute = null;
+    /**
+     * @var PDOException|null
+     */
+    public $exceptionOnPrepare = null;
 
-    public ?PDOException $exceptionOnPrepare = null;
-
-    public function __construct(PDO $pdo, string $query)
+    /**
+     * @param PDO $pdo
+     * @param string $query
+     */
+    public function __construct($pdo, $query)
     {
         $this->pdo = $pdo;
         $this->query = $query;
     }
 
-    public function toBeExecuted(bool $executed = true): static
-    {
-        $this->executed = $executed;
-
-        return $this;
-    }
-
-    public function toBePrepared(bool $prepared = true): static
+    /**
+     * @param bool $prepared
+     * @return $this
+     */
+    public function toBePrepared($prepared = true)
     {
         $this->prepared = $prepared;
 
         return $this;
     }
 
-    public function withParam(string | int $param, mixed $value, int $type = PDO::PARAM_STR): static
+    /**
+     * @param string|int $param
+     * @param mixed $value
+     * @param int $type
+     * @return $this
+     */
+    public function withParam($param, $value, $type = PDO::PARAM_STR)
     {
         $this->params[$param] = [
             'value' => $value,
@@ -61,7 +96,12 @@ class Expectation
         return $this;
     }
 
-    public function with(array | Closure $params, bool $useParamValueType = false): static
+    /**
+     * @param array|Closure $params
+     * @param bool $useParamValueType
+     * @return $this
+     */
+    public function with($params, $useParamValueType = false)
     {
         if (is_callable($params)) {
             $this->params = $params;
@@ -84,35 +124,55 @@ class Expectation
         return $this;
     }
 
-    public function withInsertId(string $insertId): static
+    /**
+     * @param string $insertId
+     * @return $this
+     */
+    public function withInsertId($insertId)
     {
-        $this->insertId = $insertId;
+        $this->insertId = (string) $insertId;
 
         return $this;
     }
 
-    public function affecting(int $rowCount): static
+    /**
+     * @param int $rowCount
+     * @return $this
+     */
+    public function affecting($rowCount)
     {
         $this->rowCount = $rowCount;
 
         return $this;
     }
 
-    public function andFetch(ResultSet $resultSet): static
+    /**
+     * @param ResultSet $resultSet
+     * @return $this
+     */
+    public function andFetch($resultSet)
     {
         $this->resultSet = $resultSet;
 
         return $this;
     }
 
-    public function andFetchRows(array $rows): static
+    /**
+     * @param array $rows
+     * @return $this
+     */
+    public function andFetchRows($rows)
     {
         return $this->andFetch(
             ResultSet::fromArray($rows),
         );
     }
 
-    public function andFetchRecord(array $row): static
+    /**
+     * @param array $row
+     * @return $this
+     */
+    public function andFetchRecord($row)
     {
         return $this->andFetch(
             ResultSet::fromArray([
@@ -121,26 +181,41 @@ class Expectation
         );
     }
 
-    public function andFailOnExecute(PDOException $exception): static
+    /**
+     * @param PDOException $exception
+     * @return $this
+     */
+    public function andFailOnExecute($exception)
     {
         $this->exceptionOnExecute = $exception;
 
         return $this;
     }
 
-    public function andFailOnPrepare(PDOException $exception): static
+    /**
+     * @param PDOException $exception
+     * @return $this
+     */
+    public function andFailOnPrepare($exception)
     {
         $this->exceptionOnPrepare = $exception;
 
         return $this;
     }
 
-    public function then(): PDO
+    /**
+     * @return PDO
+     */
+    public function then()
     {
         return $this->pdo;
     }
 
-    protected function getTypeFromValue(mixed $value): int
+    /**
+     * @param mixed $value
+     * @return int
+     */
+    protected function getTypeFromValue($value)
     {
         $type = gettype($value);
 

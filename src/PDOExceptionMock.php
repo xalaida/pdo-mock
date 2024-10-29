@@ -6,7 +6,14 @@ use PDOException;
 
 class PDOExceptionMock extends PDOException
 {
-    public static function fromErrorInfo(string $message, string $code, string $driverMessage, int $driverCode): static
+    /**
+     * @param string $message
+     * @param string $code
+     * @param string $driverMessage
+     * @param int $driverCode
+     * @return static
+     */
+    public static function fromErrorInfo($message, $code, $driverMessage, $driverCode): static
     {
         $exception = new self($message);
 

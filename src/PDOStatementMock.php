@@ -5,7 +5,6 @@ namespace Xala\Elomock;
 use ArrayIterator;
 use InvalidArgumentException;
 use Iterator;
-use Override;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
@@ -14,44 +13,91 @@ use ValueError;
 
 class PDOStatementMock extends PDOStatement
 {
-    protected PDOMock $pdo;
+    /**
+     * @var PDOMock
+     */
+    protected $pdo;
 
-    protected Expectation $expectation;
+    /**
+     * @var Expectation
+     */
+    protected $expectation;
 
-    public string $queryString;
+    public $query;
 
-    public array $params = [];
+    /**
+     * @var array
+     */
+    public $params = [];
 
-    public array $columns = [];
+    /**
+     * @var array
+     */
+    public $columns = [];
 
-    protected int $fetchMode;
+    /**
+     * @var int
+     */
+    protected $fetchMode;
 
-    protected int $cursor = 0;
+    /**
+     * @var int
+     */
+    protected $cursor = 0;
 
-    protected array $errorInfo;
+    /**
+     * @var array
+     */
+    protected $errorInfo;
 
-    protected string | null $errorCode;
+    /**
+     * @var string|null
+     */
+    protected $errorCode;
 
-    public bool $executed;
+    /**
+     * @var bool
+     */
+    public $executed;
 
-    public function __construct(PDOMock $pdo, Expectation $expectation, string $query)
+    /**
+     * @param PDOMock $pdo
+     * @param Expectation $expectation
+     * @param string $query
+     */
+    public function __construct($pdo, $expectation, $query)
     {
         $this->pdo = $pdo;
         $this->expectation = $expectation;
-        $this->queryString = $query;
         $this->executed = false;
         $this->errorInfo = ['', null, null];
         $this->errorCode = null;
+        $this->query = $query;
+
+        // This property does not work on PHP v8.0 because it is impossible to override internally readonly property.
+        if (PHP_VERSION_ID > 81000) {
+            $this->queryString = $query;
+        }
     }
 
-    #[Override]
-    public function setFetchMode($mode, $className = null, ...$params): void
+    /**
+     * @param int $mode
+     * @param $className
+     * @param ...$params
+     * @return void
+     */
+    public function setFetchMode($mode, $className = null, ...$params)
     {
         $this->fetchMode = $mode;
     }
 
-    #[Override]
-    public function bindValue($param, $value, $type = PDO::PARAM_STR): bool
+    /**
+     * @param $param
+     * @param $value
+     * @param $type
+     * @return bool
+     */
+    public function bindValue($param, $value, $type = PDO::PARAM_STR)
     {
         $this->params[$param] = [
             'value' => $value,
@@ -61,8 +107,15 @@ class PDOStatementMock extends PDOStatement
         return true;
     }
 
-    #[Override]
-    public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null): bool
+    /**
+     * @param $param
+     * @param $var
+     * @param $type
+     * @param $maxLength
+     * @param $driverOptions
+     * @return bool
+     */
+    public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
     {
         $this->params[$param] = [
             'value' => $var,
@@ -72,8 +125,15 @@ class PDOStatementMock extends PDOStatement
         return true;
     }
 
-    #[Override]
-    public function bindColumn($column, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null): bool
+    /**
+     * @param $column
+     * @param $var
+     * @param $type
+     * @param $maxLength
+     * @param $driverOptions
+     * @return bool
+     */
+    public function bindColumn($column, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
     {
         $this->columns[$column] = [
             'value' => &$var,
@@ -83,8 +143,11 @@ class PDOStatementMock extends PDOStatement
         return true;
     }
 
-    #[Override]
-    public function execute(?array $params = null): bool
+    /**
+     * @param array|null $params
+     * @return bool
+     */
+    public function execute($params = null)
     {
         $this->expectation->statement = $this;
 
@@ -109,7 +172,7 @@ class PDOStatementMock extends PDOStatement
             TestCase::assertTrue($this->expectation->prepared, 'Statement is not prepared');
         }
 
-        TestCase::assertSame($this->expectation->query, $this->queryString, 'Query does not match');
+        TestCase::assertSame($this->expectation->query, $this->query, 'Query does not match');
 
         if (! is_null($this->expectation->params)) {
             if (is_callable($this->expectation->params)) {
@@ -154,7 +217,9 @@ class PDOStatementMock extends PDOStatement
         return true;
     }
 
-    #[Override]
+    /**
+     * @return int
+     */
     public function rowCount(): int
     {
         if (! $this->executed) {
@@ -164,25 +229,36 @@ class PDOStatementMock extends PDOStatement
         return $this->expectation->rowCount;
     }
 
-    #[Override]
-    public function errorCode(): ?string
+    /**
+     * @return string|null
+     */
+    public function errorCode()
     {
         return $this->errorCode;
     }
 
-    #[Override]
+    /**
+     * @return array
+     */
     public function errorInfo(): array
     {
         return $this->errorInfo;
     }
 
-    #[Override]
+    /**
+     * @return Iterator
+     */
     public function getIterator(): Iterator
     {
         return new ArrayIterator($this->fetchAll());
     }
 
-    #[Override]
+    /**
+     * @param int $mode
+     * @param $cursorOrientation
+     * @param $cursorOffset
+     * @return array|bool|mixed|object
+     */
     public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
         if ($this->executed && isset($this->expectation->resultSet->rows[$this->cursor])) {
@@ -196,7 +272,11 @@ class PDOStatementMock extends PDOStatement
         return false;
     }
 
-    #[Override]
+    /**
+     * @param int $mode
+     * @param ...$args
+     * @return array|array[]|false|object[]|true[]
+     */
     public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$args)
     {
         if ($mode === PDO::FETCH_LAZY) {
@@ -212,7 +292,13 @@ class PDOStatementMock extends PDOStatement
         }, $this->expectation->resultSet->rows);
     }
 
-    protected function applyFetchMode(array $cols, array $row, int $mode): object | array | true
+    /**
+     * @param array $cols
+     * @param array $row
+     * @param int $mode
+     * @return object|array|true
+     */
+    protected function applyFetchMode($cols, $row, $mode)
     {
         if ($mode === PDO::FETCH_DEFAULT) {
             $mode = $this->fetchMode;
@@ -243,7 +329,12 @@ class PDOStatementMock extends PDOStatement
         }
     }
 
-    protected function applyFetchModeBound(array $columns, array $row): bool
+    /**
+     * @param array $columns
+     * @param array $row
+     * @return bool
+     */
+    protected function applyFetchModeBound($columns, $row)
     {
         foreach ($this->columns as $column => $params) {
             if (is_int($column)) {
@@ -266,7 +357,12 @@ class PDOStatementMock extends PDOStatement
         return true;
     }
 
-    protected function applyParamType(int $type, mixed $value): mixed
+    /**
+     * @param int $type
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function applyParamType($type, $value)
     {
         switch ($type) {
             case PDO::PARAM_NULL:
