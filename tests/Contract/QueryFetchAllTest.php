@@ -4,15 +4,15 @@ namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PDOStatement;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class QueryFetchAllTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldFetchRowsUsingQuery(PDO $pdo): void
     {
         $statement = $pdo->query('select * from "books"');

@@ -6,7 +6,12 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
-    protected function expectTriggerWarning(callable $callback, string | null $message = null)
+    /**
+     * @param callable $callback
+     * @param string|null $message
+     * @return mixed
+     */
+    protected function expectTriggerWarning($callback, $message = null)
     {
         $warningTriggered = false;
 

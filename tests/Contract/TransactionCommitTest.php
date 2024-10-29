@@ -3,15 +3,15 @@
 namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class TransactionCommitTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldCommitTransaction(PDO $pdo): void
     {
         static::assertFalse(

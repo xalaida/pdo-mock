@@ -2,14 +2,14 @@
 
 namespace Tests\Xala\Elomock;
 
-use PDO;
-use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use Xala\Elomock\PDOMock;
 
 class TransactionTest extends TestCase
 {
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldCommitTransaction(): void
     {
         $pdo = new PDOMock();
@@ -35,7 +35,9 @@ class TransactionTest extends TestCase
         $pdo->assertExpectationsFulfilled();
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldRollbackTransaction(): void
     {
         $pdo = new PDOMock();
@@ -50,7 +52,9 @@ class TransactionTest extends TestCase
         $pdo->assertExpectationsFulfilled();
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailWhenQueryExecutedWithoutTransaction(): void
     {
         $pdo = new PDOMock();
@@ -65,7 +69,9 @@ class TransactionTest extends TestCase
         $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldExpectTransactionUsingCallableSyntax(): void
     {
         $pdo = new PDOMock();
@@ -82,7 +88,9 @@ class TransactionTest extends TestCase
         $pdo->assertExpectationsFulfilled();
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailWhenTransactionalQueryIsNotExecuted(): void
     {
         $pdo = new PDOMock();
@@ -101,7 +109,9 @@ class TransactionTest extends TestCase
         $pdo->commit();
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldIgnoreTransactionsWhenModeIsEnabled(): void
     {
         $pdo = new PDOMock();

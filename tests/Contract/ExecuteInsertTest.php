@@ -3,15 +3,15 @@
 namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class ExecuteInsertTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldReturnAffectedRowsOnExecute(PDO $pdo): void
     {
         $result = $pdo->exec('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');

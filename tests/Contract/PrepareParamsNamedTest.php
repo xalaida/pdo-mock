@@ -3,15 +3,15 @@
 namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class PrepareParamsNamedTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleBindValue(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
@@ -31,8 +31,10 @@ class PrepareParamsNamedTest extends TestCase
         static::assertCount(2, $statement->fetchAll());
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleBindParam(PDO $pdo): void
     {
         $status = 'published';

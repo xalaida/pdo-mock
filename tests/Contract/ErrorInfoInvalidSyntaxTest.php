@@ -4,16 +4,16 @@ namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PDOException;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOExceptionMock;
 use Xala\Elomock\PDOMock;
 
 class ErrorInfoInvalidSyntaxTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldFailWithSyntaxErrorException(PDO $pdo): void
     {
         try {
@@ -30,8 +30,10 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
         }
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldClearPreviousErrorInfoOnSuccessfulQuery(PDO $pdo): void
     {
         try {
@@ -48,8 +50,10 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
         static::assertSame('00000', $pdo->errorCode());
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldFailWithSyntaxErrorUsingSilentErrorMode(PDO $pdo): void
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
@@ -61,8 +65,10 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
         static::assertSame('HY000', $pdo->errorCode());
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldFailWithSyntaxErrorUsingWarningErrorMode(PDO $pdo): void
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);

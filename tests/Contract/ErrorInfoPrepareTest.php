@@ -3,15 +3,15 @@
 namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class ErrorInfoPrepareTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldDisplayErrorInformationForSuccessfullyPreparedStatement(PDO $pdo): void
     {
         $statement = $pdo->prepare('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
@@ -23,8 +23,10 @@ class ErrorInfoPrepareTest extends TestCase
         static::assertSame(['00000', null, null], $pdo->errorInfo());
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldDisplayErrorInformationForSuccessfullyExecutedPreparedStatement(PDO $pdo): void
     {
         $statement = $pdo->prepare('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');

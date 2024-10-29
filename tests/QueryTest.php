@@ -3,13 +3,14 @@
 namespace Tests\Xala\Elomock;
 
 use PDOStatement;
-use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use Xala\Elomock\PDOMock;
 
 class QueryTest extends TestCase
 {
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFetchRowsUsingQuery(): void
     {
         $pdo = new PDOMock();
@@ -33,7 +34,9 @@ class QueryTest extends TestCase
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailWhenExpectParamsUsingQueryMethod(): void
     {
         $pdo = new PDOMock();
@@ -47,7 +50,9 @@ class QueryTest extends TestCase
         $pdo->query('delete from "posts" where "status" = ?');
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleQueryAsPreparedStatement(): void
     {
         $pdo = new PDOMock();

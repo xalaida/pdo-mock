@@ -2,14 +2,15 @@
 
 namespace Tests\Xala\Elomock;
 
-use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use Xala\Elomock\PDOMock;
 use Xala\Elomock\ResultSet;
 
 class FetchAllTest extends TestCase
 {
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchAllInBothModeAsDefault(): void
     {
         $pdo = new PDOMock();
@@ -36,7 +37,9 @@ class FetchAllTest extends TestCase
         static::assertEquals([0 => 2, 'id' => 2, 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchAllInAssocMode(): void
     {
         $pdo = new PDOMock();
@@ -44,8 +47,8 @@ class FetchAllTest extends TestCase
         $pdo->expect('select * from "books"')
             ->toBePrepared()
             ->andFetchRows([
-                ['id' => 1, 'title' => 'Kaidash’s Family'],
-                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
+                ['id' => '1', 'title' => 'Kaidash’s Family'],
+                ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
         $statement = $pdo->prepare('select * from "books"');
@@ -58,12 +61,14 @@ class FetchAllTest extends TestCase
 
         static::assertCount(2, $rows);
         static::assertIsArray($rows[0]);
-        static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
+        static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $rows[0]);
         static::assertIsArray($rows[1]);
-        static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchAllInObjMode(): void
     {
         $pdo = new PDOMock();
@@ -90,7 +95,9 @@ class FetchAllTest extends TestCase
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldUseCustomDefaultFetchMode(): void
     {
         $pdo = new PDOMock();
@@ -118,7 +125,9 @@ class FetchAllTest extends TestCase
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldUseCustomDefaultFetchModeForStatement(): void
     {
         $pdo = new PDOMock();
@@ -147,7 +156,9 @@ class FetchAllTest extends TestCase
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchOne(): void
     {
         $pdo = new PDOMock();
@@ -172,7 +183,9 @@ class FetchAllTest extends TestCase
         static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchUsingResultSetInstance(): void
     {
         $pdo = new PDOMock();
@@ -199,7 +212,9 @@ class FetchAllTest extends TestCase
         static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailWhenColumnsAreMissingForAssocMode(): void
     {
         $pdo = new PDOMock();

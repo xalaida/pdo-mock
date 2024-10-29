@@ -4,16 +4,16 @@ namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PDOException;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOExceptionMock;
 use Xala\Elomock\PDOMock;
 
 class ErrorInfoIntegrityConstraintTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement(PDO $pdo): void
     {
         $statement = $pdo->prepare("insert into books (id, title) values (1, null)");
@@ -35,8 +35,10 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
         }
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldFailWithSyntaxErrorOnExecuteForPreparedStatementUsingWarningErrorMode(PDO $pdo): void
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);

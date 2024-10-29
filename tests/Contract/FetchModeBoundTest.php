@@ -3,15 +3,15 @@
 namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class FetchModeBoundTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleFetchInBoundModeUsingColumns(PDO $pdo): void
     {
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
@@ -46,8 +46,10 @@ class FetchModeBoundTest extends TestCase
         static::assertFalse($row);
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleFetchInBoundModeUsingNamedColumns(PDO $pdo): void
     {
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');

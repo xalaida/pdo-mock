@@ -4,16 +4,16 @@ namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use PDOException;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOExceptionMock;
 use Xala\Elomock\PDOMock;
 
 class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldFailWithSyntaxErrorExceptionOnPrepare(PDO $pdo): void
     {
         try {
@@ -30,8 +30,10 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
         }
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldFailWithSyntaxErrorOnPrepareUsingWarningErrorMode(PDO $pdo): void
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);

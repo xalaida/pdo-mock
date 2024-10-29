@@ -3,13 +3,14 @@
 namespace Tests\Xala\Elomock;
 
 use PDOException;
-use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOExceptionMock;
 use Xala\Elomock\PDOMock;
 
 class FailedQueryTest extends TestCase
 {
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailWithQueryException(): void
     {
         $pdo = new PDOMock();
@@ -40,7 +41,9 @@ class FailedQueryTest extends TestCase
         }
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailUsingCustomErrorException(): void
     {
         $pdo = new PDOMock();

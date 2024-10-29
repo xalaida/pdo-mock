@@ -2,12 +2,13 @@
 
 namespace Tests\Xala\Elomock;
 
-use PHPUnit\Framework\Attributes\Test;
 use Xala\Elomock\PDOMock;
 
 class FetchTest extends TestCase
 {
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetch(): void
     {
         $pdo = new PDOMock();
@@ -40,7 +41,9 @@ class FetchTest extends TestCase
         static::assertFalse($row);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldReturnFalseWhenStatementIsNotExecuted(): void
     {
         $pdo = new PDOMock();
@@ -54,7 +57,9 @@ class FetchTest extends TestCase
         static::assertFalse($row);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchInAssocMode(): void
     {
         $pdo = new PDOMock();
@@ -87,7 +92,9 @@ class FetchTest extends TestCase
         static::assertFalse($row);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchInNumMode(): void
     {
         $pdo = new PDOMock();
@@ -120,7 +127,9 @@ class FetchTest extends TestCase
         static::assertFalse($row);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchInBothMode(): void
     {
         $pdo = new PDOMock();
@@ -153,7 +162,9 @@ class FetchTest extends TestCase
         static::assertFalse($row);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldHandleFetchInObjMode(): void
     {
         $pdo = new PDOMock();

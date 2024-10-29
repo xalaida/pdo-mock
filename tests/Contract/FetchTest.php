@@ -5,15 +5,15 @@ namespace Tests\Xala\Elomock\Contract;
 use Iterator;
 use IteratorAggregate;
 use PDO;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class FetchTest extends TestCase
 {
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleFetch(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -25,20 +25,22 @@ class FetchTest extends TestCase
         $row = $statement->fetch();
 
         static::assertIsArray($row);
-        static::assertEquals([0 => 1, 'id' => 1, 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
+        static::assertEquals([0 => '1', 'id' => '1', 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch();
 
         static::assertIsArray($row);
-        static::assertEquals([0 => 2, 'id' => 2, 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        static::assertEquals([0 => '2', 'id' => '2', 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch();
 
         static::assertFalse($row);
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldReturnFalseWhenStatementIsNotExecuted(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -48,8 +50,10 @@ class FetchTest extends TestCase
         static::assertFalse($row);
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleFetchInAssocMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -61,20 +65,22 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArray($row);
-        static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $row);
+        static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArray($row);
-        static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertFalse($row);
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleFetchInNumMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -86,20 +92,22 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArray($row);
-        static::assertSame([1, 'Kaidash’s Family'], $row);
+        static::assertSame(['1', 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArray($row);
-        static::assertSame([2,'Shadows of the Forgotten Ancestors'], $row);
+        static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertFalse($row);
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleFetchInBothMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -111,20 +119,22 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
         static::assertIsArray($row);
-        static::assertEquals([0 => 1, 'id' => 1, 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
+        static::assertEquals([0 => '1', 'id' => '1', 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
         static::assertIsArray($row);
-        static::assertEquals([0 => 2, 'id' => 2, 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        static::assertEquals([0 => '2', 'id' => '2', 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
         static::assertFalse($row);
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldHandleFetchInObjMode(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -136,20 +146,22 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
         static::assertIsObject($row);
-        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $row);
+        static::assertEquals((object) ['id' => '1', 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
         static::assertIsObject($row);
-        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
         static::assertFalse($row);
     }
 
-    #[Test]
-    #[DataProvider('contracts')]
+    /**
+     * @test
+     * @dataProvider contracts
+     */
     public function itShouldUseFetchAsIterator(PDO $pdo): void
     {
         $statement = $pdo->prepare('select * from "books"');
@@ -167,12 +179,12 @@ class FetchTest extends TestCase
         static::assertInstanceOf(Iterator::class, $iterator);
 
         static::assertEquals(0, $iterator->key());
-        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $iterator->current());
+        static::assertEquals((object) ['id' => '1', 'title' => 'Kaidash’s Family'], $iterator->current());
 
         $iterator->next();
 
         static::assertEquals(1, $iterator->key());
-        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $iterator->current());
+        static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $iterator->current());
 
         $iterator->next();
 
@@ -210,8 +222,8 @@ class FetchTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->andFetchRows([
-                ['id' => 1, 'title' => 'Kaidash’s Family'],
-                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
+                ['id' => '1', 'title' => 'Kaidash’s Family'],
+                ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
         return $pdo;

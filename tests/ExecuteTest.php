@@ -2,13 +2,14 @@
 
 namespace Tests\Xala\Elomock;
 
-use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use Xala\Elomock\PDOMock;
 
 class ExecuteTest extends TestCase
 {
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldExecuteQuery(): void
     {
         $pdo = new PDOMock();
@@ -20,7 +21,9 @@ class ExecuteTest extends TestCase
         static::assertSame(0, $result);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldCalculatesRowCountUsingFetchRows(): void
     {
         $pdo = new PDOMock();
@@ -37,7 +40,9 @@ class ExecuteTest extends TestCase
         static::assertSame(3, $result);
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailOnUnexpectedQuery(): void
     {
         $pdo = new PDOMock();
@@ -48,7 +53,9 @@ class ExecuteTest extends TestCase
         $pdo->exec('select * from "books"');
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailWhenQueryDoesntMatch(): void
     {
         $pdo = new PDOMock();
@@ -60,7 +67,9 @@ class ExecuteTest extends TestCase
         $pdo->exec('select * from "books"');
     }
 
-    #[Test]
+    /**
+     * @test
+     */
     public function itShouldFailWhenQueryIsNotExecuted(): void
     {
         $pdo = new PDOMock();
