@@ -49,25 +49,6 @@ class PrepareTest extends TestCase
     }
 
     #[Test]
-    public function itShouldFailWhenStatementIsNotExecuted(): void
-    {
-        $this->markTestSkipped('To be implemented');
-
-        $pdo = new PDOMock();
-
-        $pdo->expect('select * from "books"')
-            ->toBePrepared()
-            ->toBeExecuted(false);
-
-        $pdo->prepare('select * from "books"');
-
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Some expectations were not fulfilled');
-
-        $pdo->assertExpectationsFulfilled();
-    }
-
-    #[Test]
     public function itShouldHandleQueryParamsUsingBindParam(): void
     {
         $pdo = new PDOMock();

@@ -211,7 +211,8 @@ class PDOMock extends PDO
             return true;
         }
 
-        // TODO: ensure transaction is expected
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::beginTransaction()');
+
         $expectation = array_shift($this->expectations);
 
         TestCase::assertSame($expectation->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
@@ -231,7 +232,8 @@ class PDOMock extends PDO
             return true;
         }
 
-        // TODO: ensure transaction is expected
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::commit()');
+
         $expectation = array_shift($this->expectations);
 
         TestCase::assertSame($expectation->query, 'PDO::commit()', 'Unexpected PDO::commit()');
@@ -251,7 +253,8 @@ class PDOMock extends PDO
             return true;
         }
 
-        // TODO: ensure transaction is expected
+        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::rollback()');
+
         $expectation = array_shift($this->expectations);
 
         TestCase::assertSame($expectation->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
