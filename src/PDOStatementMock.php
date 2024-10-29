@@ -6,6 +6,7 @@ use ArrayIterator;
 use InvalidArgumentException;
 use Iterator;
 use PDO;
+use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -69,10 +70,12 @@ class PDOStatementMock extends PDOStatement
     {
         $this->pdo = $pdo;
         $this->expectation = $expectation;
-        $this->executed = false;
+        $this->query = $query;
         $this->errorInfo = ['', null, null];
         $this->errorCode = null;
-        $this->query = $query;
+        $this->fetchMode = PDO::FETCH_BOTH;
+
+        $this->executed = false;
 
         // This property does not work on PHP v8.0 because it is impossible to override internally readonly property.
         if (PHP_VERSION_ID > 81000) {
@@ -250,6 +253,8 @@ class PDOStatementMock extends PDOStatement
      */
     public function getIterator(): Iterator
     {
+        // TODO: throw exception on php < 8.0
+
         return new ArrayIterator($this->fetchAll());
     }
 
@@ -259,8 +264,12 @@ class PDOStatementMock extends PDOStatement
      * @param $cursorOffset
      * @return array|bool|mixed|object
      */
-    public function fetch($mode = PDO::FETCH_DEFAULT, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
+    public function fetch($mode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
+        if ($mode === null) {
+            $mode = $this->fetchMode;
+        }
+
         if ($this->executed && isset($this->expectation->resultSet->rows[$this->cursor])) {
             $row = $this->applyFetchMode($this->expectation->resultSet->cols, $this->expectation->resultSet->rows[$this->cursor], $mode);
 
@@ -272,15 +281,19 @@ class PDOStatementMock extends PDOStatement
         return false;
     }
 
-    /**
-     * @param int $mode
-     * @param ...$args
-     * @return array|array[]|false|object[]|true[]
-     */
-    public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$args)
-    {
+    #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) {/* IMPORTANT: ONLY FOR PHP >= 8
+    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # IMPORTANT: ONLY FOR PHP < 8
+    #*/
+        if ($mode === null) {
+            $mode = $this->fetchMode;
+        }
+
         if ($mode === PDO::FETCH_LAZY) {
-            throw new ValueError('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()');
+            if (PHP_VERSION_ID >= 80000) {
+                throw new ValueError('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()');
+            }
+
+            throw new PDOException("SQLSTATE[HY000]: General error: PDO::FETCH_LAZY can't be used with PDOStatement::fetchAll()");
         }
 
         if (! $this->executed) {
@@ -300,10 +313,6 @@ class PDOStatementMock extends PDOStatement
      */
     protected function applyFetchMode($cols, $row, $mode)
     {
-        if ($mode === PDO::FETCH_DEFAULT) {
-            $mode = $this->fetchMode;
-        }
-
         if ($mode !== PDO::FETCH_NUM && empty($cols)) {
             throw new RuntimeException('Specify columns to result set');
         }
@@ -341,7 +350,12 @@ class PDOStatementMock extends PDOStatement
                 $index = $column - 1;
 
                 if (! isset($row[$index])) {
-                    throw new ValueError('Invalid column index');
+                    if (PHP_VERSION_ID >= 80000) {
+                        throw new ValueError('Invalid column index');
+                    }
+
+                    throw new PDOException("SQLSTATE[HY000]: General error: Invalid column index");
+
                 }
             } else {
                 $index = array_search($column, $columns, true);
