@@ -52,7 +52,7 @@ class ExecuteTest extends TestCase
     public function itShouldFailWhenQueryDoesntMatch(): void
     {
         $pdo = new PDOMock();
-        $pdo->expect('select * from "users"');
+        $pdo->expect('select * from "categories"');
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: select * from "books"');
