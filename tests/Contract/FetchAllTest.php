@@ -4,7 +4,7 @@ namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
 use Tests\Xala\Elomock\TestCase;
-use ValueError;
+use Throwable;
 use Xala\Elomock\PDOMock;
 
 class FetchAllTest extends TestCase
@@ -13,7 +13,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted(PDO $pdo): void
+    public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -26,16 +26,24 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailOnFetchAllInLazyMode(PDO $pdo): void
+    public function itShouldFailOnFetchAllInLazyMode(PDO $pdo)
     {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         $statement = $pdo->prepare('select * from "books"');
 
         try {
             $statement->fetchAll($pdo::FETCH_LAZY);
 
             $this->fail('Expected exception is not thrown');
-        } catch (ValueError $e) {
-            static::assertSame('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()', $e->getMessage());
+        } catch (Throwable $e) {
+            if (PHP_VERSION_ID >= 80000) {
+                static::assertInstanceOf(\ValueError::class, $e);
+                static::assertSame('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()', $e->getMessage());
+            } else {
+                static::assertInstanceOf(\PDOException::class, $e);
+                static::assertSame("SQLSTATE[HY000]: General error: PDO::FETCH_LAZY can't be used with PDOStatement::fetchAll()", $e->getMessage());
+            }
         }
     }
 
@@ -43,7 +51,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInAssocMode(PDO $pdo): void
+    public function itShouldHandleFetchAllInAssocMode(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -64,7 +72,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInNumMode(PDO $pdo): void
+    public function itShouldHandleFetchAllInNumMode(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -85,7 +93,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInBothMode(PDO $pdo): void
+    public function itShouldHandleFetchAllInBothMode(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -106,7 +114,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInObjMode(PDO $pdo): void
+    public function itShouldHandleFetchAllInObjMode(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -127,7 +135,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInBothModeAsDefault(PDO $pdo): void
+    public function itShouldHandleFetchAllInBothModeAsDefault(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -148,7 +156,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldUseCustomDefaultFetchMode(PDO $pdo): void
+    public function itShouldUseCustomDefaultFetchMode(PDO $pdo)
     {
         $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
 
@@ -171,7 +179,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldUseCustomDefaultFetchModeForStatement(PDO $pdo): void
+    public function itShouldUseCustomDefaultFetchModeForStatement(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
