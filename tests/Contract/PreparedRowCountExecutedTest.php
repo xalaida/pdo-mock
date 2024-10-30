@@ -11,6 +11,7 @@ class PreparedRowCountExecutedTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldReturnAffectedRowsUsingPreparedStatement($pdo)
     {

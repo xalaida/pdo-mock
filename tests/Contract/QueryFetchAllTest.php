@@ -12,6 +12,7 @@ class QueryFetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFetchRowsUsingQuery($pdo)
     {

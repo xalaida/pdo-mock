@@ -11,6 +11,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandlePreparedStatement($pdo)
     {

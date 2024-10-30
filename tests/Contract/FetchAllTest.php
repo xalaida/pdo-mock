@@ -12,6 +12,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted($pdo)
     {
@@ -25,6 +26,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailOnFetchAllInLazyMode($pdo)
     {
@@ -50,6 +52,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchAllInAssocMode($pdo)
     {
@@ -71,6 +74,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchAllInNumMode($pdo)
     {
@@ -92,6 +96,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchAllInBothMode($pdo)
     {
@@ -113,6 +118,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchAllInObjMode($pdo)
     {
@@ -134,6 +140,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchAllInBothModeAsDefault($pdo)
     {
@@ -155,6 +162,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldUseCustomDefaultFetchMode($pdo)
     {
@@ -178,6 +186,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldUseCustomDefaultFetchModeForStatement($pdo)
     {

@@ -12,6 +12,7 @@ class TransactionNestedTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleNestedTransactions($pdo)
     {

@@ -12,6 +12,7 @@ class TransactionRollbackWithoutBeginTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailOnCRollbackWithoutBeginTransaction($pdo)
     {

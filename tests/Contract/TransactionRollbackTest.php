@@ -11,6 +11,7 @@ class TransactionRollbackTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldRollbackTransaction($pdo)
     {

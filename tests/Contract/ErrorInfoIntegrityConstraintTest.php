@@ -4,15 +4,16 @@ namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
 use PDOException;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOExceptionMock;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOExceptionMock;
+use Xalaida\PDOMock\PDOMock;
 
 class ErrorInfoIntegrityConstraintTest extends TestCase
 {
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement($pdo)
     {
@@ -40,6 +41,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailWithSyntaxErrorOnExecuteForPreparedStatementUsingWarningErrorMode($pdo)
     {

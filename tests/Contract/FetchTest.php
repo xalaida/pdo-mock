@@ -2,8 +2,6 @@
 
 namespace Tests\Xalaida\PDOMock\Contract;
 
-use Iterator;
-use IteratorAggregate;
 use PDO;
 use Tests\Xalaida\PDOMock\TestCase;
 use Xalaida\PDOMock\PDOMock;
@@ -13,6 +11,7 @@ class FetchTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetch($pdo)
     {
@@ -40,6 +39,7 @@ class FetchTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldReturnFalseWhenStatementIsNotExecuted($pdo)
     {
@@ -53,6 +53,7 @@ class FetchTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchInAssocMode($pdo)
     {
@@ -80,6 +81,7 @@ class FetchTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchInNumMode($pdo)
     {
@@ -107,6 +109,7 @@ class FetchTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchInBothMode($pdo)
     {
@@ -134,6 +137,7 @@ class FetchTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchInObjMode($pdo)
     {
@@ -162,6 +166,7 @@ class FetchTest extends TestCase
 //    /**
 //     * @test
 //     * @dataProvider contracts
+//     * @param PDO $pdo
 //     */
 //    public function itShouldUseFetchAsIterator($pdo)
 //    {

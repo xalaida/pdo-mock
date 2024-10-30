@@ -11,6 +11,7 @@ class FetchModeBoundTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchInBoundModeUsingColumns($pdo)
     {
@@ -49,6 +50,7 @@ class FetchModeBoundTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleFetchInBoundModeUsingNamedColumns($pdo)
     {

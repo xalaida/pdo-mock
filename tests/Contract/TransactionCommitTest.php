@@ -11,6 +11,7 @@ class TransactionCommitTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldCommitTransaction($pdo)
     {

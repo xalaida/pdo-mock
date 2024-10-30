@@ -11,6 +11,7 @@ class PrepareParamsTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleBindValue($pdo)
     {
@@ -34,6 +35,7 @@ class PrepareParamsTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldHandleBindParam($pdo)
     {

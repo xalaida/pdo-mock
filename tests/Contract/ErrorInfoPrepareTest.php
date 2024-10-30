@@ -4,13 +4,14 @@ namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
 use Tests\Xalaida\PDOMock\TestCase;
-use Xala\Elomock\PDOMock;
+use Xalaida\PDOMock\PDOMock;
 
 class ErrorInfoPrepareTest extends TestCase
 {
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldDisplayErrorInformationForSuccessfullyPreparedStatement($pdo)
     {
@@ -26,6 +27,7 @@ class ErrorInfoPrepareTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldDisplayErrorInformationForSuccessfullyExecutedPreparedStatement($pdo)
     {

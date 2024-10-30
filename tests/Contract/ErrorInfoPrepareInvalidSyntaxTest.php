@@ -13,6 +13,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailWithSyntaxErrorExceptionOnPrepare($pdo)
     {
@@ -35,6 +36,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailWithSyntaxErrorOnPrepareUsingWarningErrorMode($pdo)
     {

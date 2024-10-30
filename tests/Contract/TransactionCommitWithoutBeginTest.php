@@ -12,6 +12,7 @@ class TransactionCommitWithoutBeginTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailOnCommitWithoutBeginTransaction($pdo)
     {

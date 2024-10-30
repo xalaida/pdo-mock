@@ -13,6 +13,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailWithSyntaxErrorException($pdo)
     {
@@ -35,6 +36,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldClearPreviousErrorInfoOnSuccessfulQuery($pdo)
     {
@@ -57,6 +59,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailWithSyntaxErrorUsingSilentErrorMode($pdo)
     {
@@ -72,6 +75,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldFailWithSyntaxErrorUsingWarningErrorMode($pdo)
     {

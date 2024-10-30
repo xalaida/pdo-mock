@@ -11,6 +11,7 @@ class ExecuteDeleteTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldReturnAffectedRowsOnExecute($pdo)
     {

@@ -11,6 +11,7 @@ class ExecuteSelectTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldExecuteQuery($pdo)
     {

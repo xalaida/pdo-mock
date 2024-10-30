@@ -3,7 +3,6 @@
 namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use PHPUnit\Framework\ExpectationFailedException;
 use Tests\Xalaida\PDOMock\TestCase;
 use Xalaida\PDOMock\PDOMock;
 
@@ -12,6 +11,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldThrowValueExceptionWhenInvalidColumnIndex($pdo)
     {

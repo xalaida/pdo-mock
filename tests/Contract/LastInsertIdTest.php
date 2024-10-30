@@ -11,6 +11,7 @@ class LastInsertIdTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldUseLastInsertIdFromQuery($pdo)
     {

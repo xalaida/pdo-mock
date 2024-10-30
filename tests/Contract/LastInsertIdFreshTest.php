@@ -11,6 +11,7 @@ class LastInsertIdFreshTest extends TestCase
     /**
      * @test
      * @dataProvider contracts
+     * @param PDO $pdo
      */
     public function itShouldReturnZeroAsLastInsertId($pdo)
     {
