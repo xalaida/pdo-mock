@@ -196,7 +196,7 @@ class FetchAllTest extends TestCase
                 (new ResultSet())
                     ->setCols(['id', 'title'])
                     ->addRow([1, 'Kaidash’s Family'])
-                    ->addRow([2, 'Shadows of the Forgotten Ancestors']),
+                    ->addRow([2, 'Shadows of the Forgotten Ancestors'])
             );
 
         $statement = $pdo->prepare('select * from "books"');
@@ -224,7 +224,7 @@ class FetchAllTest extends TestCase
             ->andFetch(
                 (new ResultSet())
                     ->addRow([1, 'Kaidash’s Family'])
-                    ->addRow([2, 'Shadows of the Forgotten Ancestors']),
+                    ->addRow([2, 'Shadows of the Forgotten Ancestors'])
             );
 
         $statement = $pdo->prepare('select * from "books"');

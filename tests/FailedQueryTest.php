@@ -19,7 +19,7 @@ class FailedQueryTest extends TestCase
                 'Query exception',
                 '000',
                 'Invalid syntax',
-                1,
+                1
             ));
 
         $statement = $pdo->prepare('insert into "books" ("id", "title") values (1, null)');

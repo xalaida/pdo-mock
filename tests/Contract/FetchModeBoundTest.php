@@ -115,7 +115,7 @@ class FetchModeBoundTest extends TestCase
             'insert into "books"
             ("title", "status", "deleted") values 
             ("Kaidash’s Family", "published", 0),
-            ("Shadows of the Forgotten Ancestors", "draft", 0)',
+            ("Shadows of the Forgotten Ancestors", "draft", 0)'
         );
 
         return $pdo;

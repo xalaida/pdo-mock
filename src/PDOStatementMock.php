@@ -284,9 +284,9 @@ class PDOStatementMock extends PDOStatement
         return false;
     }
 
-    #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /* IMPORTANT: ONLY FOR PHP >= 8
-    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # IMPORTANT: ONLY FOR PHP < 8
-    #*/
+    #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /* DEFINITION FOR PHP >= 8
+    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # DEFINITION FOR PHP >= 8
+    # */
         if ($mode === null) {
             $mode = $this->fetchMode;
         }

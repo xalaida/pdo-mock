@@ -164,7 +164,7 @@ class Expectation
     public function andFetchRows($rows)
     {
         return $this->andFetch(
-            ResultSet::fromArray($rows),
+            ResultSet::fromArray($rows)
         );
     }
 
@@ -177,7 +177,7 @@ class Expectation
         return $this->andFetch(
             ResultSet::fromArray([
                 $row,
-            ]),
+            ])
         );
     }
 

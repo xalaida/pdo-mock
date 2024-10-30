@@ -15,13 +15,13 @@ class TransactionRollbackTest extends TestCase
     public function itShouldRollbackTransaction(PDO $pdo): void
     {
         static::assertTrue(
-            $pdo->beginTransaction(),
+            $pdo->beginTransaction()
         );
 
         $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
 
         static::assertTrue(
-            $pdo->rollBack(),
+            $pdo->rollBack()
         );
     }
 

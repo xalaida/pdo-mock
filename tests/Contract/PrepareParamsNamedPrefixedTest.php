@@ -17,15 +17,15 @@ class PrepareParamsNamedPrefixedTest extends TestCase
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
         static::assertTrue(
-            $statement->bindValue(':year', 2024, $pdo::PARAM_INT),
+            $statement->bindValue(':year', 2024, $pdo::PARAM_INT)
         );
 
         static::assertTrue(
-            $statement->bindValue(':status', 'published', $pdo::PARAM_STR),
+            $statement->bindValue(':status', 'published', $pdo::PARAM_STR)
         );
 
         static::assertTrue(
-            $statement->execute(),
+            $statement->execute()
         );
 
         static::assertCount(2, $statement->fetchAll());
@@ -43,15 +43,15 @@ class PrepareParamsNamedPrefixedTest extends TestCase
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
         static::assertTrue(
-            $statement->bindParam(':year', $year, $pdo::PARAM_INT),
+            $statement->bindParam(':year', $year, $pdo::PARAM_INT)
         );
 
         static::assertTrue(
-            $statement->bindParam(':status', $status, $pdo::PARAM_STR),
+            $statement->bindParam(':status', $status, $pdo::PARAM_STR)
         );
 
         static::assertTrue(
-            $statement->execute(),
+            $statement->execute()
         );
 
         static::assertCount(2, $statement->fetchAll());

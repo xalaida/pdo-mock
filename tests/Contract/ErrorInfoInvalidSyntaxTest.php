@@ -117,7 +117,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',
-                1,
+                1
             ));
 
         $pdo->expect('select * from "books"');
