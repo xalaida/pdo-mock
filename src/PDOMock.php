@@ -5,7 +5,6 @@ namespace Xalaida\PDOMock;
 use PDO;
 use PDOException;
 use PDOStatement;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class PDOMock extends PDO
