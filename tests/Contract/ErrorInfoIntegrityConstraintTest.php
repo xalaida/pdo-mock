@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
 use PDOException;
@@ -14,7 +14,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement(PDO $pdo)
+    public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -41,7 +41,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorOnExecuteForPreparedStatementUsingWarningErrorMode(PDO $pdo)
+    public function itShouldFailWithSyntaxErrorOnExecuteForPreparedStatementUsingWarningErrorMode($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 

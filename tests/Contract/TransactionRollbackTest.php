@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class TransactionRollbackTest extends TestCase
 {
@@ -12,7 +12,7 @@ class TransactionRollbackTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldRollbackTransaction(PDO $pdo)
+    public function itShouldRollbackTransaction($pdo)
     {
         static::assertTrue(
             $pdo->beginTransaction()

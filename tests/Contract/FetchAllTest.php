@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use Exception;
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class FetchAllTest extends TestCase
 {
@@ -13,7 +13,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted(PDO $pdo)
+    public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -26,7 +26,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailOnFetchAllInLazyMode(PDO $pdo)
+    public function itShouldFailOnFetchAllInLazyMode($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -51,7 +51,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInAssocMode(PDO $pdo)
+    public function itShouldHandleFetchAllInAssocMode($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -72,7 +72,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInNumMode(PDO $pdo)
+    public function itShouldHandleFetchAllInNumMode($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -93,7 +93,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInBothMode(PDO $pdo)
+    public function itShouldHandleFetchAllInBothMode($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -114,7 +114,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInObjMode(PDO $pdo)
+    public function itShouldHandleFetchAllInObjMode($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -135,7 +135,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchAllInBothModeAsDefault(PDO $pdo)
+    public function itShouldHandleFetchAllInBothModeAsDefault($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -156,7 +156,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldUseCustomDefaultFetchMode(PDO $pdo)
+    public function itShouldUseCustomDefaultFetchMode($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
 
@@ -179,7 +179,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldUseCustomDefaultFetchModeForStatement(PDO $pdo)
+    public function itShouldUseCustomDefaultFetchModeForStatement($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 

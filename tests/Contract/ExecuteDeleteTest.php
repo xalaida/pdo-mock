@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class ExecuteDeleteTest extends TestCase
 {
@@ -12,7 +12,7 @@ class ExecuteDeleteTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnAffectedRowsOnExecute(PDO $pdo)
+    public function itShouldReturnAffectedRowsOnExecute($pdo)
     {
         $result = $pdo->exec('delete from "books"');
 

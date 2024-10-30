@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xalaida\PDOMock;
 
 use RuntimeException;
-use Xala\Elomock\PDOMock;
-use Xala\Elomock\ResultSet;
+use Xalaida\PDOMock\PDOMock;
+use Xalaida\PDOMock\ResultSet;
 
 class FetchAllTest extends TestCase
 {

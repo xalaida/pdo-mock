@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class PreparedRowCountExecutedTest extends TestCase
 {
@@ -12,7 +12,7 @@ class PreparedRowCountExecutedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnAffectedRowsUsingPreparedStatement(PDO $pdo)
+    public function itShouldReturnAffectedRowsUsingPreparedStatement($pdo)
     {
         $statement = $pdo->prepare('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
 

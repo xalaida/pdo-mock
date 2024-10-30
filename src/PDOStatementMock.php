@@ -1,6 +1,6 @@
 <?php
 
-namespace Xala\Elomock;
+namespace Xalaida\PDOMock;
 
 use ArrayIterator;
 use InvalidArgumentException;
@@ -8,7 +8,6 @@ use Iterator;
 use PDO;
 use PDOException;
 use PDOStatement;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use ValueError;
 

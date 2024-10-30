@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
+use Tests\Xalaida\PDOMock\TestCase;
 use Xala\Elomock\PDOMock;
 
 class ErrorInfoPrepareTest extends TestCase
@@ -12,7 +12,7 @@ class ErrorInfoPrepareTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldDisplayErrorInformationForSuccessfullyPreparedStatement(PDO $pdo)
+    public function itShouldDisplayErrorInformationForSuccessfullyPreparedStatement($pdo)
     {
         $statement = $pdo->prepare('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
 
@@ -27,7 +27,7 @@ class ErrorInfoPrepareTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldDisplayErrorInformationForSuccessfullyExecutedPreparedStatement(PDO $pdo)
+    public function itShouldDisplayErrorInformationForSuccessfullyExecutedPreparedStatement($pdo)
     {
         $statement = $pdo->prepare('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
 

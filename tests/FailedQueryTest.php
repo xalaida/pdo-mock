@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xalaida\PDOMock;
 
 use PDOException;
-use Xala\Elomock\PDOExceptionMock;
-use Xala\Elomock\PDOMock;
+use Xalaida\PDOMock\PDOExceptionMock;
+use Xalaida\PDOMock\PDOMock;
 
 class FailedQueryTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Xala\Elomock;
+namespace Xalaida\PDOMock;
 
 use Closure;
 use InvalidArgumentException;

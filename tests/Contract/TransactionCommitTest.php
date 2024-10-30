@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class TransactionCommitTest extends TestCase
 {
@@ -12,7 +12,7 @@ class TransactionCommitTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldCommitTransaction(PDO $pdo)
+    public function itShouldCommitTransaction($pdo)
     {
         static::assertFalse(
             $pdo->inTransaction()

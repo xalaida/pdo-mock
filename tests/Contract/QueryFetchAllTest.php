@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
 use PDOStatement;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class QueryFetchAllTest extends TestCase
 {
@@ -13,7 +13,7 @@ class QueryFetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFetchRowsUsingQuery(PDO $pdo)
+    public function itShouldFetchRowsUsingQuery($pdo)
     {
         $statement = $pdo->query('select * from "books"');
 

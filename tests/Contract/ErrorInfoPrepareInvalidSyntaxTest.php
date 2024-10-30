@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
 use PDOException;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOExceptionMock;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOExceptionMock;
+use Xalaida\PDOMock\PDOMock;
 
 class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
 {
@@ -14,7 +14,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorExceptionOnPrepare(PDO $pdo)
+    public function itShouldFailWithSyntaxErrorExceptionOnPrepare($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -36,7 +36,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorOnPrepareUsingWarningErrorMode(PDO $pdo)
+    public function itShouldFailWithSyntaxErrorOnPrepareUsingWarningErrorMode($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class PrepareParamsNamedPrefixedTest extends TestCase
 {
@@ -12,7 +12,7 @@ class PrepareParamsNamedPrefixedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleBindValue(PDO $pdo)
+    public function itShouldHandleBindValue($pdo)
     {
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
@@ -35,7 +35,7 @@ class PrepareParamsNamedPrefixedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleBindParam(PDO $pdo)
+    public function itShouldHandleBindParam($pdo)
     {
         $status = 'published';
         $year = 2024;

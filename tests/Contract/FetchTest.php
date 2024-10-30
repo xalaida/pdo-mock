@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use Iterator;
 use IteratorAggregate;
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class FetchTest extends TestCase
 {
@@ -14,7 +14,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetch(PDO $pdo)
+    public function itShouldHandleFetch($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -41,7 +41,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnFalseWhenStatementIsNotExecuted(PDO $pdo)
+    public function itShouldReturnFalseWhenStatementIsNotExecuted($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -54,7 +54,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInAssocMode(PDO $pdo)
+    public function itShouldHandleFetchInAssocMode($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -81,7 +81,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInNumMode(PDO $pdo)
+    public function itShouldHandleFetchInNumMode($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -108,7 +108,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInBothMode(PDO $pdo)
+    public function itShouldHandleFetchInBothMode($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -135,7 +135,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInObjMode(PDO $pdo)
+    public function itShouldHandleFetchInObjMode($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -163,7 +163,7 @@ class FetchTest extends TestCase
 //     * @test
 //     * @dataProvider contracts
 //     */
-//    public function itShouldUseFetchAsIterator(PDO $pdo)
+//    public function itShouldUseFetchAsIterator($pdo)
 //    {
 //        $statement = $pdo->prepare('select * from "books"');
 //

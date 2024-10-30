@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class ExecuteSelectTest extends TestCase
 {
@@ -12,7 +12,7 @@ class ExecuteSelectTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldExecuteQuery(PDO $pdo)
+    public function itShouldExecuteQuery($pdo)
     {
         $result = $pdo->exec('select * from "books"');
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xalaida\PDOMock;
 
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase as BaseTestCase;

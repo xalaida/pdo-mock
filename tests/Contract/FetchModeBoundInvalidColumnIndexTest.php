@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
 use PHPUnit\Framework\ExpectationFailedException;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class FetchModeBoundInvalidColumnIndexTest extends TestCase
 {
@@ -13,7 +13,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldThrowValueExceptionWhenInvalidColumnIndex(PDO $pdo)
+    public function itShouldThrowValueExceptionWhenInvalidColumnIndex($pdo)
     {
         // TODO: it throws even with silent mode in php >= 8 but not in < 8
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);

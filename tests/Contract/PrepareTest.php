@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class PrepareTest extends TestCase
 {
@@ -12,7 +12,7 @@ class PrepareTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandlePreparedStatement(PDO $pdo)
+    public function itShouldHandlePreparedStatement($pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 

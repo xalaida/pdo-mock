@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class ErrorInfoFreshTest extends TestCase
 {
@@ -12,7 +12,7 @@ class ErrorInfoFreshTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldDisplayErrorInformationForPDOInstance(PDO $pdo)
+    public function itShouldDisplayErrorInformationForPDOInstance($pdo)
     {
         static::assertNull($pdo->errorCode());
         static::assertSame(['', null, null], $pdo->errorInfo());

@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
 use PDOException;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOExceptionMock;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOExceptionMock;
+use Xalaida\PDOMock\PDOMock;
 
 class ErrorInfoInvalidSyntaxTest extends TestCase
 {
@@ -14,7 +14,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorException(PDO $pdo)
+    public function itShouldFailWithSyntaxErrorException($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -36,7 +36,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldClearPreviousErrorInfoOnSuccessfulQuery(PDO $pdo)
+    public function itShouldClearPreviousErrorInfoOnSuccessfulQuery($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -58,7 +58,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorUsingSilentErrorMode(PDO $pdo)
+    public function itShouldFailWithSyntaxErrorUsingSilentErrorMode($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
 
@@ -73,7 +73,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorUsingWarningErrorMode(PDO $pdo)
+    public function itShouldFailWithSyntaxErrorUsingWarningErrorMode($pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 

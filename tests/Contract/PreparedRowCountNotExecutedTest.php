@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class PreparedRowCountNotExecutedTest extends TestCase
 {
@@ -12,7 +12,7 @@ class PreparedRowCountNotExecutedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnRowCountUsingNotExecutedPreparedStatement(PDO $pdo)
+    public function itShouldReturnRowCountUsingNotExecutedPreparedStatement($pdo)
     {
         $statement = $pdo->prepare('delete from "books"');
 

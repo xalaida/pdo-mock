@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class FetchModeBoundTest extends TestCase
 {
@@ -12,7 +12,7 @@ class FetchModeBoundTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInBoundModeUsingColumns(PDO $pdo)
+    public function itShouldHandleFetchInBoundModeUsingColumns($pdo)
     {
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
 
@@ -50,7 +50,7 @@ class FetchModeBoundTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInBoundModeUsingNamedColumns(PDO $pdo)
+    public function itShouldHandleFetchInBoundModeUsingNamedColumns($pdo)
     {
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
 

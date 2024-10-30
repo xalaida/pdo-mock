@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
 use PDOException;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class TransactionRollbackWithoutBeginTest extends TestCase
 {
@@ -13,7 +13,7 @@ class TransactionRollbackWithoutBeginTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailOnCRollbackWithoutBeginTransaction(PDO $pdo)
+    public function itShouldFailOnCRollbackWithoutBeginTransaction($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
 

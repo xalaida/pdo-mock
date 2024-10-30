@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Xala\Elomock;
+namespace Tests\Xalaida\PDOMock;
 
-use Xala\Elomock\PDOMock;
+use Xalaida\PDOMock\PDOMock;
 
 class ExecuteTest extends TestCase
 {

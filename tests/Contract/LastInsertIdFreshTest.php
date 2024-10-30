@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Xala\Elomock\Contract;
+namespace Tests\Xalaida\PDOMock\Contract;
 
 use PDO;
-use Tests\Xala\Elomock\TestCase;
-use Xala\Elomock\PDOMock;
+use Tests\Xalaida\PDOMock\TestCase;
+use Xalaida\PDOMock\PDOMock;
 
 class LastInsertIdFreshTest extends TestCase
 {
@@ -12,7 +12,7 @@ class LastInsertIdFreshTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnZeroAsLastInsertId(PDO $pdo)
+    public function itShouldReturnZeroAsLastInsertId($pdo)
     {
         static::assertSame('0', $pdo->lastInsertId());
         static::assertSame('0', $pdo->lastInsertId());
