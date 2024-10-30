@@ -65,9 +65,9 @@ class FetchAllTest extends TestCase
         $rows = $statement->fetchAll($pdo::FETCH_ASSOC);
 
         static::assertCount(2, $rows);
-        static::assertIsArray($rows[0]);
+        static::assertIsArrayType($rows[0]);
         static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsArray($rows[1]);
+        static::assertIsArrayType($rows[1]);
         static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
@@ -87,9 +87,9 @@ class FetchAllTest extends TestCase
         $rows = $statement->fetchAll($pdo::FETCH_NUM);
 
         static::assertCount(2, $rows);
-        static::assertIsArray($rows[0]);
+        static::assertIsArrayType($rows[0]);
         static::assertSame(['1', 'Kaidash’s Family'], $rows[0]);
-        static::assertIsArray($rows[1]);
+        static::assertIsArrayType($rows[1]);
         static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
@@ -109,9 +109,9 @@ class FetchAllTest extends TestCase
         $rows = $statement->fetchAll($pdo::FETCH_BOTH);
 
         static::assertCount(2, $rows);
-        static::assertIsArray($rows[0]);
+        static::assertIsArrayType($rows[0]);
         static::assertEquals([0 => '1', 'id' => '1', 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsArray($rows[1]);
+        static::assertIsArrayType($rows[1]);
         static::assertEquals([0 => '2', 'id' => '2', 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
@@ -131,9 +131,9 @@ class FetchAllTest extends TestCase
         $rows = $statement->fetchAll($pdo::FETCH_OBJ);
 
         static::assertCount(2, $rows);
-        static::assertIsObject($rows[0]);
+        static::assertIsObjectType($rows[0]);
         static::assertEquals((object) ['id' => '1', 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsObject($rows[1]);
+        static::assertIsObjectType($rows[1]);
         static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
@@ -153,9 +153,9 @@ class FetchAllTest extends TestCase
         $rows = $statement->fetchAll();
 
         static::assertCount(2, $rows);
-        static::assertIsArray($rows[0]);
+        static::assertIsArrayType($rows[0]);
         static::assertEquals([0 => '1', 'id' => '1', 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsArray($rows[1]);
+        static::assertIsArrayType($rows[1]);
         static::assertEquals([0 => '2', 'id' => '2', 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
@@ -177,9 +177,9 @@ class FetchAllTest extends TestCase
         $rows = $statement->fetchAll();
 
         static::assertCount(2, $rows);
-        static::assertIsObject($rows[0]);
+        static::assertIsObjectType($rows[0]);
         static::assertEquals((object) ['id' => '1', 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsObject($rows[1]);
+        static::assertIsObjectType($rows[1]);
         static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
@@ -201,9 +201,9 @@ class FetchAllTest extends TestCase
         $rows = $statement->fetchAll();
 
         static::assertCount(2, $rows);
-        static::assertIsObject($rows[0]);
+        static::assertIsObjectType($rows[0]);
         static::assertEquals((object) ['id' => '1', 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsObject($rows[1]);
+        static::assertIsObjectType($rows[1]);
         static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 

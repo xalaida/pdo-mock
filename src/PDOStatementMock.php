@@ -259,9 +259,12 @@ class PDOStatementMock extends PDOStatement
     /**
      * @return Iterator
      */
-    public function getIterator()
-    {
-        // TODO: throw exception on php < 8.0
+    #[PHP8] public function getIterator(): Iterator { /* DEFINITION COMPATIBLE WITH PHP >= 8
+    public function getIterator() { # DEFINITION COMPATIBLE WITH PHP < 8
+    # */
+        if (PHP_VERSION_ID < 80000) {
+            throw new RuntimeException('Method getIterator() is available only in PHP >= 8.0');
+        }
 
         return new ArrayIterator($this->fetchAll());
     }
@@ -289,8 +292,8 @@ class PDOStatementMock extends PDOStatement
         return false;
     }
 
-    #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /* DEFINITION FOR PHP >= 8
-    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # DEFINITION FOR PHP >= 8
+    #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /* DEFINITION COMPATIBLE WITH PHP >= 8
+    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # DEFINITION COMPATIBLE WITH PHP < 8
     # */
         if ($mode === null) {
             $mode = $this->fetchMode;

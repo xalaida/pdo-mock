@@ -27,9 +27,9 @@ class QueryTest extends TestCase
         $rows = $statement->fetchAll($pdo::FETCH_OBJ);
 
         static::assertCount(2, $rows);
-        static::assertIsObject($rows[0]);
+        static::assertIsObjectType($rows[0]);
         static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsObject($rows[1]);
+        static::assertIsObjectType($rows[1]);
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
