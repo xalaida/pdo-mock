@@ -17,7 +17,7 @@ class Expectation
     /**
      * @var PDOStatementMock|null
      */
-    public $statement = null;
+    public $statement;
 
     /**
      * @var string
@@ -27,12 +27,12 @@ class Expectation
     /**
      * @var array|Closure|null
      */
-    public $params = null;
+    public $params;
 
     /**
      * @var bool|null
      */
-    public $prepared = null;
+    public $prepared;
 
     /**
      * @var int
@@ -42,22 +42,22 @@ class Expectation
     /**
      * @var ResultSet|null
      */
-    public $resultSet = null;
+    public $resultSet;
 
     /**
      * @var string|null
      */
-    public $insertId = null;
+    public $insertId;
 
     /**
      * @var PDOException|null
      */
-    public $exceptionOnExecute = null;
+    public $exceptionOnExecute;
 
     /**
      * @var PDOException|null
      */
-    public $exceptionOnPrepare = null;
+    public $exceptionOnPrepare;
 
     /**
      * @param PDO $pdo
@@ -81,6 +81,24 @@ class Expectation
     }
 
     /**
+     * @param array|Closure $params
+     * @param bool $useParamValueType
+     * @return $this
+     */
+    public function with($params, $useParamValueType = false)
+    {
+        if (is_callable($params)) {
+            return $this->withParamsUsing($params);
+        }
+
+        if (is_array($params)) {
+            return $this->withParams($params, $useParamValueType);
+        }
+
+        throw new InvalidArgumentException('Unsupported $params type.');
+    }
+
+    /**
      * @param string|int $param
      * @param mixed $value
      * @param int $type
@@ -97,18 +115,12 @@ class Expectation
     }
 
     /**
-     * @param array|Closure $params
+     * @param array $params
      * @param bool $useParamValueType
      * @return $this
      */
-    public function with($params, $useParamValueType = false)
+    public function withParams($params, $useParamValueType = false)
     {
-        if (is_callable($params)) {
-            $this->params = $params;
-
-            return $this;
-        }
-
         foreach ($params as $key => $value) {
             $param = is_int($key)
                 ? $key + 1
@@ -122,6 +134,59 @@ class Expectation
         }
 
         return $this;
+    }
+
+    /**
+     * @param array $types
+     * @return void
+     */
+    public function withTypes($types)
+    {
+        foreach ($types as $key => $type) {
+            $param = is_int($key)
+                ? $key + 1
+                : $key;
+
+            if (! isset($this->params[$param])) {
+                throw new InvalidArgumentException("Param is not set: " . $param);
+            }
+
+            $this->params[$param]['type'] = $type;
+        }
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function withParamsUsing($callback)
+    {
+        $this->params = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $value
+     * @return int
+     */
+    protected function getTypeFromValue($value)
+    {
+        $type = gettype($value);
+
+        switch ($type) {
+            case 'string':
+                return PDO::PARAM_STR;
+
+            case 'integer':
+                return PDO::PARAM_INT;
+
+            case 'boolean':
+                return PDO::PARAM_BOOL;
+
+            default:
+                throw new InvalidArgumentException('Unsupported type: ' . $type);
+        }
     }
 
     /**
@@ -147,10 +212,27 @@ class Expectation
     }
 
     /**
-     * @param ResultSet $resultSet
+     * @param ResultSet|array $resultSet
      * @return $this
      */
     public function andFetch($resultSet)
+    {
+        if ($resultSet instanceof ResultSet) {
+            return $this->andFetchResultSet($resultSet);
+        }
+
+        if (is_array($resultSet)) {
+            return $this->andFetchRows($resultSet);
+        }
+
+        throw new InvalidArgumentException('Unsupported $resultSet type.');
+    }
+
+    /**
+     * @param ResultSet $resultSet
+     * @return $this
+     */
+    public function andFetchResultSet($resultSet)
     {
         $this->resultSet = $resultSet;
 
@@ -163,7 +245,7 @@ class Expectation
      */
     public function andFetchRows($rows)
     {
-        return $this->andFetch(
+        return $this->andFetchResultSet(
             ResultSet::fromArray($rows)
         );
     }
@@ -172,9 +254,9 @@ class Expectation
      * @param array $row
      * @return $this
      */
-    public function andFetchRecord($row)
+    public function andFetchRow($row)
     {
-        return $this->andFetch(
+        return $this->andFetchResultSet(
             ResultSet::fromArray([
                 $row,
             ])
@@ -209,28 +291,5 @@ class Expectation
     public function then()
     {
         return $this->pdo;
-    }
-
-    /**
-     * @param mixed $value
-     * @return int
-     */
-    protected function getTypeFromValue($value)
-    {
-        $type = gettype($value);
-
-        switch ($type) {
-            case 'string':
-                return PDO::PARAM_STR;
-
-            case 'integer':
-                return PDO::PARAM_INT;
-
-            case 'boolean':
-                return PDO::PARAM_BOOL;
-
-            default:
-                throw new InvalidArgumentException('Unsupported type: ' . $type);
-        }
     }
 }

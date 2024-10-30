@@ -165,7 +165,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRecord([
+            ->andFetchRow([
                 'id' => 1,
                 'title' => 'Kaidash’s Family',
             ]);
