@@ -3,6 +3,7 @@
 namespace Tests\Xala\Elomock\Contract;
 
 use PDO;
+use PHPUnit\Framework\ExpectationFailedException;
 use Tests\Xala\Elomock\TestCase;
 use Xala\Elomock\PDOMock;
 
@@ -31,8 +32,17 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
         try {
             $statement->fetch();
 
-            $this->fail('Expected exception was not thrown');
+            if (PHP_VERSION_ID >= 71000) {
+                $this->fail('Expected exception was not thrown');
+            }
+
+            static::assertSame("Kaidash’s Family", $title);
+            static::assertSame('', $status);
         } catch (\Throwable $e) {
+            if ($e instanceof ExpectationFailedException) {
+                throw $e;
+            }
+
             if (PHP_VERSION_ID >= 80000) {
                 static::assertInstanceOf(\ValueError::class, $e);
                 static::assertSame('Kaidash’s Family', $title);
