@@ -2,6 +2,7 @@
 
 namespace Tests\Xala\Elomock;
 
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -32,5 +33,15 @@ class TestCase extends BaseTestCase
         static::assertTrue($warningTriggered, 'Warning was not triggered');
 
         return $result;
+    }
+
+    protected static function assertIsArray($actual, $message = '')
+    {
+        static::assertThat($actual, new IsType(IsType::TYPE_ARRAY), $message);
+    }
+
+    protected static function assertIsObject($actual, $message = '')
+    {
+        static::assertThat($actual, new IsType(IsType::TYPE_OBJECT), $message);
     }
 }

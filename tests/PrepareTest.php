@@ -10,7 +10,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandlePreparedStatement(): void
+    public function itShouldHandlePreparedStatement()
     {
         $pdo = new PDOMock();
 
@@ -27,7 +27,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailOnUnexpectedQuery(): void
+    public function itShouldFailOnUnexpectedQuery()
     {
         $pdo = new PDOMock();
 
@@ -40,7 +40,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenStatementIsNotPrepared(): void
+    public function itShouldFailWhenStatementIsNotPrepared()
     {
         $pdo = new PDOMock();
 
@@ -56,7 +56,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleQueryParamsUsingBindParam(): void
+    public function itShouldHandleQueryParamsUsingBindParam()
     {
         $pdo = new PDOMock();
 
@@ -81,7 +81,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenQueryParamsDontMatch(): void
+    public function itShouldFailWhenQueryParamsDontMatch()
     {
         $pdo = new PDOMock();
 
@@ -106,7 +106,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleQueryParamsUsingAssociativeArray(): void
+    public function itShouldHandleQueryParamsUsingAssociativeArray()
     {
         $pdo = new PDOMock();
 
@@ -128,7 +128,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenQueryParamsUsingAssociativeArrayDontMatch(): void
+    public function itShouldFailWhenQueryParamsUsingAssociativeArrayDontMatch()
     {
         $pdo = new PDOMock();
 
@@ -151,7 +151,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleQueryNamedParams(): void
+    public function itShouldHandleQueryNamedParams()
     {
         $pdo = new PDOMock();
 
@@ -173,7 +173,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleQueryNamedParamsUsingSingleAssociativeArray(): void
+    public function itShouldHandleQueryNamedParamsUsingSingleAssociativeArray()
     {
         $pdo = new PDOMock();
 
@@ -199,7 +199,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenQueryNamedParamsUsingSingleAssociativeArrayDontMatch(): void
+    public function itShouldFailWhenQueryNamedParamsUsingSingleAssociativeArrayDontMatch()
     {
         $pdo = new PDOMock();
 
@@ -226,7 +226,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleExecParams(): void
+    public function itShouldHandleExecParams()
     {
         $pdo = new PDOMock();
 
@@ -245,7 +245,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleExecParamsTypes(): void
+    public function itShouldHandleExecParamsTypes()
     {
         $pdo = new PDOMock();
 
@@ -263,7 +263,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenParamsOverwriteBoundValues(): void
+    public function itShouldFailWhenParamsOverwriteBoundValues()
     {
         $pdo = new PDOMock();
 
@@ -285,7 +285,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldVerifyParamsUsingCallableSyntax(): void
+    public function itShouldVerifyParamsUsingCallableSyntax()
     {
         $pdo = new PDOMock();
 
@@ -311,7 +311,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenParamsCallbackReturnsFalse(): void
+    public function itShouldFailWhenParamsCallbackReturnsFalse()
     {
         $pdo = new PDOMock();
 
@@ -334,7 +334,7 @@ class PrepareTest extends TestCase
     /**
      * @test
      */
-    public function itShouldUseStatementFromPreviousExpectation(): void
+    public function itShouldUseStatementFromPreviousExpectation()
     {
         $pdo = new PDOMock();
 

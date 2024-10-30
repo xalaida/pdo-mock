@@ -12,7 +12,7 @@ class PreparedRowCountNotExecutedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnRowCountUsingNotExecutedPreparedStatement(PDO $pdo): void
+    public function itShouldReturnRowCountUsingNotExecutedPreparedStatement(PDO $pdo)
     {
         $statement = $pdo->prepare('delete from "books"');
 

@@ -14,7 +14,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetch(PDO $pdo): void
+    public function itShouldHandleFetch(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -41,7 +41,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnFalseWhenStatementIsNotExecuted(PDO $pdo): void
+    public function itShouldReturnFalseWhenStatementIsNotExecuted(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -54,7 +54,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInAssocMode(PDO $pdo): void
+    public function itShouldHandleFetchInAssocMode(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -81,7 +81,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInNumMode(PDO $pdo): void
+    public function itShouldHandleFetchInNumMode(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -108,7 +108,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInBothMode(PDO $pdo): void
+    public function itShouldHandleFetchInBothMode(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -135,7 +135,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInObjMode(PDO $pdo): void
+    public function itShouldHandleFetchInObjMode(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 
@@ -163,7 +163,7 @@ class FetchTest extends TestCase
 //     * @test
 //     * @dataProvider contracts
 //     */
-//    public function itShouldUseFetchAsIterator(PDO $pdo): void
+//    public function itShouldUseFetchAsIterator(PDO $pdo)
 //    {
 //        $statement = $pdo->prepare('select * from "books"');
 //

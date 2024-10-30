@@ -12,7 +12,7 @@ class LastInsertIdTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldUseLastInsertIdFromQuery(PDO $pdo): void
+    public function itShouldUseLastInsertIdFromQuery(PDO $pdo)
     {
         $pdo->exec('insert into "books" ("id", "title") values (777, "Kaidash’s Family")');
 

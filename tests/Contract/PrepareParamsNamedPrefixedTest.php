@@ -12,7 +12,7 @@ class PrepareParamsNamedPrefixedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleBindValue(PDO $pdo): void
+    public function itShouldHandleBindValue(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
@@ -35,7 +35,7 @@ class PrepareParamsNamedPrefixedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleBindParam(PDO $pdo): void
+    public function itShouldHandleBindParam(PDO $pdo)
     {
         $status = 'published';
         $year = 2024;

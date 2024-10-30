@@ -12,7 +12,7 @@ class TransactionRollbackTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldRollbackTransaction(PDO $pdo): void
+    public function itShouldRollbackTransaction(PDO $pdo)
     {
         static::assertTrue(
             $pdo->beginTransaction()

@@ -13,7 +13,7 @@ class TransactionRollbackWithoutBeginTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailOnCRollbackWithoutBeginTransaction(PDO $pdo): void
+    public function itShouldFailOnCRollbackWithoutBeginTransaction(PDO $pdo)
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
 

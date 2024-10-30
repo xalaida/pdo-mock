@@ -12,7 +12,7 @@ class LastInsertIdFreshTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnZeroAsLastInsertId(PDO $pdo): void
+    public function itShouldReturnZeroAsLastInsertId(PDO $pdo)
     {
         static::assertSame('0', $pdo->lastInsertId());
         static::assertSame('0', $pdo->lastInsertId());

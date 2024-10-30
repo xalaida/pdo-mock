@@ -13,7 +13,7 @@ class QueryFetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFetchRowsUsingQuery(PDO $pdo): void
+    public function itShouldFetchRowsUsingQuery(PDO $pdo)
     {
         $statement = $pdo->query('select * from "books"');
 

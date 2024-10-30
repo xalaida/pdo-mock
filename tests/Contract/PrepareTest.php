@@ -12,7 +12,7 @@ class PrepareTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandlePreparedStatement(PDO $pdo): void
+    public function itShouldHandlePreparedStatement(PDO $pdo)
     {
         $statement = $pdo->prepare('select * from "books"');
 

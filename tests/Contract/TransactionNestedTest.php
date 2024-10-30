@@ -13,7 +13,7 @@ class TransactionNestedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleNestedTransactions(PDO $pdo): void
+    public function itShouldHandleNestedTransactions(PDO $pdo)
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
 

@@ -12,7 +12,7 @@ class ErrorInfoFreshTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldDisplayErrorInformationForPDOInstance(PDO $pdo): void
+    public function itShouldDisplayErrorInformationForPDOInstance(PDO $pdo)
     {
         static::assertNull($pdo->errorCode());
         static::assertSame(['', null, null], $pdo->errorInfo());

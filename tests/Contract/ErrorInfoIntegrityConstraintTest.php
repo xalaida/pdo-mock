@@ -14,7 +14,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement(PDO $pdo): void
+    public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement(PDO $pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -41,7 +41,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorOnExecuteForPreparedStatementUsingWarningErrorMode(PDO $pdo): void
+    public function itShouldFailWithSyntaxErrorOnExecuteForPreparedStatementUsingWarningErrorMode(PDO $pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 

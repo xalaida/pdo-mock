@@ -12,7 +12,7 @@ class TransactionCommitTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldCommitTransaction(PDO $pdo): void
+    public function itShouldCommitTransaction(PDO $pdo)
     {
         static::assertFalse(
             $pdo->inTransaction()

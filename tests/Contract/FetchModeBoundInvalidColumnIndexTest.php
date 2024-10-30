@@ -13,7 +13,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldThrowValueExceptionWhenInvalidColumnIndex(PDO $pdo): void
+    public function itShouldThrowValueExceptionWhenInvalidColumnIndex(PDO $pdo)
     {
         // TODO: it throws even with silent mode in php >= 8 but not in < 8
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);

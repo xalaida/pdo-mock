@@ -12,7 +12,7 @@ class FetchModeBoundTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInBoundModeUsingColumns(PDO $pdo): void
+    public function itShouldHandleFetchInBoundModeUsingColumns(PDO $pdo)
     {
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
 
@@ -50,7 +50,7 @@ class FetchModeBoundTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldHandleFetchInBoundModeUsingNamedColumns(PDO $pdo): void
+    public function itShouldHandleFetchInBoundModeUsingNamedColumns(PDO $pdo)
     {
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
 

@@ -9,7 +9,7 @@ class FetchTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetch(): void
+    public function itShouldHandleFetch()
     {
         $pdo = new PDOMock();
 
@@ -44,7 +44,7 @@ class FetchTest extends TestCase
     /**
      * @test
      */
-    public function itShouldReturnFalseWhenStatementIsNotExecuted(): void
+    public function itShouldReturnFalseWhenStatementIsNotExecuted()
     {
         $pdo = new PDOMock();
 
@@ -60,7 +60,7 @@ class FetchTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchInAssocMode(): void
+    public function itShouldHandleFetchInAssocMode()
     {
         $pdo = new PDOMock();
 
@@ -95,7 +95,7 @@ class FetchTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchInNumMode(): void
+    public function itShouldHandleFetchInNumMode()
     {
         $pdo = new PDOMock();
 
@@ -130,7 +130,7 @@ class FetchTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchInBothMode(): void
+    public function itShouldHandleFetchInBothMode()
     {
         $pdo = new PDOMock();
 
@@ -165,7 +165,7 @@ class FetchTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchInObjMode(): void
+    public function itShouldHandleFetchInObjMode()
     {
         $pdo = new PDOMock();
 

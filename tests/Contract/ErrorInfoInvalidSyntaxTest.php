@@ -14,7 +14,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorException(PDO $pdo): void
+    public function itShouldFailWithSyntaxErrorException(PDO $pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -36,7 +36,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldClearPreviousErrorInfoOnSuccessfulQuery(PDO $pdo): void
+    public function itShouldClearPreviousErrorInfoOnSuccessfulQuery(PDO $pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -58,7 +58,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorUsingSilentErrorMode(PDO $pdo): void
+    public function itShouldFailWithSyntaxErrorUsingSilentErrorMode(PDO $pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
 
@@ -73,7 +73,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorUsingWarningErrorMode(PDO $pdo): void
+    public function itShouldFailWithSyntaxErrorUsingWarningErrorMode(PDO $pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 

@@ -10,7 +10,7 @@ class ExecuteTest extends TestCase
     /**
      * @test
      */
-    public function itShouldExecuteQuery(): void
+    public function itShouldExecuteQuery()
     {
         $pdo = new PDOMock();
 
@@ -24,7 +24,7 @@ class ExecuteTest extends TestCase
     /**
      * @test
      */
-    public function itShouldCalculatesRowCountUsingFetchRows(): void
+    public function itShouldCalculatesRowCountUsingFetchRows()
     {
         $pdo = new PDOMock();
 
@@ -43,7 +43,7 @@ class ExecuteTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailOnUnexpectedQuery(): void
+    public function itShouldFailOnUnexpectedQuery()
     {
         $pdo = new PDOMock();
 
@@ -56,7 +56,7 @@ class ExecuteTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenQueryDoesntMatch(): void
+    public function itShouldFailWhenQueryDoesntMatch()
     {
         $pdo = new PDOMock();
         $pdo->expect('select * from "categories"');
@@ -70,7 +70,7 @@ class ExecuteTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenQueryIsNotExecuted(): void
+    public function itShouldFailWhenQueryIsNotExecuted()
     {
         $pdo = new PDOMock();
         $pdo->expect('select * from "books"');

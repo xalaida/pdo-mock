@@ -12,7 +12,7 @@ class ExecuteDeleteTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnAffectedRowsOnExecute(PDO $pdo): void
+    public function itShouldReturnAffectedRowsOnExecute(PDO $pdo)
     {
         $result = $pdo->exec('delete from "books"');
 

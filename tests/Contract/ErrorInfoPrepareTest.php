@@ -12,7 +12,7 @@ class ErrorInfoPrepareTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldDisplayErrorInformationForSuccessfullyPreparedStatement(PDO $pdo): void
+    public function itShouldDisplayErrorInformationForSuccessfullyPreparedStatement(PDO $pdo)
     {
         $statement = $pdo->prepare('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
 
@@ -27,7 +27,7 @@ class ErrorInfoPrepareTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldDisplayErrorInformationForSuccessfullyExecutedPreparedStatement(PDO $pdo): void
+    public function itShouldDisplayErrorInformationForSuccessfullyExecutedPreparedStatement(PDO $pdo)
     {
         $statement = $pdo->prepare('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
 

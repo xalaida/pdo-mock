@@ -12,7 +12,7 @@ class PreparedRowCountExecutedTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnAffectedRowsUsingPreparedStatement(PDO $pdo): void
+    public function itShouldReturnAffectedRowsUsingPreparedStatement(PDO $pdo)
     {
         $statement = $pdo->prepare('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
 

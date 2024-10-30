@@ -14,7 +14,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorExceptionOnPrepare(PDO $pdo): void
+    public function itShouldFailWithSyntaxErrorExceptionOnPrepare(PDO $pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -36,7 +36,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailWithSyntaxErrorOnPrepareUsingWarningErrorMode(PDO $pdo): void
+    public function itShouldFailWithSyntaxErrorOnPrepareUsingWarningErrorMode(PDO $pdo)
     {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 

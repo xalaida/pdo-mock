@@ -12,7 +12,7 @@ class ExecuteInsertTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldReturnAffectedRowsOnExecute(PDO $pdo): void
+    public function itShouldReturnAffectedRowsOnExecute(PDO $pdo)
     {
         $result = $pdo->exec('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")');
 

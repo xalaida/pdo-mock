@@ -10,7 +10,7 @@ class TransactionTest extends TestCase
     /**
      * @test
      */
-    public function itShouldCommitTransaction(): void
+    public function itShouldCommitTransaction()
     {
         $pdo = new PDOMock();
 
@@ -38,7 +38,7 @@ class TransactionTest extends TestCase
     /**
      * @test
      */
-    public function itShouldRollbackTransaction(): void
+    public function itShouldRollbackTransaction()
     {
         $pdo = new PDOMock();
         $pdo->expectBeginTransaction();
@@ -55,7 +55,7 @@ class TransactionTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenQueryExecutedWithoutTransaction(): void
+    public function itShouldFailWhenQueryExecutedWithoutTransaction()
     {
         $pdo = new PDOMock();
 
@@ -72,7 +72,7 @@ class TransactionTest extends TestCase
     /**
      * @test
      */
-    public function itShouldExpectTransactionUsingCallableSyntax(): void
+    public function itShouldExpectTransactionUsingCallableSyntax()
     {
         $pdo = new PDOMock();
         $pdo->expectTransaction(function () use ($pdo) {
@@ -91,7 +91,7 @@ class TransactionTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenTransactionalQueryIsNotExecuted(): void
+    public function itShouldFailWhenTransactionalQueryIsNotExecuted()
     {
         $pdo = new PDOMock();
 
@@ -112,7 +112,7 @@ class TransactionTest extends TestCase
     /**
      * @test
      */
-    public function itShouldIgnoreTransactionsWhenModeIsEnabled(): void
+    public function itShouldIgnoreTransactionsWhenModeIsEnabled()
     {
         $pdo = new PDOMock();
         $pdo->ignoreTransactions();

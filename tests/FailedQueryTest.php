@@ -11,7 +11,7 @@ class FailedQueryTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWithQueryException(): void
+    public function itShouldFailWithQueryException()
     {
         $pdo = new PDOMock();
         $pdo->expect('insert into "books" ("id", "title") values (1, null)')
@@ -44,7 +44,7 @@ class FailedQueryTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailUsingCustomErrorException(): void
+    public function itShouldFailUsingCustomErrorException()
     {
         $pdo = new PDOMock();
 

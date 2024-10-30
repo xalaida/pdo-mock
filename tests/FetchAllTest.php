@@ -11,7 +11,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchAllInBothModeAsDefault(): void
+    public function itShouldHandleFetchAllInBothModeAsDefault()
     {
         $pdo = new PDOMock();
 
@@ -40,7 +40,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchAllInAssocMode(): void
+    public function itShouldHandleFetchAllInAssocMode()
     {
         $pdo = new PDOMock();
 
@@ -69,7 +69,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchAllInObjMode(): void
+    public function itShouldHandleFetchAllInObjMode()
     {
         $pdo = new PDOMock();
 
@@ -98,7 +98,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      */
-    public function itShouldUseCustomDefaultFetchMode(): void
+    public function itShouldUseCustomDefaultFetchMode()
     {
         $pdo = new PDOMock();
         $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
@@ -128,7 +128,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      */
-    public function itShouldUseCustomDefaultFetchModeForStatement(): void
+    public function itShouldUseCustomDefaultFetchModeForStatement()
     {
         $pdo = new PDOMock();
 
@@ -159,7 +159,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchOne(): void
+    public function itShouldHandleFetchOne()
     {
         $pdo = new PDOMock();
 
@@ -186,7 +186,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleFetchUsingResultSetInstance(): void
+    public function itShouldHandleFetchUsingResultSetInstance()
     {
         $pdo = new PDOMock();
 
@@ -215,7 +215,7 @@ class FetchAllTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenColumnsAreMissingForAssocMode(): void
+    public function itShouldFailWhenColumnsAreMissingForAssocMode()
     {
         $pdo = new PDOMock();
 

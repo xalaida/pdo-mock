@@ -12,7 +12,7 @@ class ExecuteSelectTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldExecuteQuery(PDO $pdo): void
+    public function itShouldExecuteQuery(PDO $pdo)
     {
         $result = $pdo->exec('select * from "books"');
 

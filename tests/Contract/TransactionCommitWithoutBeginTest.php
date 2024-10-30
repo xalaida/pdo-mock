@@ -13,7 +13,7 @@ class TransactionCommitWithoutBeginTest extends TestCase
      * @test
      * @dataProvider contracts
      */
-    public function itShouldFailOnCommitWithoutBeginTransaction(PDO $pdo): void
+    public function itShouldFailOnCommitWithoutBeginTransaction(PDO $pdo)
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_SILENT);
 

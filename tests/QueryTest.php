@@ -11,7 +11,7 @@ class QueryTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFetchRowsUsingQuery(): void
+    public function itShouldFetchRowsUsingQuery()
     {
         $pdo = new PDOMock();
 
@@ -37,7 +37,7 @@ class QueryTest extends TestCase
     /**
      * @test
      */
-    public function itShouldFailWhenExpectParamsUsingQueryMethod(): void
+    public function itShouldFailWhenExpectParamsUsingQueryMethod()
     {
         $pdo = new PDOMock();
 
@@ -53,7 +53,7 @@ class QueryTest extends TestCase
     /**
      * @test
      */
-    public function itShouldHandleQueryAsPreparedStatement(): void
+    public function itShouldHandleQueryAsPreparedStatement()
     {
         $pdo = new PDOMock();
 
