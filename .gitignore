@@ -2,3 +2,4 @@
 var/
 vendor/
 .php-cs-fixer.php
+composer.lock
