@@ -23,7 +23,7 @@ class TransactionRollbackWithoutBeginTest extends TestCase
         $pdo->rollBack();
     }
 
-    public static function contracts(): array
+    public static function contracts()
     {
         return [
             'SQLite' => [
@@ -36,12 +36,12 @@ class TransactionRollbackWithoutBeginTest extends TestCase
         ];
     }
 
-    protected static function configureSqlite(): PDO
+    protected static function configureSqlite()
     {
         return new PDO('sqlite::memory:');
     }
 
-    protected static function configureMock(): PDOMock
+    protected static function configureMock()
     {
         $pdo = new PDOMock();
 

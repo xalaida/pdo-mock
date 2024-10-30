@@ -60,7 +60,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
         static::assertSame('00000', $pdo->errorCode());
     }
 
-    public static function contracts(): array
+    public static function contracts()
     {
         return [
             'SQLite' => [
@@ -73,7 +73,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
         ];
     }
 
-    protected static function configureSqlite(): PDO
+    protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
 
@@ -82,7 +82,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
         return $pdo;
     }
 
-    protected static function configureMock(): PDOMock
+    protected static function configureMock()
     {
         $pdo = new PDOMock();
 

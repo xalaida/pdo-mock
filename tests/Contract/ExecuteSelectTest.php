@@ -19,7 +19,7 @@ class ExecuteSelectTest extends TestCase
         static::assertSame(2, $result);
     }
 
-    public static function contracts(): array
+    public static function contracts()
     {
         return [
             'SQLite' => [
@@ -32,7 +32,7 @@ class ExecuteSelectTest extends TestCase
         ];
     }
 
-    protected static function configureSqlite(): PDO
+    protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
 
@@ -43,7 +43,7 @@ class ExecuteSelectTest extends TestCase
         return $pdo;
     }
 
-    protected static function configureMock(): PDOMock
+    protected static function configureMock()
     {
         $pdo = new PDOMock();
 

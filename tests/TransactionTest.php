@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use PHPUnit\Framework\ExpectationFailedException;
 use Xala\Elomock\PDOMock;
 
 class TransactionTest extends TestCase
@@ -63,7 +62,6 @@ class TransactionTest extends TestCase
 
         $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: insert into "books" ("title") values ("Kaidash’s Family")');
 
         $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
@@ -103,8 +101,7 @@ class TransactionTest extends TestCase
         $pdo->beginTransaction();
         $pdo->exec('insert into "books" ("title") values ("Kaidash’s Family")');
 
-        $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Unexpected PDO::commit()');
+        $this->expectExceptionMessage('Unexpected function: PDO::commit()');
 
         $pdo->commit();
     }

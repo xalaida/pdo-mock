@@ -2,9 +2,9 @@
 
 namespace Tests\Xala\Elomock\Contract;
 
+use Exception;
 use PDO;
 use Tests\Xala\Elomock\TestCase;
-use Throwable;
 use Xala\Elomock\PDOMock;
 
 class FetchAllTest extends TestCase
@@ -36,7 +36,7 @@ class FetchAllTest extends TestCase
             $statement->fetchAll($pdo::FETCH_LAZY);
 
             $this->fail('Expected exception is not thrown');
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             if (PHP_VERSION_ID >= 80000) {
                 static::assertInstanceOf(\ValueError::class, $e);
                 static::assertSame('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()', $e->getMessage());
@@ -198,7 +198,7 @@ class FetchAllTest extends TestCase
         static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
-    public static function contracts(): array
+    public static function contracts()
     {
         return [
             'SQLite' => [
@@ -211,7 +211,7 @@ class FetchAllTest extends TestCase
         ];
     }
 
-    protected static function configureSqlite(): PDO
+    protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
 
@@ -222,7 +222,7 @@ class FetchAllTest extends TestCase
         return $pdo;
     }
 
-    protected static function configureMock(): PDOMock
+    protected static function configureMock()
     {
         $pdo = new PDOMock();
 

@@ -57,7 +57,7 @@ class PrepareParamsNamedTest extends TestCase
         static::assertCount(2, $statement->fetchAll());
     }
 
-    public static function contracts(): array
+    public static function contracts()
     {
         return [
             'SQLite' => [
@@ -70,7 +70,7 @@ class PrepareParamsNamedTest extends TestCase
         ];
     }
 
-    protected static function configureSqlite(): PDO
+    protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
 
@@ -81,7 +81,7 @@ class PrepareParamsNamedTest extends TestCase
         return $pdo;
     }
 
-    protected static function configureMock(): PDOMock
+    protected static function configureMock()
     {
         $pdo = new PDOMock();
 

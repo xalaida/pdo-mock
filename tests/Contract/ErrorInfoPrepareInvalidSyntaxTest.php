@@ -50,7 +50,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
         static::assertSame('HY000', $pdo->errorCode());
     }
 
-    public static function contracts(): array
+    public static function contracts()
     {
         return [
             'SQLite' => [
@@ -63,7 +63,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
         ];
     }
 
-    protected static function configureSqlite(): PDO
+    protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
 
@@ -72,7 +72,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
         return $pdo;
     }
 
-    protected static function configureMock(): PDOMock
+    protected static function configureMock()
     {
         $pdo = new PDOMock();
 

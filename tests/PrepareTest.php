@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use PHPUnit\Framework\ExpectationFailedException;
 use Xala\Elomock\PDOMock;
 
 class PrepareTest extends TestCase
@@ -31,7 +30,6 @@ class PrepareTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: select * from "books"');
 
         $pdo->prepare('select * from "books"');
@@ -47,7 +45,6 @@ class PrepareTest extends TestCase
         $pdo->expect('select * from "books"')
             ->toBePrepared();
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Statement is not prepared');
 
         $pdo->exec('select * from "books"');
@@ -97,7 +94,6 @@ class PrepareTest extends TestCase
         $statement->bindValue(2, 2024, $pdo::PARAM_INT);
         $statement->bindValue(3, true, $pdo::PARAM_BOOL);
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Params do not match');
 
         $statement->execute();
@@ -142,7 +138,6 @@ class PrepareTest extends TestCase
         $statement->bindValue(2, 2024, $pdo::PARAM_INT);
         $statement->bindValue(3, true, $pdo::PARAM_BOOL);
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Params do not match');
 
         $statement->execute();
@@ -217,7 +212,6 @@ class PrepareTest extends TestCase
         $statement->bindValue('status', 'active', $pdo::PARAM_STR);
         $statement->bindValue('published', true, $pdo::PARAM_BOOL);
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Params do not match');
 
         $statement->execute();
@@ -276,7 +270,6 @@ class PrepareTest extends TestCase
         $statement->bindValue(1, 'draft', $pdo::PARAM_STR);
         $statement->bindValue(2, 2024, $pdo::PARAM_INT);
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Params do not match');
 
         $statement->execute([]);
@@ -325,7 +318,6 @@ class PrepareTest extends TestCase
         $statement->bindValue(1, 'draft', $pdo::PARAM_STR);
         $statement->bindValue(2, 2024, $pdo::PARAM_INT);
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Params do not match');
 
         $statement->execute();

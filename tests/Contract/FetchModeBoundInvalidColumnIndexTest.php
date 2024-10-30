@@ -38,10 +38,11 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
 
             static::assertSame("Kaidash’s Family", $title);
             static::assertSame('', $status);
-        } catch (\Throwable $e) {
-            if ($e instanceof ExpectationFailedException) {
-                throw $e;
-            }
+        } catch (\Exception $e) {
+            // TODO: handle old versions
+            // if ($e instanceof ExpectationFailedException) {
+            //    throw $e;
+            //}
 
             if (PHP_VERSION_ID >= 80000) {
                 static::assertInstanceOf(\ValueError::class, $e);
@@ -55,7 +56,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
         }
     }
 
-    public static function contracts(): array
+    public static function contracts()
     {
         return [
             'SQLite' => [
@@ -68,7 +69,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
         ];
     }
 
-    protected static function configureSqlite(): PDO
+    protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
 
@@ -82,7 +83,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
         return $pdo;
     }
 
-    protected static function configureMock(): PDOMock
+    protected static function configureMock()
     {
         $pdo = new PDOMock();
 

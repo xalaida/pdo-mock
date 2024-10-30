@@ -111,15 +111,15 @@ class PDOMock extends PDO
     #[\Override]
     public function exec($statement)
     {
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $statement);
+        $expectation = $this->getExpectationForQuery($statement);
 
-        $expectation = array_shift($this->expectations);
-
-        if (! is_null($expectation->prepared)) {
-            TestCase::assertFalse($expectation->prepared, 'Statement is not prepared');
+        if ($expectation->query !== $statement) {
+            throw new RuntimeException('Unexpected query: ' . $statement);
         }
 
-        TestCase::assertSame($expectation->query, $statement, 'Unexpected query: ' . $statement);
+        if ($expectation->prepared === true) {
+            throw new RuntimeException('Statement is not prepared');
+        }
 
         if ($expectation->exceptionOnExecute && $expectation->exceptionOnExecute->errorInfo) {
             $this->errorInfo = $expectation->exceptionOnExecute->errorInfo;
@@ -165,9 +165,7 @@ class PDOMock extends PDO
     #[\Override]
     public function prepare($query, $options = [])
     {
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected query: ' . $query);
-
-        $expectation = array_shift($this->expectations);
+        $expectation = $this->getExpectationForQuery($query);
 
         if ($expectation->exceptionOnPrepare && $expectation->exceptionOnPrepare->errorInfo) {
             $this->errorInfo = $expectation->exceptionOnPrepare->errorInfo;
@@ -285,11 +283,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::beginTransaction()');
-
-        $expectation = array_shift($this->expectations);
-
-        TestCase::assertSame($expectation->query, 'PDO::beginTransaction()', 'Unexpected PDO::beginTransaction()');
+        $this->assertFunctionIsExpected('PDO::beginTransaction()');
 
         return true;
     }
@@ -311,11 +305,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::commit()');
-
-        $expectation = array_shift($this->expectations);
-
-        TestCase::assertSame($expectation->query, 'PDO::commit()', 'Unexpected PDO::commit()');
+        $this->assertFunctionIsExpected('PDO::commit()');
 
         return true;
     }
@@ -337,11 +327,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        TestCase::assertNotEmpty($this->expectations, 'Unexpected PDO::rollback()');
-
-        $expectation = array_shift($this->expectations);
-
-        TestCase::assertSame($expectation->query, 'PDO::rollback()', 'Unexpected PDO::rollback()');
+        $this->assertFunctionIsExpected('PDO::rollback()');
 
         return true;
     }
@@ -392,6 +378,39 @@ class PDOMock extends PDO
      */
     public function assertExpectationsFulfilled()
     {
-        TestCase::assertEmpty($this->expectations, 'Some expectations were not fulfilled.');
+        if (! empty($this->expectations)) {
+            throw new RuntimeException('Some expectations were not fulfilled.');
+        }
+    }
+
+    /**
+     * @param string $query
+     * @return Expectation
+     * @throws \UnexpectedValueException
+     */
+    protected function getExpectationForQuery($query)
+    {
+        if (empty($this->expectations)) {
+            throw new \RuntimeException('Unexpected query: ' . $query);
+        }
+
+        return array_shift($this->expectations);
+    }
+
+    /**
+     * @param string $function
+     * @return void
+     */
+    protected function assertFunctionIsExpected($function)
+    {
+        if (empty($this->expectations)) {
+            throw new \RuntimeException('Unexpected function: ' . $function);
+        }
+
+        $expectation = array_shift($this->expectations);
+
+        if ($expectation->query !== $function) {
+            throw new \RuntimeException('Unexpected function: ' . $function);
+        }
     }
 }

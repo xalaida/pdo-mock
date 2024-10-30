@@ -37,11 +37,11 @@ class TestCase extends BaseTestCase
 
     protected static function assertIsArray($actual, $message = '')
     {
-        static::assertThat($actual, new IsType(IsType::TYPE_ARRAY), $message);
+        static::assertTrue(is_array($actual), $message ?: gettype($actual) . ' is of type array');
     }
 
     protected static function assertIsObject($actual, $message = '')
     {
-        static::assertThat($actual, new IsType(IsType::TYPE_OBJECT), $message);
+        static::assertTrue(is_object($actual), $message ?: gettype($actual) . ' is of type object');
     }
 }

@@ -174,19 +174,25 @@ class PDOStatementMock extends PDOStatement
             $boundParams = $this->params;
         }
 
-        if (! is_null($this->expectation->prepared)) {
-            TestCase::assertTrue($this->expectation->prepared, 'Statement is not prepared');
+        if ($this->expectation->prepared === false) {
+            throw new RuntimeException('Statement is prepared');
         }
 
-        TestCase::assertSame($this->expectation->query, $this->query, 'Query does not match');
+        if ($this->expectation->query !== $this->query) {
+            throw new RuntimeException('Unexpected query: ' . $this->query);
+        }
 
         if (! is_null($this->expectation->params)) {
             if (is_callable($this->expectation->params)) {
                 $result = call_user_func($this->expectation->params, $boundParams);
 
-                TestCase::assertNotFalse($result, 'Params do not match');
+                if ($result === false) {
+                    throw new RuntimeException('Params do not match');
+                }
             } else {
-                TestCase::assertEquals($this->expectation->params, $boundParams, 'Params do not match');
+                if ($this->expectation->params != $boundParams) {
+                    throw new RuntimeException('Params do not match');
+                }
             }
         }
 
@@ -226,7 +232,7 @@ class PDOStatementMock extends PDOStatement
     /**
      * @return int
      */
-    public function rowCount(): int
+    public function rowCount()
     {
         if (! $this->executed) {
             return 0;
@@ -246,7 +252,7 @@ class PDOStatementMock extends PDOStatement
     /**
      * @return array
      */
-    public function errorInfo(): array
+    public function errorInfo()
     {
         return $this->errorInfo;
     }
@@ -254,7 +260,7 @@ class PDOStatementMock extends PDOStatement
     /**
      * @return Iterator
      */
-    public function getIterator(): Iterator
+    public function getIterator()
     {
         // TODO: throw exception on php < 8.0
 

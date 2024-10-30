@@ -18,7 +18,7 @@ class ErrorInfoFreshTest extends TestCase
         static::assertSame(['', null, null], $pdo->errorInfo());
     }
 
-    public static function contracts(): array
+    public static function contracts()
     {
         return [
             'SQLite' => [
@@ -31,12 +31,12 @@ class ErrorInfoFreshTest extends TestCase
         ];
     }
 
-    protected static function configureSqlite(): PDO
+    protected static function configureSqlite()
     {
         return new PDO('sqlite::memory:');
     }
 
-    protected static function configureMock(): PDOMock
+    protected static function configureMock()
     {
         return new PDOMock();
     }

@@ -2,7 +2,6 @@
 
 namespace Tests\Xala\Elomock;
 
-use PHPUnit\Framework\ExpectationFailedException;
 use Xala\Elomock\PDOMock;
 
 class ExecuteTest extends TestCase
@@ -47,7 +46,6 @@ class ExecuteTest extends TestCase
     {
         $pdo = new PDOMock();
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: select * from "books"');
 
         $pdo->exec('select * from "books"');
@@ -61,7 +59,6 @@ class ExecuteTest extends TestCase
         $pdo = new PDOMock();
         $pdo->expect('select * from "categories"');
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Unexpected query: select * from "books"');
 
         $pdo->exec('select * from "books"');
@@ -75,7 +72,6 @@ class ExecuteTest extends TestCase
         $pdo = new PDOMock();
         $pdo->expect('select * from "books"');
 
-        $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Some expectations were not fulfilled.');
 
         $pdo->assertExpectationsFulfilled();
