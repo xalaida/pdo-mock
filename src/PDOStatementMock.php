@@ -361,7 +361,7 @@ class PDOStatementMock extends PDOStatement
             } else {
                 $result[$key] = is_numeric($value)
                     ? ($value + 0)
-                    : (string) $value;
+                    : $value;
             }
         }
 
@@ -375,6 +375,16 @@ class PDOStatementMock extends PDOStatement
 
             foreach ($row as $key => $value) {
                 $result[$key] = $value === '' ? null : $value;
+            }
+
+            return $result;
+        }
+
+        if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_TO_STRING) {
+            $result = [];
+
+            foreach ($row as $key => $value) {
+                $result[$key] = $value === null ? '' : $value;
             }
 
             return $result;

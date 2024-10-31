@@ -82,11 +82,11 @@ class FetchOracleNullsTest extends TestCase
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
-        static::assertNull($row['title']);
+        static::assertSame('', $row['title']);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
-        static::assertNull($row['title']);
+        static::assertSame('', $row['title']);
 
         static::assertFalse(
             $statement->fetch()
