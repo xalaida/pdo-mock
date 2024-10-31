@@ -15,7 +15,6 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
      */
     public function itShouldThrowValueExceptionWhenInvalidColumnIndex($pdo)
     {
-        // TODO: it throws even with silent mode in php >= 8 but not in < 8
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
 
         $statement = $pdo->prepare('select "title" from "books"');
