@@ -137,13 +137,10 @@ class PDOMock extends PDO
 
         $expectation = $this->expectationValidator->getExpectationForQuery($statement);
 
-        if ($expectation->query !== $statement) {
-            throw new RuntimeException('Unexpected query: ' . $statement);
-        }
-
-        if ($expectation->prepared === true) {
-            throw new RuntimeException('Statement is not prepared');
-        }
+        $this->expectationValidator->verifyStatement($expectation, [
+            'query' => $statement,
+            'prepared' => false,
+        ]);
 
         if ($expectation->exceptionOnExecute) {
             return $this->getResultFromException($expectation->exceptionOnExecute, 'PDO::exec()');
@@ -297,7 +294,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        $this->assertFunctionIsExpected('PDO::beginTransaction()');
+        $this->expectationValidator->assertFunctionIsExpected('PDO::beginTransaction()');
 
         return true;
     }
@@ -319,7 +316,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        $this->assertFunctionIsExpected('PDO::commit()');
+        $this->expectationValidator->assertFunctionIsExpected('PDO::commit()');
 
         return true;
     }
@@ -341,7 +338,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        $this->assertFunctionIsExpected('PDO::rollback()');
+        $this->expectationValidator->assertFunctionIsExpected('PDO::rollback()');
 
         return true;
     }
@@ -393,18 +390,5 @@ class PDOMock extends PDO
     public function assertExpectationsFulfilled()
     {
         $this->expectationValidator->assertExpectationsFulfilled();
-    }
-
-    /**
-     * @param string $function
-     * @return void
-     */
-    protected function assertFunctionIsExpected($function)
-    {
-        $expectation = $this->expectationValidator->getExpectationForFunction($function);
-
-        if ($expectation->query !== $function) {
-            throw new \RuntimeException('Unexpected function: ' . $function);
-        }
     }
 }

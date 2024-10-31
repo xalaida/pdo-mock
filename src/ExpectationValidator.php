@@ -59,16 +59,43 @@ class ExpectationValidator
         return array_shift($this->expectations);
     }
 
-    public function validateQuery($expectation, $reality)
+    public function verifyStatement($expectation, $statement)
     {
-        if ($expectation !== $reality) {
-            throw new RuntimeException('Unexpected query: ' . $reality);
+        $this->validateQuery($expectation, $statement);
+        $this->validatePrepared($expectation, $statement);
+    }
+
+    public function validateQuery($expectation, $statement)
+    {
+        $this->assertionManager->increment();
+
+        if ($expectation->query !== $statement['query']) {
+            throw new RuntimeException('Unexpected query: ' . $statement['query']);
         }
     }
 
-    public function validateParams()
+    public function validatePrepared($expectation, $statement)
     {
+        $this->assertionManager->increment();
 
+        if ($expectation->prepared === true && $statement['prepared'] === false) {
+            throw new RuntimeException('Statement is not prepared');
+        }
+
+        if ($expectation->prepared === false && $statement['prepared'] === true) {
+            throw new RuntimeException('Statement should not be prepared');
+        }
+    }
+
+    public function assertFunctionIsExpected($function)
+    {
+        $expectation = $this->getExpectationForFunction($function);
+
+        $this->assertionManager->increment();
+
+        if ($expectation->query !== $function) {
+            throw new \RuntimeException('Unexpected function: ' . $function);
+        }
     }
 
     /**
