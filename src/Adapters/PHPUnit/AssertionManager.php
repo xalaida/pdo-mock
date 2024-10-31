@@ -17,7 +17,7 @@ class AssertionManager implements AssertionManagerInterface
         $this->phpunit = $phpunit;
     }
 
-    public function incrementAssertions($count = 1)
+    public function increment($count = 1)
     {
         $this->phpunit->addToAssertionCount($count);
     }

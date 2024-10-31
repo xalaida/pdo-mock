@@ -412,7 +412,7 @@ class PDOMock extends PDO
     public function assertExpectationsFulfilled()
     {
         if ($this->assertionManager) {
-            $this->assertionManager->incrementAssertions();
+            $this->assertionManager->increment();
         }
 
         if (! empty($this->expectations)) {
