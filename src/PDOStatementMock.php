@@ -297,19 +297,19 @@ class PDOStatementMock extends PDOStatement
             $mode = $this->fetchMode;
         }
 
+        $row = false;
+
         if ($this->executed && isset($this->expectation->resultSet->rows[$this->cursor])) {
-            $row = $this->applyFetchMode(
+            $row = $this->applyFetchTransformations(
+                $this->expectation->resultSet->rows[$this->cursor],
                 $this->expectation->resultSet->cols,
-                $this->applyStringifyFetch($this->expectation->resultSet->rows[$this->cursor]),
                 $mode
             );
 
             $this->cursor++;
-
-            return $row;
         }
 
-        return false;
+        return $row;
     }
 
     #[\ReturnTypeWillChange]
@@ -329,16 +329,27 @@ class PDOStatementMock extends PDOStatement
             }
         }
 
-        if (! $this->executed) {
-            return [];
+        $allRows = [];
+
+        if ($this->executed) {
+            foreach ($this->expectation->resultSet->rows as $row) {
+                $allRows[] = $this->applyFetchTransformations($row, $this->expectation->resultSet->cols, $mode);
+            }
         }
 
-        return array_map(function ($row) use ($mode) {
-            return $this->applyFetchMode($this->expectation->resultSet->cols, $this->applyStringifyFetch($row), $mode);
-        }, $this->expectation->resultSet->rows);
+        return $allRows;
     }
 
-    protected function applyStringifyFetch($row)
+    protected function applyFetchTransformations($row, $cols, $mode)
+    {
+        return $this->applyFetchMode(
+            $this->applyFetchCase($cols),
+            $this->applyFetchStringify($row),
+            $mode
+        );
+    }
+
+    protected function applyFetchStringify($row)
     {
         $result = [];
 
@@ -350,6 +361,25 @@ class PDOStatementMock extends PDOStatement
                     ? ($value + 0)
                     : (string) $value;
             }
+        }
+
+        return $result;
+    }
+
+    protected function applyFetchCase($cols)
+    {
+        $result = [];
+
+        if ($this->pdo->getAttribute(PDO::ATTR_CASE) === PDO::CASE_UPPER) {
+            foreach ($cols as $col) {
+                $result[$col] = strtoupper($col);
+            }
+        } else if ($this->pdo->getAttribute(PDO::ATTR_CASE) === PDO::CASE_LOWER) {
+            foreach ($cols as $col) {
+                $result[$col] = strtolower($col);
+            }
+        } else {
+            $result = $cols;
         }
 
         return $result;
