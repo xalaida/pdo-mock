@@ -25,7 +25,11 @@ class GetAttributeTest extends TestCase
      */
     public function itShouldReturnStringifyFetchesAttribute($pdo)
     {
-        static::assertSame(false, $pdo->getAttribute($pdo::ATTR_STRINGIFY_FETCHES));
+        if (PHP_VERSION_ID < 82000) {
+            $this->markTestSkipped('PHP internal bug');
+        } else {
+            static::assertSame(false, $pdo->getAttribute($pdo::ATTR_STRINGIFY_FETCHES));
+        }
     }
 
     public static function contracts()
