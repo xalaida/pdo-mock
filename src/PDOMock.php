@@ -61,6 +61,7 @@ class PDOMock extends PDO
                 : PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
             PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80000,
+            PDO::ATTR_EMULATE_PREPARES => false,
         ] + $attributes;
     }
 
