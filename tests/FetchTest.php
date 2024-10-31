@@ -36,9 +36,9 @@ class FetchTest extends TestCase
         static::assertIsArrayType($row);
         static::assertEquals([0 => 2, 'id' => 2, 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
-        $row = $statement->fetch();
-
-        static::assertFalse($row);
+        static::assertFalse(
+            $statement->fetch()
+        );
     }
 
     /**

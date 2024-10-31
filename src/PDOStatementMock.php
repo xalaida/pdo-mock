@@ -344,7 +344,9 @@ class PDOStatementMock extends PDOStatement
     {
         return $this->applyFetchMode(
             $this->applyFetchCase($cols),
-            $this->applyFetchStringify($row),
+            $this->applyFetchOracleNull(
+                $this->applyFetchStringify($row)
+            ),
             $mode
         );
     }
@@ -364,6 +366,21 @@ class PDOStatementMock extends PDOStatement
         }
 
         return $result;
+    }
+
+    protected function applyFetchOracleNull($row)
+    {
+        if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING) {
+            $result = [];
+
+            foreach ($row as $key => $value) {
+                $result[$key] = $value === '' ? null : $value;
+            }
+
+            return $result;
+        }
+
+        return $row;
     }
 
     protected function applyFetchCase($cols)

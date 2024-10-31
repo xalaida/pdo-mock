@@ -31,9 +31,9 @@ class FetchCaseTest extends TestCase
 
         static::assertEquals((object) ['Id' => 2, 'Title' => 'Shadows of the Forgotten Ancestors'], $row);
 
-        $row = $statement->fetch();
-
-        static::assertFalse($row);
+        static::assertFalse(
+            $statement->fetch()
+        );
     }
 
     /**
@@ -59,9 +59,9 @@ class FetchCaseTest extends TestCase
 
         static::assertEquals((object) ['ID' => 2, 'TITLE' => 'Shadows of the Forgotten Ancestors'], $row);
 
-        $row = $statement->fetch();
-
-        static::assertFalse($row);
+        static::assertFalse(
+            $statement->fetch()
+        );
     }
 
     /**
@@ -87,9 +87,9 @@ class FetchCaseTest extends TestCase
 
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
-        $row = $statement->fetch();
-
-        static::assertFalse($row);
+        static::assertFalse(
+            $statement->fetch()
+        );
     }
 
     public static function contracts()
