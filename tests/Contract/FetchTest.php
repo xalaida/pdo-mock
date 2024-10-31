@@ -186,39 +186,42 @@ class FetchTest extends TestCase
         static::assertFalse($row);
     }
 
-// TODO: enable test on php 8 and more
-//    /**
-//     * @test
-//     * @dataProvider contracts
-//     * @param PDO $pdo
-//     */
-//    public function itShouldUseFetchAsIterator($pdo)
-//    {
-//        $statement = $pdo->prepare('select * from "books"');
-//
-//        $statement->setFetchMode($pdo::FETCH_OBJ);
-//
-//        $result = $statement->execute();
-//
-//        static::assertTrue($result);
-//
-//        $iterator = $statement->getIterator();
-//
-//        static::assertInstanceOf(Iterator::class, $iterator);
-//
-//        static::assertEquals(0, $iterator->key());
-//        static::assertEquals((object) ['id' => '1', 'title' => 'Kaidash’s Family'], $iterator->current());
-//
-//        $iterator->next();
-//
-//        static::assertEquals(1, $iterator->key());
-//        static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $iterator->current());
-//
-//        $iterator->next();
-//
-//        static::assertNull($iterator->current());
-//        static::assertFalse($iterator->valid());
-//    }
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     */
+    public function itShouldUseFetchAsIterator($pdo)
+    {
+        if (PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped('PDOStatement::getIterator() is available only on PHP >= 8.0');
+        }
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        $statement->setFetchMode($pdo::FETCH_OBJ);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+
+        $iterator = $statement->getIterator();
+
+        static::assertInstanceOf(\Iterator::class, $iterator);
+
+        static::assertEquals(0, $iterator->key());
+        static::assertEquals((object) ['id' => '1', 'title' => 'Kaidash’s Family'], $iterator->current());
+
+        $iterator->next();
+
+        static::assertEquals(1, $iterator->key());
+        static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $iterator->current());
+
+        $iterator->next();
+
+        static::assertNull($iterator->current());
+        static::assertFalse($iterator->valid());
+    }
 
     public static function contracts()
     {
