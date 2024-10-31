@@ -26,7 +26,7 @@ class GetAttributeTest extends TestCase
     public function itShouldReturnStringifyFetchesAttribute($pdo)
     {
         if (PHP_VERSION_ID < 82000) {
-            $this->markTestSkipped('PHP internal bug');
+            $this->markTestSkipped('PHP internal bug: https://github.com/php/php-src/issues/12969');
         } else {
             static::assertSame(false, $pdo->getAttribute($pdo::ATTR_STRINGIFY_FETCHES));
         }
