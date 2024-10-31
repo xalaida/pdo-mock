@@ -282,7 +282,11 @@ class PDOStatementMock extends PDOStatement
         }
 
         if ($this->executed && isset($this->expectation->resultSet->rows[$this->cursor])) {
-            $row = $this->applyFetchMode($this->expectation->resultSet->cols, $this->expectation->resultSet->rows[$this->cursor], $mode);
+            $row = $this->applyFetchMode(
+                $this->expectation->resultSet->cols,
+                $this->normalizeFetchRow($this->expectation->resultSet->rows[$this->cursor]),
+                $mode
+            );
 
             $this->cursor++;
 
@@ -312,8 +316,25 @@ class PDOStatementMock extends PDOStatement
         }
 
         return array_map(function ($row) use ($mode) {
-            return $this->applyFetchMode($this->expectation->resultSet->cols, $row, $mode);
+            return $this->applyFetchMode($this->expectation->resultSet->cols, $this->normalizeFetchRow($row), $mode);
         }, $this->expectation->resultSet->rows);
+    }
+
+    protected function normalizeFetchRow($row)
+    {
+        $normalized = [];
+
+        foreach ($row as $key => $value) {
+            if ($this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES)) {
+                $normalized[$key] = (string) $value;
+            } else {
+                $normalized[$key] = is_numeric($value)
+                    ? ($value + 0)
+                    : (string) $value;
+            }
+        }
+
+        return $normalized;
     }
 
     /**

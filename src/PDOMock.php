@@ -10,6 +10,11 @@ use RuntimeException;
 class PDOMock extends PDO
 {
     /**
+     * @var AssertionManager|null
+     */
+    public $assertionManager;
+
+    /**
      * @var array<int, Expectation>
      */
     public $expectations = [];
@@ -51,8 +56,18 @@ class PDOMock extends PDO
     {
         $this->attributes = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_STRINGIFY_FETCHES => false,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
         ] + $attributes;
+    }
+
+    /**
+     * @param AssertionManager|null $assertionManager
+     * @return void
+     */
+    public function setAssertionManager($assertionManager = null)
+    {
+        $this->assertionManager = $assertionManager;
     }
 
     /**
@@ -377,6 +392,10 @@ class PDOMock extends PDO
      */
     public function assertExpectationsFulfilled()
     {
+        if ($this->assertionManager) {
+            $this->assertionManager->incrementAssertions();
+        }
+
         if (! empty($this->expectations)) {
             throw new RuntimeException('Some expectations were not fulfilled.');
         }
