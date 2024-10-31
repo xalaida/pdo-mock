@@ -2,6 +2,7 @@
 
 namespace Tests\Xalaida\PDOMock;
 
+use Xalaida\PDOMock\Adapters\PHPUnit\AssertionManager;
 use Xalaida\PDOMock\PDOMock;
 
 class TransactionTest extends TestCase
@@ -39,7 +40,7 @@ class TransactionTest extends TestCase
      */
     public function itShouldRollbackTransaction()
     {
-        $pdo = new PDOMock();
+        $pdo = $this->getPDOMock();
         $pdo->expectBeginTransaction();
         $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
         $pdo->expectRollback();
@@ -72,7 +73,7 @@ class TransactionTest extends TestCase
      */
     public function itShouldExpectTransactionUsingCallableSyntax()
     {
-        $pdo = new PDOMock();
+        $pdo = $this->getPDOMock();
         $pdo->expectTransaction(function () use ($pdo) {
             $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
             $pdo->expect('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors")');
@@ -111,7 +112,7 @@ class TransactionTest extends TestCase
      */
     public function itShouldIgnoreTransactionsWhenModeIsEnabled()
     {
-        $pdo = new PDOMock();
+        $pdo = new PDOMock(new AssertionManager($this));
         $pdo->ignoreTransactions();
         $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
 
