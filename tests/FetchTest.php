@@ -63,6 +63,7 @@ class FetchTest extends TestCase
     public function itShouldHandleFetchInAssocMode()
     {
         $pdo = new PDOMock();
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
@@ -98,6 +99,7 @@ class FetchTest extends TestCase
     public function itShouldHandleFetchInNumMode()
     {
         $pdo = new PDOMock();
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()

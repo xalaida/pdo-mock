@@ -56,7 +56,9 @@ class PDOMock extends PDO
     {
         $this->attributes = [
             PDO::ATTR_DRIVER_NAME => $dsn,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PHP_VERSION_ID < 80000
+                ? PDO::ERRMODE_SILENT
+                : PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
             PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80000,
         ] + $attributes;

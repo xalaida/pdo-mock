@@ -163,6 +163,7 @@ class FetchAllTest extends TestCase
     public function itShouldHandleFetchOne()
     {
         $pdo = new PDOMock();
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
@@ -190,6 +191,7 @@ class FetchAllTest extends TestCase
     public function itShouldHandleFetchUsingResultSetInstance()
     {
         $pdo = new PDOMock();
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()

@@ -15,7 +15,11 @@ class GetAttributeTest extends TestCase
      */
     public function itShouldReturnErrorModeAttribute($pdo)
     {
-        static::assertSame($pdo::ERRMODE_EXCEPTION, $pdo->getAttribute($pdo::ATTR_ERRMODE));
+        if (PHP_VERSION_ID < 80000) {
+            static::assertSame($pdo::ERRMODE_SILENT, $pdo->getAttribute($pdo::ATTR_ERRMODE));
+        } else {
+            static::assertSame($pdo::ERRMODE_EXCEPTION, $pdo->getAttribute($pdo::ATTR_ERRMODE));
+        }
     }
 
     /**
@@ -25,7 +29,7 @@ class GetAttributeTest extends TestCase
      */
     public function itShouldReturnStringifyFetchesAttribute($pdo)
     {
-        if (PHP_VERSION_ID < 82000) {
+        if (PHP_VERSION_ID < 80200) {
             $this->markTestSkipped('PHP internal bug: https://github.com/php/php-src/issues/12969');
         } else {
             static::assertSame(false, $pdo->getAttribute($pdo::ATTR_STRINGIFY_FETCHES));

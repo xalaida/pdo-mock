@@ -14,6 +14,8 @@ class FailedQueryTest extends TestCase
     public function itShouldFailWithQueryException()
     {
         $pdo = new PDOMock();
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
+
         $pdo->expect('insert into "books" ("id", "title") values (1, null)')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(
                 'Query exception',
@@ -47,6 +49,7 @@ class FailedQueryTest extends TestCase
     public function itShouldFailUsingCustomErrorException()
     {
         $pdo = new PDOMock();
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
 
         $pdo->expect('select table "books"')
             ->andFailOnExecute(new PDOException('Invalid SQL'));
