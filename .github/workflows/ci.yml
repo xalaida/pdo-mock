@@ -65,4 +65,4 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run PHPUnit
-      run: composer run phpunit
+      run: vendor/bin/phpunit -c ${{ matrix.phpunit-config }}
