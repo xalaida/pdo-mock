@@ -209,7 +209,9 @@ class GetAttributeTest extends TestCase
     public function itShouldReturnAttributeStringifyFetches($pdo)
     {
         if (PHP_VERSION_ID < 80200) {
-            $this->markTestSkipped('PHP internal bug: https://github.com/php/php-src/issues/12969');
+            $this->expectExceptionMessage('SQLSTATE[IM001]: Driver does not support this function: driver does not support that attribute');
+
+            $pdo->getAttribute($pdo::ATTR_STRINGIFY_FETCHES);
         } else {
             static::assertSame(false, $pdo->getAttribute($pdo::ATTR_STRINGIFY_FETCHES));
         }

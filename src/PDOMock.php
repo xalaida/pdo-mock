@@ -64,9 +64,13 @@ class PDOMock extends PDO
             PDO::ATTR_CASE => PDO::CASE_NATURAL,
             PDO::ATTR_ORACLE_NULLS => 0,
             PDO::ATTR_PERSISTENT => false,
-            PDO::ATTR_STATEMENT_CLASS => [PDOStatement::class],
+            PDO::ATTR_STATEMENT_CLASS => [
+                PDOStatement::class
+            ],
             PDO::ATTR_DRIVER_NAME => $dsn,
-            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80000, // TODO: rework this to throw according to original
+            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80200
+                ? null
+                : false,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
         ] + $attributes;
     }

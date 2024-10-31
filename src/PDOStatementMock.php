@@ -360,7 +360,7 @@ class PDOStatementMock extends PDOStatement
      */
     protected function shouldStringifyFetch()
     {
-        if (PHP_VERSION_ID < 80100 && $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+        if (PHP_VERSION_ID < 80200 && $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             return true;
         }
 
