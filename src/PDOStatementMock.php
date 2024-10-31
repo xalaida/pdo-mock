@@ -163,48 +163,15 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function execute($params = null)
     {
-        $this->clearErrorInfo();
+        $params = $params !== null
+            ? $this->prepareParams($params)
+            : $this->params;
+
+        $this->pdo->expectationValidator->assertQueryMatch($this->expectation->query, $this->query);
+        $this->pdo->expectationValidator->assertParamsEqual($this->expectation->params, $params);
+        $this->pdo->expectationValidator->assertPreparedMatch($this->expectation->prepared, true);
 
         $this->expectation->statement = $this;
-
-        if (! is_null($params)) {
-            $boundParams = [];
-
-            foreach ($params as $key => $value) {
-                $param = is_int($key)
-                    ? $key + 1
-                    : $key;
-
-                $boundParams[$param] = [
-                    'value' => $value,
-                    'type' => PDO::PARAM_STR,
-                ];
-            }
-        } else {
-            $boundParams = $this->params;
-        }
-
-        if ($this->expectation->prepared === false) {
-            throw new RuntimeException('Statement is prepared');
-        }
-
-        if ($this->expectation->query !== $this->query) {
-            throw new RuntimeException('Unexpected query: ' . $this->query);
-        }
-
-        if (! is_null($this->expectation->params)) {
-            if (is_callable($this->expectation->params)) {
-                $result = call_user_func($this->expectation->params, $boundParams);
-
-                if ($result === false) {
-                    throw new RuntimeException('Params do not match');
-                }
-            } else {
-                if ($this->expectation->params != $boundParams) {
-                    throw new RuntimeException('Params do not match');
-                }
-            }
-        }
 
         $this->executed = true;
 
@@ -212,11 +179,35 @@ class PDOStatementMock extends PDOStatement
             return $this->getResultFromException($this->expectation->exceptionOnExecute, 'PDOStatement::execute()');
         }
 
+        $this->clearErrorInfo();
+
         if (! is_null($this->expectation->insertId)) {
             $this->pdo->lastInsertId = $this->expectation->insertId;
         }
 
         return true;
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     */
+    protected function prepareParams(array $params)
+    {
+        $result = [];
+
+        foreach ($params as $key => $value) {
+            $param = is_int($key)
+                ? $key + 1
+                : $key;
+
+            $result[$param] = [
+                'value' => $value,
+                'type' => PDO::PARAM_STR,
+            ];
+        }
+
+        return $result;
     }
 
     protected function clearErrorInfo()

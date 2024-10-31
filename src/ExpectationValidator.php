@@ -61,28 +61,63 @@ class ExpectationValidator
 
     public function verifyStatement($expectation, $statement)
     {
-        $this->validateQuery($expectation, $statement);
+        $this->assertQueryEquals($expectation, $statement);
+        $this->validateParams($expectation, $statement);
         $this->validatePrepared($expectation, $statement);
     }
 
-    public function validateQuery($expectation, $statement)
+    public function assertQueryMatch($expectation, $reality)
     {
         $this->assertionManager->increment();
 
-        if ($expectation->query !== $statement['query']) {
-            throw new RuntimeException('Unexpected query: ' . $statement['query']);
+        if ($expectation !== $reality) {
+            throw new RuntimeException('Unexpected query: ' . $reality);
         }
     }
 
-    public function validatePrepared($expectation, $statement)
+    public function assertParamsEqual($expectation, $reality)
     {
         $this->assertionManager->increment();
 
-        if ($expectation->prepared === true && $statement['prepared'] === false) {
+        if (! is_null($expectation)) {
+            if (is_callable($expectation)) {
+                $result = call_user_func($expectation, $reality);
+
+                if ($result === false) {
+                    throw new RuntimeException('Params do not match');
+                }
+            } else {
+                if ($expectation != $reality) {
+                    throw new RuntimeException('Params do not match');
+                }
+            }
+        }
+    }
+
+    public function assertPreparedMatch($expectation, $reality)
+    {
+        if ($expectation !== null) {
+            $this->assertionManager->increment();
+        }
+
+        if ($expectation === true && $reality === false) {
             throw new RuntimeException('Statement is not prepared');
         }
 
-        if ($expectation->prepared === false && $statement['prepared'] === true) {
+        if ($expectation === false && $reality === true) {
+            throw new RuntimeException('Statement should not be prepared');
+        }
+    }
+
+    public function assertIsNotPrepared($expectation, $reality)
+    {
+        $this->assertionManager->increment();
+
+        if ($expectation === true && $reality === false) {
+            throw new RuntimeException('Statement is not prepared');
+        }
+
+        if ($expectation === false && $reality === true) {
             throw new RuntimeException('Statement should not be prepared');
         }
     }

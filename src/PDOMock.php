@@ -133,18 +133,16 @@ class PDOMock extends PDO
     #[\Override]
     public function exec($statement)
     {
-        $this->clearErrorInfo();
-
         $expectation = $this->expectationValidator->getExpectationForQuery($statement);
 
-        $this->expectationValidator->verifyStatement($expectation, [
-            'query' => $statement,
-            'prepared' => false,
-        ]);
+        $this->expectationValidator->assertQueryMatch($expectation->query, $statement);
+        $this->expectationValidator->assertPreparedMatch($expectation->prepared, false);
 
         if ($expectation->exceptionOnExecute) {
             return $this->getResultFromException($expectation->exceptionOnExecute, 'PDO::exec()');
         }
+
+        $this->clearErrorInfo();
 
         if (! is_null($expectation->insertId)) {
             $this->lastInsertId = $expectation->insertId;
@@ -166,13 +164,13 @@ class PDOMock extends PDO
     #[\Override]
     public function prepare($query, $options = [])
     {
-        $this->clearErrorInfo();
-
         $expectation = $this->expectationValidator->getExpectationForQuery($query);
 
         if ($expectation->exceptionOnPrepare) {
             return $this->getResultFromException($expectation->exceptionOnPrepare, 'PDO::prepare()');
         }
+
+        $this->clearErrorInfo();
 
         $statement = new PDOStatementMock($this, $expectation, $query);
 
