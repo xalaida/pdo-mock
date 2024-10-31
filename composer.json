@@ -3,9 +3,6 @@
     "description": "Mock PDO library for PHP unit testing, allowing query expectation, parameter binding, fetch mode simulation, to test database interactions without a live connection.",
     "type": "library",
     "license": "MIT",
-    "scripts": {
-        "phpunit": "phpunit"
-    },
     "autoload": {
         "psr-4": {
             "Xalaida\\PDOMock\\": "src/"
