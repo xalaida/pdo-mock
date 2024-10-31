@@ -2,7 +2,6 @@
 
 namespace Tests\Xalaida\PDOMock;
 
-use Xalaida\PDOMock\Adapters\PHPUnit\AssertionManager;
 use Xalaida\PDOMock\PDOMock;
 
 class TransactionTest extends TestCase

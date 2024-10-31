@@ -10,11 +10,6 @@ use PDOException;
 class Expectation
 {
     /**
-     * @var PDO
-     */
-    public $pdo;
-
-    /**
      * @var PDOStatementMock|null
      */
     public $statement;
@@ -60,12 +55,10 @@ class Expectation
     public $exceptionOnPrepare;
 
     /**
-     * @param PDO $pdo
      * @param string $query
      */
-    public function __construct($pdo, $query)
+    public function __construct($query)
     {
-        $this->pdo = $pdo;
         $this->query = $query;
     }
 
@@ -283,13 +276,5 @@ class Expectation
         $this->exceptionOnPrepare = $exception;
 
         return $this;
-    }
-
-    /**
-     * @return PDO
-     */
-    public function then()
-    {
-        return $this->pdo;
     }
 }

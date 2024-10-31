@@ -3,7 +3,7 @@
 namespace Xalaida\PDOMock\Adapters\PHPUnit;
 
 use PHPUnit\Framework\TestCase;
-use Xalaida\PDOMock\AssertionManager as AssertionManagerInterface;
+use Xalaida\PDOMock\AssertionManagerInterface as AssertionManagerInterface;
 
 class AssertionManager implements AssertionManagerInterface
 {

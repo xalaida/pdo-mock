@@ -10,16 +10,6 @@ use RuntimeException;
 class PDOMock extends PDO
 {
     /**
-     * @var AssertionManager|null
-     */
-    public $assertionManager;
-
-    /**
-     * @var array<int, Expectation>
-     */
-    public $expectations = [];
-
-    /**
      * @var bool
      */
     public $ignoreTransactions = false;
@@ -50,11 +40,18 @@ class PDOMock extends PDO
     private $errorCode = null;
 
     /**
+     * @var ExpectationValidator
+     */
+    public $expectationValidator;
+
+    /**
      * @param string $dsn
      * @param array $attributes
      */
     public function __construct($dsn = 'mock', $attributes = [])
     {
+        $this->expectationValidator = new ExpectationValidator(new AssertionManager());
+
         $this->attributes = [
             PDO::ATTR_ERRMODE => PHP_VERSION_ID < 80000
                 ? PDO::ERRMODE_SILENT
@@ -75,13 +72,9 @@ class PDOMock extends PDO
         ] + $attributes;
     }
 
-    /**
-     * @param AssertionManager|null $assertionManager
-     * @return void
-     */
-    public function setAssertionManager($assertionManager = null)
+    public function setExpectationValidator($expectationValidator)
     {
-        $this->assertionManager = $assertionManager;
+        $this->expectationValidator = $expectationValidator;
     }
 
     /**
@@ -129,11 +122,7 @@ class PDOMock extends PDO
      */
     public function expect($query)
     {
-        $expectation = new Expectation($this, $query);
-
-        $this->expectations[] = $expectation;
-
-        return $expectation;
+        return $this->expectationValidator->expectQuery($query);
     }
 
     /**
@@ -146,7 +135,7 @@ class PDOMock extends PDO
     {
         $this->clearErrorInfo();
 
-        $expectation = $this->getExpectationForQuery($statement);
+        $expectation = $this->expectationValidator->getExpectationForQuery($statement);
 
         if ($expectation->query !== $statement) {
             throw new RuntimeException('Unexpected query: ' . $statement);
@@ -182,7 +171,7 @@ class PDOMock extends PDO
     {
         $this->clearErrorInfo();
 
-        $expectation = $this->getExpectationForQuery($query);
+        $expectation = $this->expectationValidator->getExpectationForQuery($query);
 
         if ($expectation->exceptionOnPrepare) {
             return $this->getResultFromException($expectation->exceptionOnPrepare, 'PDO::prepare()');
@@ -251,7 +240,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation($this, 'PDO::beginTransaction()');
+        $this->expectationValidator->expectFunction('PDO::beginTransaction()');
     }
 
     /**
@@ -263,7 +252,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation($this, 'PDO::commit()');
+        $this->expectationValidator->expectFunction('PDO::commit()');
     }
 
     /**
@@ -275,7 +264,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
         }
 
-        $this->expectations[] = new Expectation($this, 'PDO::rollback()');
+        $this->expectationValidator->expectFunction('PDO::rollback()');
     }
 
     /**
@@ -403,27 +392,7 @@ class PDOMock extends PDO
      */
     public function assertExpectationsFulfilled()
     {
-        if ($this->assertionManager) {
-            $this->assertionManager->increment();
-        }
-
-        if (! empty($this->expectations)) {
-            throw new RuntimeException('Some expectations were not fulfilled.');
-        }
-    }
-
-    /**
-     * @param string $query
-     * @return Expectation
-     * @throws \UnexpectedValueException
-     */
-    protected function getExpectationForQuery($query)
-    {
-        if (empty($this->expectations)) {
-            throw new \RuntimeException('Unexpected query: ' . $query);
-        }
-
-        return array_shift($this->expectations);
+        $this->expectationValidator->assertExpectationsFulfilled();
     }
 
     /**
@@ -432,11 +401,7 @@ class PDOMock extends PDO
      */
     protected function assertFunctionIsExpected($function)
     {
-        if (empty($this->expectations)) {
-            throw new \RuntimeException('Unexpected function: ' . $function);
-        }
-
-        $expectation = array_shift($this->expectations);
+        $expectation = $this->expectationValidator->getExpectationForFunction($function);
 
         if ($expectation->query !== $function) {
             throw new \RuntimeException('Unexpected function: ' . $function);

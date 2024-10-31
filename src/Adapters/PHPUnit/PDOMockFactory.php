@@ -12,7 +12,7 @@ class PDOMockFactory
 
         $assertionManager = new AssertionManager($phpunit);
 
-        $pdo->setAssertionManager($assertionManager);
+        $pdo->expectationValidator->assertionManager = $assertionManager;
 
         return $pdo;
     }

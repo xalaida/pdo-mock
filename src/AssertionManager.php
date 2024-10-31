@@ -2,11 +2,15 @@
 
 namespace Xalaida\PDOMock;
 
-interface AssertionManager
+class AssertionManager implements AssertionManagerInterface
 {
+    public $count = 0;
+
     /**
-     * @param int $count
-     * @return void
+     * @inheritDoc
      */
-    public function increment($count = 1);
+    public function increment($count = 1)
+    {
+        $this->count += $count;
+    }
 }
