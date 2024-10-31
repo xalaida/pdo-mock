@@ -23,11 +23,19 @@ class FetchStringifyFetchesDisabledTest extends TestCase
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
-        static::assertSame(1, $row->id);
-        static::assertSame('Kaidash’s Family', $row->title);
-        static::assertSame(2024, $row->year);
-        static::assertSame(9.99, $row->price);
-        static::assertSame(0, $row->published);
+        if (PHP_VERSION_ID < 81000) {
+            static::assertSame('1', $row->id);
+            static::assertSame('Kaidash’s Family', $row->title);
+            static::assertSame('2024', $row->year);
+            static::assertSame('9.99', $row->price);
+            static::assertSame('0', $row->published);
+        } else {
+            static::assertSame(1, $row->id);
+            static::assertSame('Kaidash’s Family', $row->title);
+            static::assertSame(2024, $row->year);
+            static::assertSame(9.99, $row->price);
+            static::assertSame(0, $row->published);
+        }
     }
 
     public static function contracts()
@@ -56,7 +64,7 @@ class FetchStringifyFetchesDisabledTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock();
+        $pdo = new PDOMock('sqlite');
 
         $pdo->expect('select * from "books"')
             ->andFetchRows([

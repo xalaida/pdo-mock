@@ -44,7 +44,7 @@ class PreparedRowCountNotExecutedTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock();
+        $pdo = new PDOMock('sqlite');
 
         $pdo->expect('delete from "books"')
             ->affecting(2);

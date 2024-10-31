@@ -86,7 +86,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock();
+        $pdo = new PDOMock('sqlite');
 
         $pdo->expect('insert into books (id, title) values (1, null)')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(

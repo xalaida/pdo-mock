@@ -39,6 +39,6 @@ class LastInsertIdFreshTest extends TestCase
 
     protected static function configureMock()
     {
-        return new PDOMock();
+        return new PDOMock('sqlite');
     }
 }

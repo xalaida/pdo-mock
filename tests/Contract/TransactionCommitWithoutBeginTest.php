@@ -44,7 +44,7 @@ class TransactionCommitWithoutBeginTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock();
+        $pdo = new PDOMock('sqlite');
 
         $pdo->expectCommit();
 

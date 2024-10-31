@@ -73,9 +73,15 @@ class FetchAllTest extends TestCase
 
         static::assertCount(2, $rows);
         static::assertIsArrayType($rows[0]);
-        static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
         static::assertIsArrayType($rows[1]);
-        static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
+
+        if (PHP_VERSION_ID < 81000) {
+            static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $rows[0]);
+            static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        } else {
+            static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
+            static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        }
     }
 
     /**
@@ -85,6 +91,8 @@ class FetchAllTest extends TestCase
      */
     public function itShouldHandleFetchAllInNumMode($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+
         $statement = $pdo->prepare('select * from "books"');
 
         $result = $statement->execute();
@@ -95,9 +103,15 @@ class FetchAllTest extends TestCase
 
         static::assertCount(2, $rows);
         static::assertIsArrayType($rows[0]);
-        static::assertSame([1, 'Kaidash’s Family'], $rows[0]);
         static::assertIsArrayType($rows[1]);
-        static::assertSame([2, 'Shadows of the Forgotten Ancestors'], $rows[1]);
+
+        if (PHP_VERSION_ID < 81000) {
+            static::assertSame(['1', 'Kaidash’s Family'], $rows[0]);
+            static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        } else {
+            static::assertSame([1, 'Kaidash’s Family'], $rows[0]);
+            static::assertSame([2, 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        }
     }
 
     /**
@@ -243,7 +257,7 @@ class FetchAllTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock();
+        $pdo = new PDOMock('sqlite');
 
         $pdo->expect('select * from "books"')
             ->andFetchRows([

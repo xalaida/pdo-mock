@@ -85,7 +85,7 @@ class PrepareParamsTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock();
+        $pdo = new PDOMock('sqlite');
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ?')
             ->toBePrepared()

@@ -68,12 +68,22 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArrayType($row);
-        static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $row);
+
+        if (PHP_VERSION_ID < 81000) {
+            static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $row);
+        } else {
+            static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $row);
+        }
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArrayType($row);
-        static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+
+        if (PHP_VERSION_ID < 81000) {
+            static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        } else {
+            static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        }
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
@@ -98,12 +108,22 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArrayType($row);
-        static::assertSame([1, 'Kaidash’s Family'], $row);
+
+        if (PHP_VERSION_ID < 81000) {
+            static::assertSame(['1', 'Kaidash’s Family'], $row);
+        } else {
+            static::assertSame([1, 'Kaidash’s Family'], $row);
+        }
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArrayType($row);
-        static::assertSame([2, 'Shadows of the Forgotten Ancestors'], $row);
+
+        if (PHP_VERSION_ID < 81000) {
+            static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $row);
+        } else {
+            static::assertSame([2, 'Shadows of the Forgotten Ancestors'], $row);
+        }
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
@@ -226,7 +246,7 @@ class FetchTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock();
+        $pdo = new PDOMock('sqlite');
 
         $pdo->expect('select * from "books"')
             ->andFetchRows([

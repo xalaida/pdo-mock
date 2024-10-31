@@ -52,12 +52,13 @@ class PDOMock extends PDO
     /**
      * @param array $attributes
      */
-    public function __construct($attributes = [])
+    public function __construct($dsn = 'mock', $attributes = [])
     {
         $this->attributes = [
+            PDO::ATTR_DRIVER_NAME => $dsn,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_STRINGIFY_FETCHES => false,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
+            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80000,
         ] + $attributes;
     }
 
