@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
     bootstrap="vendor/autoload.php"
-    executionOrder="depends,defects"
     beStrictAboutOutputDuringTests="true"
+    colors="true"
+    cacheDirectory="var/phpunit/cache"
     failOnRisky="true"
     failOnWarning="true"
-    colors="true"
+    executionOrder="depends,defects"
 >
     <testsuites>
         <testsuite name="default">
@@ -15,7 +16,7 @@
         </testsuite>
     </testsuites>
 
-    <source restrictNotices="true" restrictWarnings="true">
+    <source>
         <include>
             <directory>src</directory>
         </include>
