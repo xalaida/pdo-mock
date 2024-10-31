@@ -144,6 +144,8 @@ class PDOMock extends PDO
     #[\Override]
     public function exec($statement)
     {
+        $this->clearErrorInfo();
+
         $expectation = $this->getExpectationForQuery($statement);
 
         if ($expectation->query !== $statement) {
@@ -154,28 +156,8 @@ class PDOMock extends PDO
             throw new RuntimeException('Statement is not prepared');
         }
 
-        if ($expectation->exceptionOnExecute && $expectation->exceptionOnExecute->errorInfo) {
-            $this->errorInfo = $expectation->exceptionOnExecute->errorInfo;
-            $this->errorCode = $expectation->exceptionOnExecute->errorInfo[0];
-        } else {
-            $this->errorInfo = ['00000', null, null];
-            $this->errorCode = $this->errorInfo[0];
-        }
-
         if ($expectation->exceptionOnExecute) {
-            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
-                return false;
-            }
-
-            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
-                trigger_error('PDO::exec(): ' . $expectation->exceptionOnExecute->getMessage(), E_USER_WARNING);
-
-                return false;
-            }
-
-            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
-                throw $expectation->exceptionOnExecute;
-            }
+            return $this->getResultFromException($expectation->exceptionOnExecute, 'PDO::exec()');
         }
 
         if (! is_null($expectation->insertId)) {
@@ -198,30 +180,12 @@ class PDOMock extends PDO
     #[\Override]
     public function prepare($query, $options = [])
     {
+        $this->clearErrorInfo();
+
         $expectation = $this->getExpectationForQuery($query);
 
-        if ($expectation->exceptionOnPrepare && $expectation->exceptionOnPrepare->errorInfo) {
-            $this->errorInfo = $expectation->exceptionOnPrepare->errorInfo;
-            $this->errorCode = $expectation->exceptionOnPrepare->errorInfo[0];
-        } else {
-            $this->errorInfo = ['00000', null, null];
-            $this->errorCode = $this->errorInfo[0];
-        }
-
         if ($expectation->exceptionOnPrepare) {
-            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
-                return false;
-            }
-
-            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
-                trigger_error('PDO::prepare(): ' . $expectation->exceptionOnPrepare->getMessage(), E_USER_WARNING);
-
-                return false;
-            }
-
-            if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
-                throw $expectation->exceptionOnPrepare;
-            }
+            return $this->getResultFromException($expectation->exceptionOnPrepare, 'PDO::prepare()');
         }
 
         $statement = new PDOStatementMock($this, $expectation, $query);
@@ -231,6 +195,34 @@ class PDOMock extends PDO
         );
 
         return $statement;
+    }
+
+    protected function clearErrorInfo()
+    {
+        $this->errorInfo = ['00000', null, null];
+        $this->errorCode = $this->errorInfo[0];
+    }
+
+    protected function getResultFromException($exception, $function)
+    {
+        if ($exception->errorInfo) {
+            $this->errorInfo = $exception->errorInfo;
+            $this->errorCode = $exception->errorInfo[0];
+        }
+
+        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
+            return false;
+        }
+
+        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
+            trigger_error($function . ': ' . $exception->getMessage(), E_USER_WARNING);
+
+            return false;
+        }
+
+        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
+            throw $exception;
+        }
     }
 
     /**
