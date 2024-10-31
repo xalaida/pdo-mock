@@ -91,6 +91,7 @@ class PDOStatementMock extends PDOStatement
      * @param ...$params
      * @return void
      */
+    #[\Override]
     public function setFetchMode($mode, $className = null, ...$params)
     {
         $this->fetchMode = $mode;
@@ -162,6 +163,8 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function execute($params = null)
     {
+        $this->clearErrorInfo();
+
         $this->expectation->statement = $this;
 
         if (! is_null($params)) {
@@ -205,28 +208,8 @@ class PDOStatementMock extends PDOStatement
 
         $this->executed = true;
 
-        if ($this->expectation->exceptionOnExecute && $this->expectation->exceptionOnExecute->errorInfo) {
-            $this->errorInfo = $this->expectation->exceptionOnExecute->errorInfo;
-            $this->errorCode = $this->expectation->exceptionOnExecute->errorInfo[0];
-        } else {
-            $this->errorInfo = ['00000', null, null];
-            $this->errorCode = $this->errorInfo[0];
-        }
-
         if ($this->expectation->exceptionOnExecute) {
-            if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
-                return false;
-            }
-
-            if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
-                trigger_error('PDOStatement::execute(): ' . $this->expectation->exceptionOnExecute->getMessage(), E_USER_WARNING);
-
-                return false;
-            }
-
-            if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
-                throw $this->expectation->exceptionOnExecute;
-            }
+            return $this->getResultFromException($this->expectation->exceptionOnExecute, 'PDOStatement::execute()');
         }
 
         if (! is_null($this->expectation->insertId)) {
@@ -234,6 +217,34 @@ class PDOStatementMock extends PDOStatement
         }
 
         return true;
+    }
+
+    protected function clearErrorInfo()
+    {
+        $this->errorInfo = ['00000', null, null];
+        $this->errorCode = $this->errorInfo[0];
+    }
+
+    protected function getResultFromException($exception, $function)
+    {
+        if ($exception->errorInfo) {
+            $this->errorInfo = $exception->errorInfo;
+            $this->errorCode = $exception->errorInfo[0];
+        }
+
+        if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
+            return false;
+        }
+
+        if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
+            trigger_error($function . ': ' . $exception->getMessage(), E_USER_WARNING);
+
+            return false;
+        }
+
+        if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
+            throw $exception;
+        }
     }
 
     /**
@@ -273,9 +284,8 @@ class PDOStatementMock extends PDOStatement
     /**
      * @return Iterator
      */
-    #[PHP8] public function getIterator(): Iterator { /* DEFINITION COMPATIBLE WITH PHP >= 8
-    public function getIterator() { # DEFINITION COMPATIBLE WITH PHP < 8
-    # */
+    #[PHP8] public function getIterator(): Iterator { /*
+    public function getIterator() { # */
         if (PHP_VERSION_ID < 80000) {
             throw new RuntimeException('Method getIterator() is available only in PHP >= 8.0');
         }
@@ -314,9 +324,8 @@ class PDOStatementMock extends PDOStatement
 
     #[\ReturnTypeWillChange]
     #[\Override]
-    #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /* DEFINITION COMPATIBLE WITH PHP >= 8
-    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # DEFINITION COMPATIBLE WITH PHP < 8
-    # */
+    #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /*
+    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # */
         if ($mode === null) {
             $mode = $this->fetchMode;
         }
