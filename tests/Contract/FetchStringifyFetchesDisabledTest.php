@@ -23,7 +23,7 @@ class FetchStringifyFetchesDisabledTest extends TestCase
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
-        if (PHP_VERSION_ID < 81000) {
+        if (PHP_VERSION_ID < 80100) {
             static::assertSame('1', $row->id);
             static::assertSame('Kaidash’s Family', $row->title);
             static::assertSame('2024', $row->year);

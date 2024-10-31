@@ -69,7 +69,7 @@ class FetchTest extends TestCase
 
         static::assertIsArrayType($row);
 
-        if (PHP_VERSION_ID < 81000) {
+        if (PHP_VERSION_ID < 80100) {
             static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $row);
         } else {
             static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $row);
@@ -79,7 +79,7 @@ class FetchTest extends TestCase
 
         static::assertIsArrayType($row);
 
-        if (PHP_VERSION_ID < 81000) {
+        if (PHP_VERSION_ID < 80100) {
             static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
         } else {
             static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
@@ -109,7 +109,7 @@ class FetchTest extends TestCase
 
         static::assertIsArrayType($row);
 
-        if (PHP_VERSION_ID < 81000) {
+        if (PHP_VERSION_ID < 80100) {
             static::assertSame(['1', 'Kaidash’s Family'], $row);
         } else {
             static::assertSame([1, 'Kaidash’s Family'], $row);
@@ -119,7 +119,7 @@ class FetchTest extends TestCase
 
         static::assertIsArrayType($row);
 
-        if (PHP_VERSION_ID < 81000) {
+        if (PHP_VERSION_ID < 80100) {
             static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $row);
         } else {
             static::assertSame([2, 'Shadows of the Forgotten Ancestors'], $row);

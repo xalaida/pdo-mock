@@ -80,7 +80,7 @@ class PDOStatementMock extends PDOStatement
         $this->executed = false;
 
         // This property does not work on PHP v8.0 because it is impossible to override internally readonly property.
-        if (PHP_VERSION_ID > 81000) {
+        if (PHP_VERSION_ID > 80100) {
             $this->queryString = $query;
         }
     }
@@ -102,6 +102,8 @@ class PDOStatementMock extends PDOStatement
      * @param $type
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function bindValue($param, $value, $type = PDO::PARAM_STR)
     {
         $this->params[$param] = [
@@ -120,6 +122,8 @@ class PDOStatementMock extends PDOStatement
      * @param $driverOptions
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
     {
         $this->params[$param] = [
@@ -138,6 +142,8 @@ class PDOStatementMock extends PDOStatement
      * @param $driverOptions
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function bindColumn($column, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
     {
         $this->columns[$column] = [
@@ -152,6 +158,8 @@ class PDOStatementMock extends PDOStatement
      * @param array|null $params
      * @return bool
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function execute($params = null)
     {
         $this->expectation->statement = $this;
@@ -231,6 +239,8 @@ class PDOStatementMock extends PDOStatement
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function rowCount()
     {
         if (! $this->executed) {
@@ -243,6 +253,8 @@ class PDOStatementMock extends PDOStatement
     /**
      * @return string|null
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function errorCode()
     {
         return $this->errorCode;
@@ -251,6 +263,8 @@ class PDOStatementMock extends PDOStatement
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function errorInfo()
     {
         return $this->errorInfo;
@@ -275,6 +289,8 @@ class PDOStatementMock extends PDOStatement
      * @param $cursorOffset
      * @return array|bool|mixed|object
      */
+    #[\ReturnTypeWillChange]
+    #[\Override]
     public function fetch($mode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
         if ($mode === null) {
@@ -296,6 +312,8 @@ class PDOStatementMock extends PDOStatement
         return false;
     }
 
+    #[\ReturnTypeWillChange]
+    #[\Override]
     #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /* DEFINITION COMPATIBLE WITH PHP >= 8
     public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # DEFINITION COMPATIBLE WITH PHP < 8
     # */
@@ -342,7 +360,7 @@ class PDOStatementMock extends PDOStatement
      */
     protected function shouldStringifyFetch()
     {
-        if (PHP_VERSION_ID < 81000 && $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+        if (PHP_VERSION_ID < 80100 && $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             return true;
         }
 
