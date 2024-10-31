@@ -29,7 +29,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
 
         static::assertTrue($result);
 
-        if (PHP_VERSION_ID < 71000) {
+        if (PHP_VERSION_ID < 70100) {
             try {
                 $statement->fetch();
 
