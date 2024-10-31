@@ -9,8 +9,6 @@
     shortenArraysForExportThreshold="10"
     beStrictAboutCoverageMetadata="true"
     beStrictAboutOutputDuringTests="true"
-    displayDetailsOnPhpunitDeprecations="true"
-    failOnPhpunitDeprecation="false"
     failOnRisky="true"
     failOnWarning="true"
 >
