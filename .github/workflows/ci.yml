@@ -12,9 +12,29 @@ permissions:
 jobs:
   ci:
     strategy:
-      matrix:
-        php-versions: [ "5.6", "7.0", "7.1", "7.2", "7.3", "7.4", "8.0", "8.1", "8.2", "8.3" ]
       fail-fast: false
+      matrix:
+        include:
+          - php-version: '5.6'
+            phpunit-config: 'phpunit.dist.xml'
+          - php-version: '7.0'
+            phpunit-config: 'phpunit.dist.xml'
+          - php-version: '7.1'
+            phpunit-config: 'phpunit.dist.xml'
+          - php-version: '7.2'
+            phpunit-config: 'phpunit.dist.xml'
+          - php-version: '7.3'
+            phpunit-config: 'phpunit-9.dist.xml'
+          - php-version: '7.4'
+            phpunit-config: 'phpunit-9.dist.xml'
+          - php-version: '8.0'
+            phpunit-config: 'phpunit-9.dist.xml'
+          - php-version: '8.1'
+            phpunit-config: 'phpunit-10.dist.xml'
+          - php-version: '8.2'
+            phpunit-config: 'phpunit-11.dist.xml'
+          - php-version: '8.3'
+            phpunit-config: 'phpunit-11.dist.xml'
 
     runs-on: ubuntu-latest
 
