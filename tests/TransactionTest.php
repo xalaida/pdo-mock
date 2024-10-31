@@ -112,7 +112,7 @@ class TransactionTest extends TestCase
      */
     public function itShouldIgnoreTransactionsWhenModeIsEnabled()
     {
-        $pdo = new PDOMock(new AssertionManager($this));
+        $pdo = $this->getPDOMock();
         $pdo->ignoreTransactions();
         $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
 

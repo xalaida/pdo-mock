@@ -304,11 +304,11 @@ class PDOStatementMock extends PDOStatement
         }
 
         if ($mode === PDO::FETCH_LAZY) {
-            if (PHP_VERSION_ID >= 80000) {
+            if (PHP_VERSION_ID < 80000) {
+                throw new PDOException("SQLSTATE[HY000]: General error: PDO::FETCH_LAZY can't be used with PDOStatement::fetchAll()");
+            } else {
                 throw new ValueError('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()');
             }
-
-            throw new PDOException("SQLSTATE[HY000]: General error: PDO::FETCH_LAZY can't be used with PDOStatement::fetchAll()");
         }
 
         if (! $this->executed) {
@@ -382,12 +382,11 @@ class PDOStatementMock extends PDOStatement
                 $index = $column - 1;
 
                 if (! isset($row[$index])) {
-                    if (PHP_VERSION_ID >= 80000) {
+                    if (PHP_VERSION_ID < 80000) {
+                        throw new PDOException("SQLSTATE[HY000]: General error: Invalid column index");
+                    } else {
                         throw new ValueError('Invalid column index');
                     }
-
-                    throw new PDOException("SQLSTATE[HY000]: General error: Invalid column index");
-
                 }
             } else {
                 $index = array_search($column, $columns, true);

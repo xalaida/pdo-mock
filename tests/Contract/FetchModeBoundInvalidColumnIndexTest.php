@@ -29,29 +29,29 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
 
         static::assertTrue($result);
 
-        try {
-            $statement->fetch();
+        if (PHP_VERSION_ID < 71000) {
+            try {
+                $statement->fetch();
 
-            if (PHP_VERSION_ID >= 71000) {
-                $this->fail('Expected exception was not thrown');
-            }
-
-            static::assertSame("Kaidash’s Family", $title);
-            static::assertSame('', $status);
-        } catch (\Exception $e) {
-            // TODO: handle old versions
-            // if ($e instanceof ExpectationFailedException) {
-            //    throw $e;
-            //}
-
-            if (PHP_VERSION_ID >= 80000) {
-                static::assertInstanceOf(\ValueError::class, $e);
-                static::assertSame('Kaidash’s Family', $title);
-                static::assertSame('Invalid column index', $e->getMessage());
-            } else {
+                static::assertSame("Kaidash’s Family", $title);
+                static::assertSame('', $status);
+            } catch (\Exception $e) {
                 static::assertInstanceOf(\PDOException::class, $e);
                 static::assertSame('Kaidash’s Family', $title);
                 static::assertSame('SQLSTATE[HY000]: General error: Invalid column index', $e->getMessage());
+            }
+        } else {
+            try {
+                $statement->fetch();
+
+                $this->fail('Expected exception was not thrown');
+            } catch (\Throwable $e) {
+                static::assertSame("Kaidash’s Family", $title);
+                static::assertSame(null, $status);
+
+                static::assertInstanceOf(\ValueError::class, $e);
+                static::assertSame('Kaidash’s Family', $title);
+                static::assertSame('Invalid column index', $e->getMessage());
             }
         }
     }

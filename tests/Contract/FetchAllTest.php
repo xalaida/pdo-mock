@@ -2,7 +2,6 @@
 
 namespace Tests\Xalaida\PDOMock\Contract;
 
-use Exception;
 use PDO;
 use Tests\Xalaida\PDOMock\TestCase;
 use Xalaida\PDOMock\PDOMock;
@@ -34,17 +33,23 @@ class FetchAllTest extends TestCase
 
         $statement = $pdo->prepare('select * from "books"');
 
-        try {
-            $statement->fetchAll($pdo::FETCH_LAZY);
+        if (PHP_VERSION_ID < 80000) {
+            try {
+                $statement->fetchAll($pdo::FETCH_LAZY);
 
-            $this->fail('Expected exception is not thrown');
-        } catch (Exception $e) {
-            if (PHP_VERSION_ID >= 80000) {
-                static::assertInstanceOf(\ValueError::class, $e);
-                static::assertSame('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()', $e->getMessage());
-            } else {
+                $this->fail('Expected exception is not thrown');
+            } catch (\Exception $e) {
                 static::assertInstanceOf(\PDOException::class, $e);
                 static::assertSame("SQLSTATE[HY000]: General error: PDO::FETCH_LAZY can't be used with PDOStatement::fetchAll()", $e->getMessage());
+            }
+        } else {
+            try {
+                $statement->fetchAll($pdo::FETCH_LAZY);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\Throwable $e) {
+                static::assertInstanceOf(\ValueError::class, $e);
+                static::assertSame('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()', $e->getMessage());
             }
         }
     }
