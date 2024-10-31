@@ -57,6 +57,8 @@ class FetchTest extends TestCase
      */
     public function itShouldHandleFetchInAssocMode($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+
         $statement = $pdo->prepare('select * from "books"');
 
         $result = $statement->execute();
@@ -66,12 +68,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArrayType($row);
-        static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $row);
+        static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArrayType($row);
-        static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
@@ -85,6 +87,8 @@ class FetchTest extends TestCase
      */
     public function itShouldHandleFetchInNumMode($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+
         $statement = $pdo->prepare('select * from "books"');
 
         $result = $statement->execute();
@@ -94,12 +98,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArrayType($row);
-        static::assertSame(['1', 'Kaidash’s Family'], $row);
+        static::assertSame([1, 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArrayType($row);
-        static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $row);
+        static::assertSame([2, 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
@@ -122,12 +126,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
         static::assertIsArrayType($row);
-        static::assertEquals([0 => '1', 'id' => '1', 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
+        static::assertEquals([0 => 1, 'id' => 1, 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
         static::assertIsArrayType($row);
-        static::assertEquals([0 => '2', 'id' => '2', 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        static::assertEquals([0 => 2, 'id' => 2, 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_BOTH);
 
@@ -150,12 +154,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
         static::assertIsObjectType($row);
-        static::assertEquals((object) ['id' => '1', 'title' => 'Kaidash’s Family'], $row);
+        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
         static::assertIsObjectType($row);
-        static::assertEquals((object) ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
+        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_OBJ);
 
@@ -226,8 +230,8 @@ class FetchTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->andFetchRows([
-                ['id' => '1', 'title' => 'Kaidash’s Family'],
-                ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'],
+                ['id' => 1, 'title' => 'Kaidash’s Family'],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
         return $pdo;

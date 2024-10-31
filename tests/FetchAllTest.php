@@ -43,12 +43,13 @@ class FetchAllTest extends TestCase
     public function itShouldHandleFetchAllInAssocMode()
     {
         $pdo = new PDOMock();
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
             ->andFetchRows([
-                ['id' => '1', 'title' => 'Kaidash’s Family'],
-                ['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'],
+                ['id' => 1, 'title' => 'Kaidash’s Family'],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
 
         $statement = $pdo->prepare('select * from "books"');
@@ -61,9 +62,9 @@ class FetchAllTest extends TestCase
 
         static::assertCount(2, $rows);
         static::assertIsArrayType($rows[0]);
-        static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $rows[0]);
+        static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
         static::assertIsArrayType($rows[1]);
-        static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
     /**
