@@ -50,18 +50,24 @@ class PDOMock extends PDO
     private $errorCode = null;
 
     /**
+     * @param string $dsn
      * @param array $attributes
      */
     public function __construct($dsn = 'mock', $attributes = [])
     {
         $this->attributes = [
-            PDO::ATTR_DRIVER_NAME => $dsn,
             PDO::ATTR_ERRMODE => PHP_VERSION_ID < 80000
                 ? PDO::ERRMODE_SILENT
                 : PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_SERVER_VERSION => '1.0.0',
+            PDO::ATTR_CLIENT_VERSION => '1.0.0',
+            PDO::ATTR_CASE => PDO::CASE_NATURAL,
+            PDO::ATTR_ORACLE_NULLS => 0,
+            PDO::ATTR_PERSISTENT => false,
+            PDO::ATTR_STATEMENT_CLASS => [PDOStatement::class],
+            PDO::ATTR_DRIVER_NAME => $dsn,
+            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80000, // TODO: rework this to throw according to original
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
-            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80000,
-            PDO::ATTR_EMULATE_PREPARES => false,
         ] + $attributes;
     }
 
@@ -91,11 +97,16 @@ class PDOMock extends PDO
     /**
      * @param $attribute
      * @return mixed
+     * @throws PDOException
      */
     #[\ReturnTypeWillChange]
     #[\Override]
     public function getAttribute($attribute)
     {
+        if (! isset($this->attributes[$attribute])) {
+            throw new PDOException('SQLSTATE[IM001]: Driver does not support this function: driver does not support that attribute');
+        }
+
         return $this->attributes[$attribute];
     }
 
