@@ -187,7 +187,7 @@ class PDOStatementMock extends PDOStatement
             : $this->params;
 
         $this->pdo->expectationValidator->assertQueryMatch($this->expectation->query, $this->query);
-        $this->pdo->expectationValidator->assertParamsEqual($this->expectation->params, $params);
+        $this->pdo->expectationValidator->assertParamsMatch($this->expectation->params, $params);
         $this->pdo->expectationValidator->assertPreparedMatch($this->expectation->prepared, true);
 
         $this->expectation->statement = $this;
@@ -540,6 +540,31 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
+     * @param int $type
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function applyParamType($type, $value)
+    {
+        switch ($type) {
+            case PDO::PARAM_NULL:
+                return null;
+
+            case PDO::PARAM_INT:
+                return (int) $value;
+
+            case PDO::PARAM_STR:
+                return (string) $value;
+
+            case PDO::PARAM_BOOL:
+                return (bool) $value;
+
+            default:
+                throw new InvalidArgumentException('Unsupported column type: ' . $type);
+        }
+    }
+
+    /**
      * @param array $cols
      * @param array $row
      * @return object
@@ -570,30 +595,5 @@ class PDOStatementMock extends PDOStatement
         }
 
         return $classInstance;
-    }
-
-    /**
-     * @param int $type
-     * @param mixed $value
-     * @return mixed
-     */
-    protected function applyParamType($type, $value)
-    {
-        switch ($type) {
-            case PDO::PARAM_NULL:
-                return null;
-
-            case PDO::PARAM_INT:
-                return (int) $value;
-
-            case PDO::PARAM_STR:
-                return (string) $value;
-
-            case PDO::PARAM_BOOL:
-                return (bool) $value;
-
-            default:
-                throw new InvalidArgumentException('Unsupported column type: ' . $type);
-        }
     }
 }

@@ -76,7 +76,7 @@ class ExpectationValidator
         }
     }
 
-    public function assertParamsEqual($expectation, $reality)
+    public function assertParamsMatch($expectation, $reality)
     {
         $this->runCallbacks();
 
