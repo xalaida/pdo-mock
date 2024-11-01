@@ -50,7 +50,7 @@ class PDOMock extends PDO
      */
     public function __construct($dsn = 'mock', $attributes = [])
     {
-        $this->expectationValidator = new ExpectationValidator(new AssertionManager());
+        $this->expectationValidator = new ExpectationValidator();
         $this->attributes = [
             PDO::ATTR_ERRMODE => PHP_VERSION_ID < 80000
                 ? PDO::ERRMODE_SILENT

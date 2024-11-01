@@ -8,14 +8,24 @@ class ExpectationValidator
 {
     public $expectations = [];
 
-    /**
-     * @var AssertionManagerInterface
-     */
-    public $assertionManager;
+    public $callbacks = [];
 
-    public function __construct($assertionManager)
+    /**
+     * @return void
+     */
+    public function useCallback($callback)
     {
-        $this->assertionManager = $assertionManager;
+        $this->callbacks[] = $callback;
+    }
+
+    /**
+     * @return void
+     */
+    protected function runCallbacks()
+    {
+        foreach ($this->callbacks as $callback) {
+            $callback();
+        }
     }
 
     public function expectQuery($query)
@@ -59,16 +69,9 @@ class ExpectationValidator
         return array_shift($this->expectations);
     }
 
-    public function verifyStatement($expectation, $statement)
-    {
-        $this->assertQueryEquals($expectation, $statement);
-        $this->validateParams($expectation, $statement);
-        $this->validatePrepared($expectation, $statement);
-    }
-
     public function assertQueryMatch($expectation, $reality)
     {
-        $this->assertionManager->increment();
+        $this->runCallbacks();
 
         if ($expectation !== $reality) {
             throw new RuntimeException('Unexpected query: ' . $reality);
@@ -77,7 +80,7 @@ class ExpectationValidator
 
     public function assertParamsEqual($expectation, $reality)
     {
-        $this->assertionManager->increment();
+        $this->runCallbacks();
 
         if (! is_null($expectation)) {
             if (is_callable($expectation)) {
@@ -97,21 +100,8 @@ class ExpectationValidator
     public function assertPreparedMatch($expectation, $reality)
     {
         if ($expectation !== null) {
-            $this->assertionManager->increment();
+            $this->runCallbacks();
         }
-
-        if ($expectation === true && $reality === false) {
-            throw new RuntimeException('Statement is not prepared');
-        }
-
-        if ($expectation === false && $reality === true) {
-            throw new RuntimeException('Statement should not be prepared');
-        }
-    }
-
-    public function assertIsNotPrepared($expectation, $reality)
-    {
-        $this->assertionManager->increment();
 
         if ($expectation === true && $reality === false) {
             throw new RuntimeException('Statement is not prepared');
@@ -126,7 +116,7 @@ class ExpectationValidator
     {
         $expectation = $this->getExpectationForFunction($function);
 
-        $this->assertionManager->increment();
+        $this->runCallbacks();
 
         if ($expectation->query !== $function) {
             throw new \RuntimeException('Unexpected function: ' . $function);
@@ -138,7 +128,7 @@ class ExpectationValidator
      */
     public function assertExpectationsFulfilled()
     {
-        $this->assertionManager->increment();
+        $this->runCallbacks();
 
         if (! empty($this->expectations)) {
             throw new RuntimeException('Some expectations were not fulfilled.');
