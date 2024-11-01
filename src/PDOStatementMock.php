@@ -106,8 +106,14 @@ class PDOStatementMock extends PDOStatement
     public function setFetchMode($mode, $className = null, ...$params)
     {
         $this->fetchMode = $mode;
-        $this->fetchClassName = $className;
-        $this->fetchModeParams = $params;
+
+        if ($className) {
+            $this->fetchClassName = $className;
+        }
+
+        if ($params) {
+            $this->fetchModeParams = $params;
+        }
     }
 
     /**
@@ -495,7 +501,7 @@ class PDOStatementMock extends PDOStatement
                 return $this->applyFetchModeBound($cols, $row);
 
             case PDO::FETCH_CLASS:
-                return $this->applyFetchModeClass($cols, $row, $this->fetchClassName, ...$this->fetchModeParams);
+                return $this->applyFetchModeClass($cols, $row);
 
             default:
                 throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
@@ -537,14 +543,16 @@ class PDOStatementMock extends PDOStatement
     /**
      * @param array $cols
      * @param array $row
-     * @param string $className
-     * @param ...$constructArgs
      * @return object
      * @throws \ReflectionException
      */
-    protected function applyFetchModeClass($cols, $row, $className, ...$constructArgs)
+    protected function applyFetchModeClass($cols, $row)
     {
-        $reflectionClass = new ReflectionClass($className);
+        if (! $this->fetchClassName) {
+            throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
+        }
+
+        $reflectionClass = new ReflectionClass($this->fetchClassName);
 
         $classInstance = $reflectionClass->newInstanceWithoutConstructor();
 
@@ -559,7 +567,7 @@ class PDOStatementMock extends PDOStatement
         $constructor = $reflectionClass->getConstructor();
 
         if ($constructor) {
-            $constructor->invokeArgs($classInstance, ...$constructArgs);
+            $constructor->invokeArgs($classInstance, ...$this->fetchModeParams);
         }
 
         return $classInstance;

@@ -15,7 +15,33 @@ class FetchModeClassTest extends TestCase
      */
     public function itShouldFetchIntoClass($pdo)
     {
-        $statement = $pdo->query('select * from "books"', $pdo::FETCH_CLASS, BookForClassFetchMode::class);
+        $statement = $pdo->query('select * from "books"');
+
+        $statement->setFetchMode($pdo::FETCH_CLASS, BookForClassFetchMode::class);
+
+        $row = $statement->fetch($pdo::FETCH_CLASS);
+
+        static::assertInstanceOf(BookForClassFetchMode::class, $row);
+        static::assertSame(1, $row->id);
+        static::assertSame('Kaidash’s Family', $row->title);
+
+        $row = $statement->fetch($pdo::FETCH_CLASS);
+
+        static::assertInstanceOf(BookForClassFetchMode::class, $row);
+        static::assertSame(2, $row->id);
+        static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     */
+    public function itShouldFetchIntoClassUsingDefaultFetchMode($pdo)
+    {
+        $statement = $pdo->query('select * from "books"');
+
+        $statement->setFetchMode($pdo::FETCH_CLASS, BookForClassFetchMode::class);
 
         $row = $statement->fetch();
 
@@ -37,7 +63,9 @@ class FetchModeClassTest extends TestCase
      */
     public function itShouldFetchIntoClassWithConstructor($pdo)
     {
-        $statement = $pdo->query('select * from "books"', $pdo::FETCH_CLASS, BookForClassFetchModeWithConstructor::class, [1000, false]);
+        $statement = $pdo->query('select * from "books"');
+
+        $statement->setFetchMode($pdo::FETCH_CLASS, BookForClassFetchModeWithConstructor::class, [1000, false]);
 
         $row = $statement->fetch();
 

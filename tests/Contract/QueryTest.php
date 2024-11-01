@@ -31,6 +31,28 @@ class QueryTest extends TestCase
         static::assertSame(0, $statement->rowCount());
     }
 
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     */
+    public function itShouldFetchIntoClassUsingQuery($pdo)
+    {
+        $statement = $pdo->query('select * from "books"', $pdo::FETCH_CLASS, BookForQuery::class);
+
+        $row = $statement->fetch();
+
+        static::assertInstanceOf(BookForQuery::class, $row);
+        static::assertSame(1, $row->id);
+        static::assertSame('Kaidash’s Family', $row->title);
+
+        $row = $statement->fetch();
+
+        static::assertInstanceOf(BookForQuery::class, $row);
+        static::assertSame(2, $row->id);
+        static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
+    }
+
     public static function contracts()
     {
         return [
@@ -67,4 +89,11 @@ class QueryTest extends TestCase
 
         return $pdo;
     }
+}
+
+class BookForQuery
+{
+    public $id;
+
+    public $title;
 }
