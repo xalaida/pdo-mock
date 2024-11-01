@@ -10,19 +10,14 @@ use RuntimeException;
 class PDOMock extends PDO
 {
     /**
+     * @var ExpectationValidator
+     */
+    public $expectationValidator;
+
+    /**
      * @var bool
      */
     public $ignoreTransactions = false;
-
-    /**
-     * @var array<int, int>
-     */
-    public $attributes = [];
-
-    /**
-     * @var bool
-     */
-    protected $inTransaction = false;
 
     /**
      * @var string
@@ -30,19 +25,24 @@ class PDOMock extends PDO
     public $lastInsertId = '0';
 
     /**
-     * @var array
+     * @var array<int, int>
      */
-    private $errorInfo = ['', null, null];
+    protected $attributes;
+
+    /**
+     * @var bool
+     */
+    protected $inTransaction = false;
 
     /**
      * @var string|null
      */
-    private $errorCode = null;
+    protected $errorCode;
 
     /**
-     * @var ExpectationValidator
+     * @var array
      */
-    public $expectationValidator;
+    protected $errorInfo = ['', null, null];
 
     /**
      * @param string $dsn
@@ -71,9 +71,89 @@ class PDOMock extends PDO
         ] + $attributes;
     }
 
+    /**
+     * @param bool $ignoreTransactions
+     * @return void
+     */
+    public function ignoreTransactions($ignoreTransactions = true)
+    {
+        $this->ignoreTransactions = $ignoreTransactions;
+    }
+
+    /**
+     * @param ExpectationValidator $expectationValidator
+     * @return void
+     */
     public function setExpectationValidator($expectationValidator)
     {
         $this->expectationValidator = $expectationValidator;
+    }
+
+    /**
+     * @param string $query
+     * @return Expectation
+     */
+    public function expect($query)
+    {
+        return $this->expectationValidator->expectQuery($query);
+    }
+
+    /**
+     * @return void
+     */
+    public function expectBeginTransaction()
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
+        }
+
+        $this->expectationValidator->expectFunction('PDO::beginTransaction()');
+    }
+
+    /**
+     * @return void
+     */
+    public function expectCommit()
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
+        }
+
+        $this->expectationValidator->expectFunction('PDO::commit()');
+    }
+
+    /**
+     * @return void
+     */
+    public function expectRollback()
+    {
+        if ($this->ignoreTransactions) {
+            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
+        }
+
+        $this->expectationValidator->expectFunction('PDO::rollback()');
+    }
+
+    /**
+     * @param callable $callback
+     * @return void
+     */
+    public function expectTransaction($callback)
+    {
+        $this->expectBeginTransaction();
+
+        $callback($this);
+
+        $this->expectCommit();
+    }
+
+
+    /**
+     * @return void
+     */
+    public function assertExpectationsFulfilled()
+    {
+        $this->expectationValidator->assertExpectationsFulfilled();
     }
 
     /**
@@ -104,24 +184,6 @@ class PDOMock extends PDO
         }
 
         return $this->attributes[$attribute];
-    }
-
-    /**
-     * @param bool $ignoreTransactions
-     * @return void
-     */
-    public function ignoreTransactions($ignoreTransactions = true)
-    {
-        $this->ignoreTransactions = $ignoreTransactions;
-    }
-
-    /**
-     * @param string $query
-     * @return Expectation
-     */
-    public function expect($query)
-    {
-        return $this->expectationValidator->expectQuery($query);
     }
 
     /**
@@ -180,30 +242,6 @@ class PDOMock extends PDO
         return $statement;
     }
 
-    protected function clearErrorInfo()
-    {
-        $this->errorCode = PDO::ERR_NONE;
-        $this->errorInfo = [PDO::ERR_NONE, null, null];
-    }
-
-    protected function handleException($exception, $function)
-    {
-        if ($exception->errorInfo) {
-            $this->errorInfo = $exception->errorInfo;
-            $this->errorCode = $exception->errorInfo[0];
-        }
-
-        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
-            throw $exception;
-        }
-
-        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
-            trigger_error($function . ': ' . $exception->getMessage(), E_USER_WARNING);
-        }
-
-        return false;
-    }
-
     /**
      * @param string $query
      * @param $fetchMode
@@ -219,55 +257,6 @@ class PDOMock extends PDO
         $statement->execute();
 
         return $statement;
-    }
-
-    /**
-     * @return void
-     */
-    public function expectBeginTransaction()
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
-        }
-
-        $this->expectationValidator->expectFunction('PDO::beginTransaction()');
-    }
-
-    /**
-     * @return void
-     */
-    public function expectCommit()
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
-        }
-
-        $this->expectationValidator->expectFunction('PDO::commit()');
-    }
-
-    /**
-     * @return void
-     */
-    public function expectRollback()
-    {
-        if ($this->ignoreTransactions) {
-            throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
-        }
-
-        $this->expectationValidator->expectFunction('PDO::rollback()');
-    }
-
-    /**
-     * @param callable $callback
-     * @return void
-     */
-    public function expectTransaction($callback)
-    {
-        $this->expectBeginTransaction();
-
-        $callback($this);
-
-        $this->expectCommit();
     }
 
     /**
@@ -380,8 +369,33 @@ class PDOMock extends PDO
     /**
      * @return void
      */
-    public function assertExpectationsFulfilled()
+    protected function clearErrorInfo()
     {
-        $this->expectationValidator->assertExpectationsFulfilled();
+        $this->errorCode = PDO::ERR_NONE;
+        $this->errorInfo = [PDO::ERR_NONE, null, null];
+    }
+
+    /**
+     * @param PDOException $exception
+     * @param $function
+     * @return false
+     * @throws PDOException
+     */
+    protected function handleException($exception, $function)
+    {
+        if ($exception->errorInfo) {
+            $this->errorInfo = $exception->errorInfo;
+            $this->errorCode = $exception->errorInfo[0];
+        }
+
+        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
+            throw $exception;
+        }
+
+        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
+            trigger_error($function . ': ' . $exception->getMessage(), E_USER_WARNING);
+        }
+
+        return false;
     }
 }
