@@ -244,15 +244,17 @@ class PDOMock extends PDO
 
     /**
      * @param string $query
-     * @param $fetchMode
+     * @param int $fetchMode
      * @param ...$fetch_mode_args
      * @return PDOStatement
      */
     #[\ReturnTypeWillChange]
     #[\Override]
-    public function query($query, $fetchMode = null, ...$fetch_mode_args)
+    public function query($query, $fetchMode = PDO::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args)
     {
         $statement = $this->prepare($query);
+
+        $statement->setFetchMode($fetchMode, ...$fetch_mode_args);
 
         $statement->execute();
 

@@ -95,6 +95,29 @@ class FetchTest extends TestCase
      * @dataProvider contracts
      * @param PDO $pdo
      */
+    public function itShouldNotOverrideDefaultFetchMode($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+        $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        $statement->execute();
+
+        static::assertIsArrayType(
+            $statement->fetch($pdo::FETCH_ASSOC)
+        );
+
+        static::assertIsObjectType(
+            $statement->fetch()
+        );
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     */
     public function itShouldHandleFetchInNumMode($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);

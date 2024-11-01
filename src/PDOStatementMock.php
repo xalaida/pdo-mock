@@ -8,6 +8,7 @@ use Iterator;
 use PDO;
 use PDOException;
 use PDOStatement;
+use ReflectionClass;
 use RuntimeException;
 use ValueError;
 
@@ -42,6 +43,16 @@ class PDOStatementMock extends PDOStatement
      * @var int
      */
     protected $fetchMode;
+
+    /**
+     * @var string|null
+     */
+    protected $fetchClassName;
+
+    /**
+     * @var array
+     */
+    protected $fetchModeParams;
 
     /**
      * @var int
@@ -86,7 +97,7 @@ class PDOStatementMock extends PDOStatement
 
     /**
      * @param int $mode
-     * @param $className
+     * @param string|null $className
      * @param ...$params
      * @return void
      */
@@ -95,6 +106,8 @@ class PDOStatementMock extends PDOStatement
     public function setFetchMode($mode, $className = null, ...$params)
     {
         $this->fetchMode = $mode;
+        $this->fetchClassName = $className;
+        $this->fetchModeParams = $params;
     }
 
     /**
@@ -462,7 +475,7 @@ class PDOStatementMock extends PDOStatement
     protected function applyFetchMode($cols, $row, $mode)
     {
         if ($mode !== PDO::FETCH_NUM && empty($cols)) {
-            throw new RuntimeException('ResultSet columns are not specified.');
+            throw new RuntimeException('ResultSet columns were not set.');
         }
 
         switch ($mode) {
@@ -481,17 +494,20 @@ class PDOStatementMock extends PDOStatement
             case PDO::FETCH_BOUND:
                 return $this->applyFetchModeBound($cols, $row);
 
+            case PDO::FETCH_CLASS:
+                return $this->applyFetchModeClass($cols, $row, $this->fetchClassName, ...$this->fetchModeParams);
+
             default:
                 throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
         }
     }
 
     /**
-     * @param array $columns
+     * @param array $cols
      * @param array $row
      * @return bool
      */
-    protected function applyFetchModeBound($columns, $row)
+    protected function applyFetchModeBound($cols, $row)
     {
         foreach ($this->columns as $column => $params) {
             if (is_int($column)) {
@@ -505,7 +521,7 @@ class PDOStatementMock extends PDOStatement
                     }
                 }
             } else {
-                $index = array_search($column, $columns, true);
+                $index = array_search($column, $cols, true);
             }
 
             if ($index === false) {
@@ -516,6 +532,37 @@ class PDOStatementMock extends PDOStatement
         }
 
         return true;
+    }
+
+    /**
+     * @param array $cols
+     * @param array $row
+     * @param string $className
+     * @param ...$constructArgs
+     * @return object
+     * @throws \ReflectionException
+     */
+    protected function applyFetchModeClass($cols, $row, $className, ...$constructArgs)
+    {
+        $reflectionClass = new ReflectionClass($className);
+
+        $classInstance = $reflectionClass->newInstanceWithoutConstructor();
+
+        foreach ($cols as $key => $col) {
+            if ($reflectionClass->hasProperty($col)) {
+                $prop = $reflectionClass->getProperty($col);
+                $prop->setAccessible(true);
+                $prop->setValue($classInstance, $row[$key]);
+            }
+        }
+
+        $constructor = $reflectionClass->getConstructor();
+
+        if ($constructor) {
+            $constructor->invokeArgs($classInstance, ...$constructArgs);
+        }
+
+        return $classInstance;
     }
 
     /**

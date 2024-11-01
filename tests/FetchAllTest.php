@@ -237,7 +237,7 @@ class FetchAllTest extends TestCase
         static::assertTrue($result);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Specify columns to result set');
+        $this->expectExceptionMessage('ResultSet columns were not set.');
 
         $statement->fetchAll($pdo::FETCH_ASSOC);
     }
