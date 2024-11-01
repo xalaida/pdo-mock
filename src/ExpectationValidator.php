@@ -54,7 +54,7 @@ class ExpectationValidator
     public function getExpectationForQuery($query)
     {
         if (empty($this->expectations)) {
-            throw new \RuntimeException('Unexpected query: ' . $query);
+            throw new ExpectationFailedException('Unexpected query: ' . $query);
         }
 
         return array_shift($this->expectations);
@@ -63,7 +63,7 @@ class ExpectationValidator
     public function getExpectationForFunction($function)
     {
         if (empty($this->expectations)) {
-            throw new \RuntimeException('Unexpected function: ' . $function);
+            throw new ExpectationFailedException('Unexpected function: ' . $function);
         }
 
         return array_shift($this->expectations);
@@ -74,7 +74,7 @@ class ExpectationValidator
         $this->runCallbacks();
 
         if ($expectation !== $reality) {
-            throw new RuntimeException('Unexpected query: ' . $reality);
+            throw new ExpectationFailedException('Unexpected query: ' . $reality);
         }
     }
 
@@ -87,11 +87,11 @@ class ExpectationValidator
                 $result = call_user_func($expectation, $reality);
 
                 if ($result === false) {
-                    throw new RuntimeException('Params do not match');
+                    throw new ExpectationFailedException('Params do not match');
                 }
             } else {
                 if ($expectation != $reality) {
-                    throw new RuntimeException('Params do not match');
+                    throw new ExpectationFailedException('Params do not match');
                 }
             }
         }
@@ -104,11 +104,11 @@ class ExpectationValidator
         }
 
         if ($expectation === true && $reality === false) {
-            throw new RuntimeException('Statement is not prepared');
+            throw new ExpectationFailedException('Statement is not prepared');
         }
 
         if ($expectation === false && $reality === true) {
-            throw new RuntimeException('Statement should not be prepared');
+            throw new ExpectationFailedException('Statement should not be prepared');
         }
     }
 
@@ -119,7 +119,7 @@ class ExpectationValidator
         $this->runCallbacks();
 
         if ($expectation->query !== $function) {
-            throw new \RuntimeException('Unexpected function: ' . $function);
+            throw new ExpectationFailedException('Unexpected function: ' . $function);
         }
     }
 
@@ -131,7 +131,7 @@ class ExpectationValidator
         $this->runCallbacks();
 
         if (! empty($this->expectations)) {
-            throw new RuntimeException('Some expectations were not fulfilled.');
+            throw new ExpectationFailedException('Some expectations were not fulfilled.');
         }
     }
 }
