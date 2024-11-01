@@ -176,7 +176,7 @@ class PDOStatementMock extends PDOStatement
         $this->executed = true;
 
         if ($this->expectation->exceptionOnExecute) {
-            return $this->getResultFromException($this->expectation->exceptionOnExecute, 'PDOStatement::execute()');
+            return $this->handleException($this->expectation->exceptionOnExecute, 'PDOStatement::execute()');
         }
 
         $this->clearErrorInfo();
@@ -212,30 +212,26 @@ class PDOStatementMock extends PDOStatement
 
     protected function clearErrorInfo()
     {
-        $this->errorInfo = ['00000', null, null];
-        $this->errorCode = $this->errorInfo[0];
+        $this->errorCode = PDO::ERR_NONE;
+        $this->errorInfo = [PDO::ERR_NONE, null, null];
     }
 
-    protected function getResultFromException($exception, $function)
+    protected function handleException($exception, $function)
     {
         if ($exception->errorInfo) {
             $this->errorInfo = $exception->errorInfo;
             $this->errorCode = $exception->errorInfo[0];
         }
 
-        if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
-            return false;
+        if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
+            throw $exception;
         }
 
         if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
             trigger_error($function . ': ' . $exception->getMessage(), E_USER_WARNING);
-
-            return false;
         }
 
-        if ($this->pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
-            throw $exception;
-        }
+        return false;
     }
 
     /**

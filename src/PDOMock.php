@@ -51,7 +51,6 @@ class PDOMock extends PDO
     public function __construct($dsn = 'mock', $attributes = [])
     {
         $this->expectationValidator = new ExpectationValidator(new AssertionManager());
-
         $this->attributes = [
             PDO::ATTR_ERRMODE => PHP_VERSION_ID < 80000
                 ? PDO::ERRMODE_SILENT
@@ -139,7 +138,7 @@ class PDOMock extends PDO
         $this->expectationValidator->assertPreparedMatch($expectation->prepared, false);
 
         if ($expectation->exceptionOnExecute) {
-            return $this->getResultFromException($expectation->exceptionOnExecute, 'PDO::exec()');
+            return $this->handleException($expectation->exceptionOnExecute, 'PDO::exec()');
         }
 
         $this->clearErrorInfo();
@@ -167,7 +166,7 @@ class PDOMock extends PDO
         $expectation = $this->expectationValidator->getExpectationForQuery($query);
 
         if ($expectation->exceptionOnPrepare) {
-            return $this->getResultFromException($expectation->exceptionOnPrepare, 'PDO::prepare()');
+            return $this->handleException($expectation->exceptionOnPrepare, 'PDO::prepare()');
         }
 
         $this->clearErrorInfo();
@@ -183,30 +182,26 @@ class PDOMock extends PDO
 
     protected function clearErrorInfo()
     {
-        $this->errorInfo = ['00000', null, null];
-        $this->errorCode = $this->errorInfo[0];
+        $this->errorCode = PDO::ERR_NONE;
+        $this->errorInfo = [PDO::ERR_NONE, null, null];
     }
 
-    protected function getResultFromException($exception, $function)
+    protected function handleException($exception, $function)
     {
         if ($exception->errorInfo) {
             $this->errorInfo = $exception->errorInfo;
             $this->errorCode = $exception->errorInfo[0];
         }
 
-        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
-            return false;
+        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
+            throw $exception;
         }
 
         if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_WARNING) {
             trigger_error($function . ': ' . $exception->getMessage(), E_USER_WARNING);
-
-            return false;
         }
 
-        if ($this->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION) {
-            throw $exception;
-        }
+        return false;
     }
 
     /**
