@@ -16,12 +16,12 @@ class PDOStatementMock extends PDOStatement
     /**
      * @var PDOMock
      */
-    protected $pdo;
+    public $pdo;
 
     /**
      * @var Expectation
      */
-    protected $expectation;
+    public $expectation;
 
     /**
      * @var string
@@ -61,7 +61,7 @@ class PDOStatementMock extends PDOStatement
     /**
      * @var bool
      */
-    public $executed;
+    protected $executed;
 
     /**
      * @param PDOMock $pdo
@@ -76,7 +76,6 @@ class PDOStatementMock extends PDOStatement
         $this->errorInfo = ['', null, null];
         $this->errorCode = null;
         $this->fetchMode = PDO::FETCH_BOTH;
-
         $this->executed = false;
 
         // This property does not work on PHP v8.0 because it is impossible to override internally readonly property.
@@ -91,6 +90,7 @@ class PDOStatementMock extends PDOStatement
      * @param ...$params
      * @return void
      */
+    #[\ReturnTypeWillChange]
     #[\Override]
     public function setFetchMode($mode, $className = null, ...$params)
     {
@@ -210,12 +210,21 @@ class PDOStatementMock extends PDOStatement
         return $result;
     }
 
+    /**
+     * @return void
+     */
     protected function clearErrorInfo()
     {
         $this->errorCode = PDO::ERR_NONE;
         $this->errorInfo = [PDO::ERR_NONE, null, null];
     }
 
+    /**
+     * @param PDOException $exception
+     * @param string $function
+     * @return false
+     * @throws PDOException
+     */
     protected function handleException($exception, $function)
     {
         if ($exception->errorInfo) {
@@ -309,6 +318,12 @@ class PDOStatementMock extends PDOStatement
         return $row;
     }
 
+    /**
+     * @param int $mode
+     * @param $fetch_argument
+     * @param ...$args
+     * @return array
+     */
     #[\ReturnTypeWillChange]
     #[\Override]
     #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /*
@@ -336,6 +351,12 @@ class PDOStatementMock extends PDOStatement
         return $allRows;
     }
 
+    /**
+     * @param array $row
+     * @param array $cols
+     * @param int $mode
+     * @return array|bool|object
+     */
     protected function applyFetchTransformations($row, $cols, $mode)
     {
         return $this->applyFetchMode(
@@ -347,6 +368,10 @@ class PDOStatementMock extends PDOStatement
         );
     }
 
+    /**
+     * @param array $row
+     * @return array
+     */
     protected function applyFetchStringify($row)
     {
         $result = [];
@@ -364,6 +389,10 @@ class PDOStatementMock extends PDOStatement
         return $result;
     }
 
+    /**
+     * @param array $row
+     * @return array
+     */
     protected function applyFetchOracleNull($row)
     {
         if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING) {
@@ -389,6 +418,10 @@ class PDOStatementMock extends PDOStatement
         return $row;
     }
 
+    /**
+     * @param array $cols
+     * @return array
+     */
     protected function applyFetchCase($cols)
     {
         $result = [];
@@ -429,7 +462,7 @@ class PDOStatementMock extends PDOStatement
     protected function applyFetchMode($cols, $row, $mode)
     {
         if ($mode !== PDO::FETCH_NUM && empty($cols)) {
-            throw new RuntimeException('Specify columns to result set');
+            throw new RuntimeException('ResultSet columns are not specified.');
         }
 
         switch ($mode) {
@@ -506,7 +539,7 @@ class PDOStatementMock extends PDOStatement
                 return (bool) $value;
 
             default:
-                throw new RuntimeException('Unsupported column type: ' . $type);
+                throw new InvalidArgumentException('Unsupported column type: ' . $type);
         }
     }
 }

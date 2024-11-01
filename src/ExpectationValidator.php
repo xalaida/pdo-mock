@@ -2,8 +2,6 @@
 
 namespace Xalaida\PDOMock;
 
-use RuntimeException;
-
 class ExpectationValidator
 {
     public $expectations = [];

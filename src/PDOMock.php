@@ -377,7 +377,7 @@ class PDOMock extends PDO
 
     /**
      * @param PDOException $exception
-     * @param $function
+     * @param string $function
      * @return false
      * @throws PDOException
      */
