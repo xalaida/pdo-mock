@@ -339,14 +339,13 @@ class PDOStatementMock extends PDOStatement
 
     /**
      * @param int $mode
-     * @param $fetch_argument
      * @param ...$args
      * @return array
      */
     #[\ReturnTypeWillChange]
     #[\Override]
-    #[PHP8] public function fetchAll($mode = null, $fetch_argument = null, ...$args) { /*
-    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) { # */
+    public function fetchAll($mode = null, ...$args)
+    {
         if ($mode === null) {
             $mode = $this->fetchMode;
         }
