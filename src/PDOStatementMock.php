@@ -20,7 +20,7 @@ class PDOStatementMock extends PDOStatement
     public $pdo;
 
     /**
-     * @var Expectation
+     * @var QueryExpectation
      */
     public $expectation;
 
@@ -76,7 +76,7 @@ class PDOStatementMock extends PDOStatement
 
     /**
      * @param PDOMock $pdo
-     * @param Expectation $expectation
+     * @param QueryExpectation $expectation
      * @param string $query
      */
     public function __construct($pdo, $expectation, $query)
@@ -186,13 +186,13 @@ class PDOStatementMock extends PDOStatement
             ? $this->prepareParams($params)
             : $this->params;
 
-        $this->pdo->expectationValidator->assertQueryMatch($this->expectation->query, $this->query);
-        $this->pdo->expectationValidator->assertParamsMatch($this->expectation->params, $params);
-        $this->pdo->expectationValidator->assertPreparedMatch($this->expectation->prepared, true);
-
-        $this->expectation->statement = $this;
+        $this->expectation->assertQueryMatch($this->query);
+        $this->expectation->assertParamsMatch($params);
+        $this->expectation->assertIsPrepared();
 
         $this->executed = true;
+
+        $this->expectation->statement = $this;
 
         if ($this->expectation->exceptionOnExecute) {
             return $this->handleException($this->expectation->exceptionOnExecute, 'PDOStatement::execute()');

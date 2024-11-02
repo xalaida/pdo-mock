@@ -45,7 +45,7 @@ class PrepareTest extends TestCase
         $pdo->expect('select * from "books"')
             ->toBePrepared();
 
-        $this->expectExceptionMessage('Statement is not prepared');
+        $this->expectExceptionMessage('Statement should not be prepared');
 
         $pdo->exec('select * from "books"');
     }

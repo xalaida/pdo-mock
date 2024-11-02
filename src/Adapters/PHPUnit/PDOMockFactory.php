@@ -4,6 +4,7 @@ namespace Xalaida\PDOMock\Adapters\PHPUnit;
 
 use PHPUnit\Framework\TestCase;
 use Xalaida\PDOMock\PDOMock;
+use Xalaida\PDOMock\AssertionValidator as BaseAssertionValidator;
 
 class PDOMockFactory
 {
@@ -15,9 +16,9 @@ class PDOMockFactory
     {
         $pdo = new PDOMock();
 
-        $pdo->expectationValidator->useCallback(function () use ($phpunit) {
-            $phpunit->addToAssertionCount(1);
-        });
+        $assertionValidator = new AssertionValidator($phpunit, new BaseAssertionValidator());
+
+        $pdo->expectationManager->setAssertionValidator($assertionValidator);
 
         return $pdo;
     }

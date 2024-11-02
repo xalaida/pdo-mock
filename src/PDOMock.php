@@ -10,9 +10,9 @@ use RuntimeException;
 class PDOMock extends PDO
 {
     /**
-     * @var ExpectationValidator
+     * @var ExpectationManager
      */
-    public $expectationValidator;
+    public $expectationManager;
 
     /**
      * @var bool
@@ -50,7 +50,7 @@ class PDOMock extends PDO
      */
     public function __construct($dsn = 'mock', $attributes = [])
     {
-        $this->expectationValidator = new ExpectationValidator();
+        $this->expectationManager = new ExpectationManager();
         $this->attributes = [
             PDO::ATTR_ERRMODE => PHP_VERSION_ID < 80000
                 ? PDO::ERRMODE_SILENT
@@ -81,21 +81,21 @@ class PDOMock extends PDO
     }
 
     /**
-     * @param ExpectationValidator $expectationValidator
+     * @param ExpectationManager $expectationManager
      * @return void
      */
-    public function setExpectationValidator($expectationValidator)
+    public function setExpectationManager($expectationManager)
     {
-        $this->expectationValidator = $expectationValidator;
+        $this->expectationManager = $expectationManager;
     }
 
     /**
      * @param string $query
-     * @return Expectation
+     * @return QueryExpectation
      */
     public function expect($query)
     {
-        return $this->expectationValidator->expectQuery($query);
+        return $this->expectationManager->expectQuery($query);
     }
 
     /**
@@ -107,7 +107,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
         }
 
-        $this->expectationValidator->expectFunction('PDO::beginTransaction()');
+        $this->expectationManager->expectFunction('PDO::beginTransaction()');
     }
 
     /**
@@ -119,7 +119,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
         }
 
-        $this->expectationValidator->expectFunction('PDO::commit()');
+        $this->expectationManager->expectFunction('PDO::commit()');
     }
 
     /**
@@ -131,7 +131,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
         }
 
-        $this->expectationValidator->expectFunction('PDO::rollback()');
+        $this->expectationManager->expectFunction('PDO::rollback()');
     }
 
     /**
@@ -153,7 +153,7 @@ class PDOMock extends PDO
      */
     public function assertExpectationsFulfilled()
     {
-        $this->expectationValidator->assertExpectationsFulfilled();
+        $this->expectationManager->assertExpectationsFulfilled();
     }
 
     /**
@@ -194,10 +194,10 @@ class PDOMock extends PDO
     #[\Override]
     public function exec($statement)
     {
-        $expectation = $this->expectationValidator->getExpectationForQuery($statement);
+        $expectation = $this->expectationManager->getExpectationForQuery($statement);
 
-        $this->expectationValidator->assertQueryMatch($expectation->query, $statement);
-        $this->expectationValidator->assertPreparedMatch($expectation->prepared, false);
+        $expectation->assertQueryMatch($statement);
+        $expectation->assertIsNotPrepared();
 
         if ($expectation->exceptionOnExecute) {
             return $this->handleException($expectation->exceptionOnExecute, 'PDO::exec()');
@@ -225,7 +225,7 @@ class PDOMock extends PDO
     #[\Override]
     public function prepare($query, $options = [])
     {
-        $expectation = $this->expectationValidator->getExpectationForQuery($query);
+        $expectation = $this->expectationManager->getExpectationForQuery($query);
 
         if ($expectation->exceptionOnPrepare) {
             return $this->handleException($expectation->exceptionOnPrepare, 'PDO::prepare()');
@@ -278,7 +278,9 @@ class PDOMock extends PDO
             return true;
         }
 
-        $this->expectationValidator->assertFunctionIsExpected('PDO::beginTransaction()');
+        $expectation = $this->expectationManager->getExpectationForFunction('PDO::beginTransaction()');
+
+        $expectation->assertFunctionMatch('PDO::beginTransaction()');
 
         return true;
     }
@@ -300,7 +302,9 @@ class PDOMock extends PDO
             return true;
         }
 
-        $this->expectationValidator->assertFunctionIsExpected('PDO::commit()');
+        $expectation = $this->expectationManager->getExpectationForFunction('PDO::commit()');
+
+        $expectation->assertFunctionMatch('PDO::commit()');
 
         return true;
     }
@@ -322,7 +326,9 @@ class PDOMock extends PDO
             return true;
         }
 
-        $this->expectationValidator->assertFunctionIsExpected('PDO::rollback()');
+        $expectation = $this->expectationManager->getExpectationForFunction('PDO::rollback()');
+
+        $expectation->assertFunctionMatch('PDO::rollback()');
 
         return true;
     }

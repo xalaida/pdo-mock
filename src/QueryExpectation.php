@@ -7,12 +7,12 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 
-class Expectation
+class QueryExpectation
 {
     /**
-     * @var PDOStatementMock|null
+     * @var AssertionValidator
      */
-    public $statement;
+    public $assertionValidator;
 
     /**
      * @var string
@@ -55,11 +55,25 @@ class Expectation
     public $exceptionOnPrepare;
 
     /**
+     * @var PDOStatementMock|null
+     */
+    public $statement;
+
+    /**
      * @param string $query
      */
     public function __construct($query)
     {
         $this->query = $query;
+    }
+
+    /**
+     * @param AssertionValidator $assertionValidator
+     * @return void
+     */
+    public function setAssertionValidator($assertionValidator)
+    {
+        $this->assertionValidator = $assertionValidator;
     }
 
     /**
@@ -276,5 +290,45 @@ class Expectation
         $this->exceptionOnPrepare = $exception;
 
         return $this;
+    }
+
+    /**
+     * @param string $query
+     * @return void
+     */
+    public function assertQueryMatch($query)
+    {
+        $this->assertionValidator->assertQueryMatch($this->query, $query);
+    }
+
+    /**
+     * @param array $params
+     * @return void
+     */
+    public function assertParamsMatch($params)
+    {
+        if (! is_null($this->params)) {
+            $this->assertionValidator->assertParamsMatch($this->params, $params);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function assertIsPrepared()
+    {
+        if (! is_null($this->prepared)) {
+            $this->assertionValidator->assertIsPrepared($this->prepared);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function assertIsNotPrepared()
+    {
+        if (! is_null($this->prepared)) {
+            $this->assertionValidator->assertIsNotPrepared($this->prepared);
+        }
     }
 }
