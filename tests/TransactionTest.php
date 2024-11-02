@@ -39,7 +39,7 @@ class TransactionTest extends TestCase
      */
     public function itShouldRollbackTransaction()
     {
-        $pdo = $this->getPDOMock();
+        $pdo = new PDOMock();
         $pdo->expectBeginTransaction();
         $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
         $pdo->expectRollback();
@@ -72,7 +72,7 @@ class TransactionTest extends TestCase
      */
     public function itShouldExpectTransactionUsingCallableSyntax()
     {
-        $pdo = $this->getPDOMock();
+        $pdo = new PDOMock();
         $pdo->expectTransaction(function () use ($pdo) {
             $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');
             $pdo->expect('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors")');
@@ -111,8 +111,7 @@ class TransactionTest extends TestCase
      */
     public function itShouldIgnoreTransactionsWhenModeIsEnabled()
     {
-        $pdo = $this->getPDOMock();
-
+        $pdo = new PDOMock();
         $pdo->ignoreTransactions();
 
         $pdo->expect('insert into "books" ("title") values ("Kaidash’s Family")');

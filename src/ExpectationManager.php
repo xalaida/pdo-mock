@@ -5,28 +5,14 @@ namespace Xalaida\PDOMock;
 class ExpectationManager
 {
     /**
+     * @var AssertionValidatorInterface
+     */
+    public static $assertionValidator;
+
+    /**
      * @var array<int, QueryExpectation|FunctionExpectation>
      */
     public $expectations = [];
-
-    /**
-     * @var AssertionValidator
-     */
-    public $assertionValidator;
-
-    public function __construct()
-    {
-        $this->assertionValidator = new AssertionValidator();
-    }
-
-    /**
-     * @param AssertionValidator $assertionValidator
-     * @return void
-     */
-    public function setAssertionValidator($assertionValidator)
-    {
-        $this->assertionValidator = $assertionValidator;
-    }
 
     /**
      * @param string $query
@@ -36,7 +22,9 @@ class ExpectationManager
     {
         $expectation = new QueryExpectation($query);
 
-        $expectation->setAssertionValidator($this->assertionValidator);
+        $expectation->setAssertionValidator(
+            static::getAssertionValidator()
+        );
 
         $this->expectations[] = $expectation;
 
@@ -51,7 +39,9 @@ class ExpectationManager
     {
         $expectation = new FunctionExpectation($function);
 
-        $expectation->setAssertionValidator($this->assertionValidator);
+        $expectation->setAssertionValidator(
+            static::getAssertionValidator()
+        );
 
         $this->expectations[] = $expectation;
 
@@ -106,5 +96,25 @@ class ExpectationManager
         if (! empty($this->expectations)) {
             throw new ExpectationFailedException('Some expectations were not fulfilled.');
         }
+    }
+
+    /**
+     * @param AssertionValidatorInterface $assertionValidator
+     */
+    public static function useAssertionValidator($assertionValidator)
+    {
+        static::$assertionValidator = $assertionValidator;
+    }
+
+    /**
+     * @return AssertionValidatorInterface
+     */
+    protected static function getAssertionValidator()
+    {
+        if (is_null(static::$assertionValidator)) {
+            static::$assertionValidator = new AssertionValidator();
+        }
+
+        return static::$assertionValidator;
     }
 }

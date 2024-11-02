@@ -5,7 +5,7 @@ namespace Xalaida\PDOMock;
 class FunctionExpectation
 {
     /**
-     * @var AssertionValidator
+     * @var AssertionValidatorInterface
      */
     public $assertionValidator;
 
@@ -23,7 +23,7 @@ class FunctionExpectation
     }
 
     /**
-     * @param AssertionValidator $assertionValidator
+     * @param AssertionValidatorInterface $assertionValidator
      * @return void
      */
     public function setAssertionValidator($assertionValidator)

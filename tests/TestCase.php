@@ -3,18 +3,9 @@
 namespace Tests\Xalaida\PDOMock;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Xalaida\PDOMock\Adapters\PHPUnit\PDOMockFactory;
 
 class TestCase extends BaseTestCase
 {
-    /**
-     * @return \Xalaida\PDOMock\PDOMock
-     */
-    public function getPDOMock()
-    {
-        return PDOMockFactory::forTestCase($this);
-    }
-
     /**
      * @param callable $callback
      * @param string|null $message

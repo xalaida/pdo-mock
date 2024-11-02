@@ -23,4 +23,8 @@
             <directory>src</directory>
         </include>
     </source>
+
+    <extensions>
+        <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\Extension"/>
+    </extensions>
 </phpunit>

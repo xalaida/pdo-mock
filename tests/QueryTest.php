@@ -3,6 +3,7 @@
 namespace Tests\Xalaida\PDOMock;
 
 use PDOStatement;
+use PHPUnit\Framework\ExpectationFailedException;
 use Xalaida\PDOMock\PDOMock;
 
 class QueryTest extends TestCase
@@ -43,7 +44,8 @@ class QueryTest extends TestCase
         $pdo->expect('delete from "posts" where "status" = ?')
             ->with(['draft']);
 
-        $this->expectExceptionMessage('Params do not match');
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Params do not match.');
 
         $pdo->query('delete from "posts" where "status" = ?');
     }
