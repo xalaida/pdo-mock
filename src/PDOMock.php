@@ -64,9 +64,7 @@ class PDOMock extends PDO
                 PDOStatement::class
             ],
             PDO::ATTR_DRIVER_NAME => $dsn,
-            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80200
-                ? null
-                : false,
+            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80200,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
         ] + $attributes;
     }

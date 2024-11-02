@@ -3,9 +3,16 @@
 namespace Tests\Xalaida\PDOMock;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use Xalaida\PDOMock\ExpectationManager;
+use Xalaida\PDOMock\Adapter\PHPUnit\AssertionValidator;
 
 class TestCase extends BaseTestCase
 {
+    public static function setUpBeforeClass()
+    {
+        ExpectationManager::useAssertionValidator(new AssertionValidator());
+    }
+
     /**
      * @param callable $callback
      * @param string|null $message

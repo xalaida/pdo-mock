@@ -14,6 +14,34 @@ Inspired by the GO library [SQL-mock](https://github.com/DATA-DOG/go-sqlmock).
 composer require xalaida/pdo-mock
 ```
 
+## Integration with PHPUnit
+
+If you are using PHPUnit, probably you want to integrate its assertion mechanism with the PDOMock library.
+
+To do so, register the extension in your configuration file for PHPUnit:
+
+```xml
+<extensions>
+    <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\Extension"/>
+</extensions>
+```
+
+Or manually configure it in your `TestCase` class:
+
+```php
+use PHPUnit\Framework\TestCase as BaseTestCase;
+use Xalaida\PDOMock\ExpectationManager;
+use Xalaida\PDOMock\Adapter\PHPUnit\AssertionValidator;
+
+class TestCase extends BaseTestCase
+{
+    public static function setUpBeforeClass()
+    {
+        ExpectationManager::useAssertionValidator(new AssertionValidator());
+    }
+}
+```
+
 ## Demo
 
 Service:

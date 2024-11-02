@@ -16,13 +16,13 @@ jobs:
       matrix:
         include:
           - php-version: '5.6'
-            phpunit-config: 'phpunit.dist.xml'
+            phpunit-config: 'phpunit-6.dist.xml'
           - php-version: '7.0'
-            phpunit-config: 'phpunit.dist.xml'
+            phpunit-config: 'phpunit-6.dist.xml'
           - php-version: '7.1'
-            phpunit-config: 'phpunit.dist.xml'
+            phpunit-config: 'phpunit-6.dist.xml'
           - php-version: '7.2'
-            phpunit-config: 'phpunit.dist.xml'
+            phpunit-config: 'phpunit-6.dist.xml'
           - php-version: '7.3'
             phpunit-config: 'phpunit-9.dist.xml'
           - php-version: '7.4'

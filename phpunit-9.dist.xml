@@ -11,13 +11,13 @@
     colors="true"
     verbose="true"
 >
-  <coverage processUncoveredFiles="true">
-    <include>
-      <directory suffix=".php">src</directory>
-    </include>
-  </coverage>
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
 
-  <testsuite name="default">
-    <directory suffix="Test.php">tests</directory>
-  </testsuite>
+    <testsuite name="default">
+        <directory suffix="Test.php">tests</directory>
+    </testsuite>
 </phpunit>
