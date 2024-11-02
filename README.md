@@ -38,7 +38,7 @@ class BookService
 
         $statement->execute();
 
-        return $statement->fetch(PDO::FETCH_OBJ);
+        return $statement->fetch(PDO::FETCH_ASSOC);
     }
 }
 ```
@@ -57,7 +57,7 @@ class BookServiceTest
 
         $pdo->expect('select * from "books" where "id" = :id')
             ->with(['id' => 7])
-            ->andFetchRows([
+            ->andFetch([
                 ['id' => 7, 'title' => 'The Forest Song']
             ]);
 
