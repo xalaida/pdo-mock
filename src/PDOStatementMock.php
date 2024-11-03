@@ -379,8 +379,10 @@ class PDOStatementMock extends PDOStatement
     {
         return $this->applyFetchMode(
             $this->applyFetchCase($cols),
-            $this->applyFetchOracleNull(
-                $this->applyFetchStringify($row)
+            $this->applyFetchStringify(
+                $this->applyFetchOracleNull(
+                    $row
+                )
             ),
             $mode
         );
@@ -396,7 +398,9 @@ class PDOStatementMock extends PDOStatement
 
         foreach ($row as $key => $value) {
             if ($this->shouldStringifyFetch()) {
-                $result[$key] = (string) $value;
+                $result[$key] = ! is_null($value)
+                    ? (string) $value
+                    : null;
             } else {
                 $result[$key] = is_numeric($value)
                     ? ($value + 0)

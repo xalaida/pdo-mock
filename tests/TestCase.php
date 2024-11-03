@@ -8,7 +8,10 @@ use Xalaida\PDOMock\Adapter\PHPUnit\AssertionValidator;
 
 class TestCase extends BaseTestCase
 {
-    public static function setUpBeforeClass()
+    /**
+     * @beforeClass
+     */
+    public static function setUpPDOMock()
     {
         ExpectationManager::useAssertionValidator(new AssertionValidator());
     }
@@ -49,5 +52,18 @@ class TestCase extends BaseTestCase
     protected static function assertIsObjectType($actual, $message = '')
     {
         static::assertTrue(is_object($actual), $message ?: gettype($actual) . ' is of type object');
+    }
+
+    public static function getExpectationFailedExceptionClass()
+    {
+        if (class_exists(\PHPUnit\Framework\ExpectationFailedException::class)) {
+            return \PHPUnit\Framework\ExpectationFailedException::class;
+        }
+
+        if (class_exists(\PHPUnit_Framework_ExpectationFailedException::class)) {
+            return \PHPUnit_Framework_ExpectationFailedException::class;
+        }
+
+        throw new \RuntimeException('ExpectationFailedException does not exist.');
     }
 }

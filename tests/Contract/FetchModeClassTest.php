@@ -22,13 +22,13 @@ class FetchModeClassTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_CLASS);
 
         static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertSame(1, $row->id);
+        static::assertEquals(1, $row->id);
         static::assertSame('Kaidash’s Family', $row->title);
 
         $row = $statement->fetch($pdo::FETCH_CLASS);
 
         static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertSame(2, $row->id);
+        static::assertEquals(2, $row->id);
         static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
     }
 
@@ -39,6 +39,8 @@ class FetchModeClassTest extends TestCase
      */
     public function itShouldFetchIntoClassUsingDefaultFetchMode($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+
         $statement = $pdo->query('select * from "books"');
 
         $statement->setFetchMode($pdo::FETCH_CLASS, BookForClassFetchMode::class);
@@ -46,13 +48,13 @@ class FetchModeClassTest extends TestCase
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertSame(1, $row->id);
+        static::assertEquals(1, $row->id);
         static::assertSame('Kaidash’s Family', $row->title);
 
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertSame(2, $row->id);
+        static::assertEquals(2, $row->id);
         static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
     }
 
@@ -63,6 +65,8 @@ class FetchModeClassTest extends TestCase
      */
     public function itShouldFetchIntoClassWithConstructor($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+
         $statement = $pdo->query('select * from "books"');
 
         $statement->setFetchMode($pdo::FETCH_CLASS, BookForClassFetchModeWithConstructor::class, [1000, false]);
@@ -70,7 +74,7 @@ class FetchModeClassTest extends TestCase
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $row);
-        static::assertSame(1, $row->id);
+        static::assertEquals(1, $row->id);
         static::assertSame('Kaidash’s Family', $row->title);
         static::assertSame(1000, $row->price);
         static::assertFalse($row->published);
@@ -78,7 +82,7 @@ class FetchModeClassTest extends TestCase
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $row);
-        static::assertSame(2, $row->id);
+        static::assertEquals(2, $row->id);
         static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
         static::assertSame(1000, $row->price);
         static::assertFalse($row->published);

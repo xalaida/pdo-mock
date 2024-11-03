@@ -220,6 +220,8 @@ class FetchTest extends TestCase
             $this->markTestSkipped('PDOStatement::getIterator() is available only on PHP >= 8.0');
         }
 
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+
         $statement = $pdo->prepare('select * from "books"');
 
         $statement->setFetchMode($pdo::FETCH_OBJ);

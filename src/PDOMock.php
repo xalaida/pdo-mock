@@ -58,7 +58,7 @@ class PDOMock extends PDO
             PDO::ATTR_SERVER_VERSION => '1.0.0',
             PDO::ATTR_CLIENT_VERSION => '1.0.0',
             PDO::ATTR_CASE => PDO::CASE_NATURAL,
-            PDO::ATTR_ORACLE_NULLS => 0,
+            PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
             PDO::ATTR_PERSISTENT => false,
             PDO::ATTR_STATEMENT_CLASS => [
                 PDOStatement::class

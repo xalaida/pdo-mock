@@ -16,16 +16,18 @@ class QueryTest extends TestCase
      */
     public function itShouldFetchAsObjects($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+
         $statement = $pdo->query('select * from "books"', $pdo::FETCH_OBJ);
 
         $rows = $statement->fetchAll();
 
         static::assertCount(2, $rows);
         static::assertIsObjectType($rows[0]);
-        static::assertSame(1, $rows[0]->id);
+        static::assertSame('1', $rows[0]->id);
         static::assertSame('Kaidash’s Family', $rows[0]->title);
         static::assertIsObjectType($rows[1]);
-        static::assertSame(2, $rows[1]->id);
+        static::assertSame('2', $rows[1]->id);
         static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->title);
         $this->assertInstanceOf(PDOStatement::class, $statement);
         static::assertSame(0, $statement->rowCount());
@@ -38,18 +40,20 @@ class QueryTest extends TestCase
      */
     public function itShouldFetchIntoClassUsingQuery($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+
         $statement = $pdo->query('select * from "books"', $pdo::FETCH_CLASS, BookForQuery::class);
 
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForQuery::class, $row);
-        static::assertSame(1, $row->id);
+        static::assertSame('1', $row->id);
         static::assertSame('Kaidash’s Family', $row->title);
 
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForQuery::class, $row);
-        static::assertSame(2, $row->id);
+        static::assertSame('2', $row->id);
         static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
     }
 

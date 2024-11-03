@@ -2,7 +2,6 @@
 
 namespace Tests\Xalaida\PDOMock;
 
-use PHPUnit\Framework\ExpectationFailedException;
 use Xalaida\PDOMock\PDOMock;
 
 class ExecuteTest extends TestCase
@@ -60,7 +59,7 @@ class ExecuteTest extends TestCase
         $pdo = new PDOMock();
         $pdo->expect('select * from "categories"');
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(static::getExpectationFailedExceptionClass());
         $this->expectExceptionMessage('Query does not match.');
 
         $pdo->exec('select * from "books"');
