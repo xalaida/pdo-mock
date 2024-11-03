@@ -14,6 +14,7 @@ class FetchAllTest extends TestCase
     public function itShouldHandleFetchAll()
     {
         $pdo = new PDOMock();
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
