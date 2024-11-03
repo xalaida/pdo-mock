@@ -20,11 +20,7 @@ class ExpectationManager
      */
     public function expectQuery($query)
     {
-        $expectation = new QueryExpectation($query);
-
-        $expectation->setAssertionValidator(
-            static::getAssertionValidator()
-        );
+        $expectation = new QueryExpectation(static::getAssertionValidator(), $query);
 
         $this->expectations[] = $expectation;
 
@@ -37,11 +33,7 @@ class ExpectationManager
      */
     public function expectFunction($function)
     {
-        $expectation = new FunctionExpectation($function);
-
-        $expectation->setAssertionValidator(
-            static::getAssertionValidator()
-        );
+        $expectation = new FunctionExpectation(static::getAssertionValidator(), $function);
 
         $this->expectations[] = $expectation;
 

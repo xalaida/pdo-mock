@@ -10,7 +10,7 @@ use PDOException;
 class QueryExpectation
 {
     /**
-     * @var AssertionValidator
+     * @var AssertionValidatorInterface
      */
     public $assertionValidator;
 
@@ -60,20 +60,13 @@ class QueryExpectation
     public $statement;
 
     /**
+     * @param AssertionValidatorInterface $assertionValidator
      * @param string $query
      */
-    public function __construct($query)
-    {
-        $this->query = $query;
-    }
-
-    /**
-     * @param AssertionValidator $assertionValidator
-     * @return void
-     */
-    public function setAssertionValidator($assertionValidator)
+    public function __construct($assertionValidator, $query)
     {
         $this->assertionValidator = $assertionValidator;
+        $this->query = $query;
     }
 
     /**

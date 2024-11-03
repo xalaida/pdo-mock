@@ -15,20 +15,13 @@ class FunctionExpectation
     public $function;
 
     /**
+     * @param AssertionValidatorInterface $assertionValidator
      * @param string $function
      */
-    public function __construct($function)
-    {
-        $this->function = $function;
-    }
-
-    /**
-     * @param AssertionValidatorInterface $assertionValidator
-     * @return void
-     */
-    public function setAssertionValidator($assertionValidator)
+    public function __construct($assertionValidator, $function)
     {
         $this->assertionValidator = $assertionValidator;
+        $this->function = $function;
     }
 
     /**
