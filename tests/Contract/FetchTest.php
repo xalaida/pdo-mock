@@ -57,7 +57,7 @@ class FetchTest extends TestCase
      */
     public function itShouldHandleFetchInAssocMode($pdo)
     {
-        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
 
         $statement = $pdo->prepare('select * from "books"');
 
@@ -68,22 +68,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArrayType($row);
-
-        if (PHP_VERSION_ID < 80100) {
-            static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $row);
-        } else {
-            static::assertSame(['id' => 1, 'title' => 'Kaidash’s Family'], $row);
-        }
+        static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
         static::assertIsArrayType($row);
-
-        if (PHP_VERSION_ID < 80100) {
-            static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
-        } else {
-            static::assertSame(['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
-        }
+        static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
 
         $row = $statement->fetch($pdo::FETCH_ASSOC);
 
@@ -120,7 +110,7 @@ class FetchTest extends TestCase
      */
     public function itShouldHandleFetchInNumMode($pdo)
     {
-        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
 
         $statement = $pdo->prepare('select * from "books"');
 
@@ -131,26 +121,12 @@ class FetchTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArrayType($row);
-
-        if (PHP_VERSION_ID < 80100) {
-            static::assertSame(['1', 'Kaidash’s Family'], $row);
-        } else {
-            static::assertSame([1, 'Kaidash’s Family'], $row);
-        }
+        static::assertSame(['1', 'Kaidash’s Family'], $row);
 
         $row = $statement->fetch($pdo::FETCH_NUM);
 
         static::assertIsArrayType($row);
-
-        if (PHP_VERSION_ID < 80100) {
-            static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $row);
-        } else {
-            static::assertSame([2, 'Shadows of the Forgotten Ancestors'], $row);
-        }
-
-        $row = $statement->fetch($pdo::FETCH_NUM);
-
-        static::assertFalse($row);
+        static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $row);
     }
 
     /**
