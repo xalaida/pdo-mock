@@ -68,16 +68,6 @@ class GetAttributeTest extends TestCase
      * @dataProvider contracts
      * @param PDO $pdo
      */
-    public function itShouldReturnAttributeDriverName($pdo)
-    {
-        static::assertSame('sqlite', $pdo->getAttribute($pdo::ATTR_DRIVER_NAME));
-    }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     */
     public function itShouldReturnAttributeDefaultFetchMode($pdo)
     {
         static::assertSame($pdo::FETCH_BOTH, $pdo->getAttribute($pdo::ATTR_DEFAULT_FETCH_MODE));
@@ -103,6 +93,6 @@ class GetAttributeTest extends TestCase
 
     protected static function configureMock()
     {
-        return new PDOMock('sqlite');
+        return new PDOMock();
     }
 }

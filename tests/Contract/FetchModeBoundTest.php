@@ -125,7 +125,7 @@ class FetchModeBoundTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock('sqlite');
+        $pdo = new PDOMock();
 
         $pdo->expect('select "id", "title", "status", "deleted" from "books" where "deleted" = ?')
             ->withParam(1, 0, $pdo::PARAM_BOOL)

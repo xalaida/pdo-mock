@@ -45,10 +45,12 @@ class PDOMock extends PDO
     protected $errorInfo = ['', null, null];
 
     /**
-     * @param string $dsn
+     * @param string|null $dsn
+     * @param string|null $username
+     * @param string|null $password
      * @param array $attributes
      */
-    public function __construct($dsn = 'mock', $attributes = [])
+    public function __construct($dsn = null, $username = null, $password = null, $attributes = [])
     {
         $this->expectationManager = new ExpectationManager();
         $this->attributes = [
@@ -63,8 +65,8 @@ class PDOMock extends PDO
             PDO::ATTR_STATEMENT_CLASS => [
                 PDOStatement::class
             ],
-            PDO::ATTR_DRIVER_NAME => $dsn,
-            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80200,
+            PDO::ATTR_DRIVER_NAME => 'mock',
+            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80100,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
         ] + $attributes;
     }

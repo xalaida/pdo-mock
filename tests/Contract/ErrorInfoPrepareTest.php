@@ -66,7 +66,7 @@ class ErrorInfoPrepareTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock('sqlite');
+        $pdo = new PDOMock();
 
         $pdo->expect('insert into "books" ("id", "title") values (1, "Stolen Happiness by Ivan Franko")');
 

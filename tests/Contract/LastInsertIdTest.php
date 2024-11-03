@@ -45,7 +45,7 @@ class LastInsertIdTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock('sqlite');
+        $pdo = new PDOMock();
 
         $pdo->expect('insert into "books" ("id", "title") values (777, "Kaidash’s Family")')
             ->withInsertId(777);

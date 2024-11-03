@@ -114,7 +114,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
 
     protected static function configureMock()
     {
-        $pdo = new PDOMock('sqlite');
+        $pdo = new PDOMock();
 
         $pdo->expect('select table "books"')
             ->andFailOnExecute(PDOExceptionMock::fromErrorInfo(
