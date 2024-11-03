@@ -325,9 +325,9 @@ class PDOStatementMock extends PDOStatement
         $row = false;
 
         if ($this->executed && isset($this->expectation->resultSet->rows[$this->cursor])) {
-            $row = $this->applyFetchTransformations(
+            $row = $this->applyFetchMode(
+                $this->applyFetchColumnCase($this->expectation->resultSet->cols),
                 $this->expectation->resultSet->rows[$this->cursor],
-                $this->expectation->resultSet->cols,
                 $mode
             );
 
@@ -369,8 +369,10 @@ class PDOStatementMock extends PDOStatement
         $allRows = [];
 
         if ($this->executed) {
+            $cols = $this->applyFetchColumnCase($this->expectation->resultSet->cols);
+
             foreach ($this->expectation->resultSet->rows as $row) {
-                $allRows[] = $this->applyFetchTransformations($row, $this->expectation->resultSet->cols, $mode);
+                $allRows[] = $this->applyFetchMode($cols, $row, $mode);
             }
         }
 
@@ -378,81 +380,10 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $row
-     * @param array $cols
-     * @param int $mode
-     * @return array|bool|object
-     */
-    protected function applyFetchTransformations($row, $cols, $mode)
-    {
-        return $this->applyFetchMode(
-            $this->applyFetchCase($cols),
-            $this->applyFetchStringify(
-                $this->applyFetchOracleNull(
-                    $row
-                )
-            ),
-            $mode
-        );
-    }
-
-    /**
-     * @param array $row
-     * @return array
-     */
-    protected function applyFetchStringify($row)
-    {
-        $result = [];
-
-        foreach ($row as $key => $value) {
-            if ($this->shouldStringifyFetch()) {
-                $result[$key] = ! is_null($value)
-                    ? (string) $value
-                    : null;
-            } else {
-                $result[$key] = is_numeric($value)
-                    ? ($value + 0)
-                    : $value;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array $row
-     * @return array
-     */
-    protected function applyFetchOracleNull($row)
-    {
-        if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING) {
-            $result = [];
-
-            foreach ($row as $key => $value) {
-                $result[$key] = $value === '' ? null : $value;
-            }
-
-            return $result;
-        }
-
-        if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_TO_STRING) {
-            $result = [];
-
-            foreach ($row as $key => $value) {
-                $result[$key] = $value === null ? '' : $value;
-            }
-
-            return $result;
-        }
-
-        return $row;
-    }
-
-    /**
      * @param array $cols
      * @return array
      */
-    protected function applyFetchCase($cols)
+    protected function applyFetchColumnCase($cols)
     {
         $result = [];
 
@@ -476,7 +407,7 @@ class PDOStatementMock extends PDOStatement
      */
     protected function shouldStringifyFetch()
     {
-        if (PHP_VERSION_ID < 80100 && $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+        if (PHP_VERSION_ID < 80100) {
             return true;
         }
 
@@ -497,22 +428,22 @@ class PDOStatementMock extends PDOStatement
 
         switch ($mode) {
             case PDO::FETCH_NUM:
-                return $row;
+                return $this->applyFetchModeNum($row);
 
             case PDO::FETCH_ASSOC:
-                return array_combine($cols, $row);
+                return $this->applyFetchModeAssoc($row, $cols);
 
             case PDO::FETCH_OBJ:
-                return (object) array_combine($cols, $row);
+                return $this->applyFetchModeObj($row, $cols);
 
             case PDO::FETCH_BOTH:
-                return array_merge($row, array_combine($cols, $row));
+                return $this->applyFetchModeBoth($row, $cols);
 
             case PDO::FETCH_BOUND:
-                return $this->applyFetchModeBound($cols, $row);
+                return $this->applyFetchModeBound($row, $cols);
 
             case PDO::FETCH_CLASS:
-                return $this->applyFetchModeClass($cols, $row);
+                return $this->applyFetchModeClass($row, $cols);
 
             default:
                 throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
@@ -520,11 +451,52 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $cols
      * @param array $row
+     * @return array
+     */
+    protected function applyFetchModeNum($row)
+    {
+        return $this->castRowValues($row);
+    }
+
+    /**
+     * @param array $row
+     * @param array $cols
+     * @return array
+     */
+    protected function applyFetchModeAssoc($row, $cols)
+    {
+        return array_combine($cols, $this->castRowValues($row));
+    }
+
+    /**
+     * @param array $row
+     * @param array $cols
+     * @return object
+     */
+    protected function applyFetchModeObj($row, $cols)
+    {
+        return (object) array_combine($cols, $this->castRowValues($row));
+    }
+
+    /**
+     * @param array $row
+     * @param array $cols
+     * @return array
+     */
+    protected function applyFetchModeBoth($row, $cols)
+    {
+        $values = $this->castRowValues($row);
+
+        return array_merge($values, array_combine($cols, $values));
+    }
+
+    /**
+     * @param array $row
+     * @param array $cols
      * @return bool
      */
-    protected function applyFetchModeBound($cols, $row)
+    protected function applyFetchModeBound($row, $cols)
     {
         foreach ($this->columns as $column => $params) {
             if (is_int($column)) {
@@ -544,7 +516,7 @@ class PDOStatementMock extends PDOStatement
             if ($index === false) {
                 $params['value'] = null;
             } else {
-                $params['value'] = $this->applyParamType($params['type'], $row[$index]);
+                $params['value'] = $this->castRowValue($row[$index], $params['type']);
             }
         }
 
@@ -552,11 +524,86 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param int $type
+     * @param array $row
+     * @param array $cols
+     * @return object
+     * @throws \ReflectionException
+     */
+    protected function applyFetchModeClass($row, $cols)
+    {
+        if (! $this->fetchClassName) {
+            throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
+        }
+
+        $reflectionClass = new ReflectionClass($this->fetchClassName);
+
+        $classInstance = $reflectionClass->newInstanceWithoutConstructor();
+
+        foreach ($cols as $key => $col) {
+            if ($reflectionClass->hasProperty($col)) {
+                $prop = $reflectionClass->getProperty($col);
+                $prop->setAccessible(true);
+                $prop->setValue($classInstance, $this->castRowValue($row[$key]));
+            }
+        }
+
+        $constructor = $reflectionClass->getConstructor();
+
+        if ($constructor) {
+            $constructor->invokeArgs($classInstance, ...$this->fetchModeParams);
+        }
+
+        return $classInstance;
+    }
+
+    /**
+     * @param array $row
+     * @return array
+     */
+    protected function castRowValues($row)
+    {
+        $result = [];
+
+        foreach ($row as $key => $value) {
+            $result[$key] = $this->castRowValue($value);
+        }
+
+        return $result;
+    }
+
+    /**
      * @param mixed $value
+     * @param int|null $type
      * @return mixed
      */
-    protected function applyParamType($type, $value)
+    protected function castRowValue($value, $type = null)
+    {
+        if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING && $value === '') {
+            $value = null;
+        }
+
+        // FIXME: resolve stringify property correctly
+        if ($this->shouldStringifyFetch() && ($type === null || $type === PDO::PARAM_INT)) {
+            $type = PDO::PARAM_STR;
+        }
+
+        if ($type !== null) {
+            $value = $this->applyParamType($value, $type);
+        }
+
+        if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_TO_STRING && $value === null) {
+            $value = '';
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @param int $type
+     * @return mixed
+     */
+    protected function applyParamType($value, $type)
     {
         switch ($type) {
             case PDO::PARAM_NULL:
@@ -574,38 +621,5 @@ class PDOStatementMock extends PDOStatement
             default:
                 throw new InvalidArgumentException('Unsupported column type: ' . $type);
         }
-    }
-
-    /**
-     * @param array $cols
-     * @param array $row
-     * @return object
-     * @throws \ReflectionException
-     */
-    protected function applyFetchModeClass($cols, $row)
-    {
-        if (! $this->fetchClassName) {
-            throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
-        }
-
-        $reflectionClass = new ReflectionClass($this->fetchClassName);
-
-        $classInstance = $reflectionClass->newInstanceWithoutConstructor();
-
-        foreach ($cols as $key => $col) {
-            if ($reflectionClass->hasProperty($col)) {
-                $prop = $reflectionClass->getProperty($col);
-                $prop->setAccessible(true);
-                $prop->setValue($classInstance, $row[$key]);
-            }
-        }
-
-        $constructor = $reflectionClass->getConstructor();
-
-        if ($constructor) {
-            $constructor->invokeArgs($classInstance, ...$this->fetchModeParams);
-        }
-
-        return $classInstance;
     }
 }

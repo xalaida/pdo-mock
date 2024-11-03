@@ -89,6 +89,94 @@ class FetchModeBoundTest extends TestCase
         static::assertFalse($row);
     }
 
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     */
+    public function itShouldHandleFetchInBoundModeWithOracleNullToEmptyString($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_ORACLE_NULLS, $pdo::NULL_TO_STRING);
+
+        $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
+
+        $statement->setFetchMode($pdo::FETCH_BOUND);
+
+        $statement->bindValue(1, 0, $pdo::PARAM_BOOL);
+
+        $statement->bindColumn('id', $id, $pdo::PARAM_INT);
+        $statement->bindColumn('title', $title, $pdo::PARAM_STR);
+        $statement->bindColumn('status', $status, $pdo::PARAM_NULL);
+        $statement->bindColumn('deleted', $deleted, $pdo::PARAM_BOOL);
+        $statement->bindColumn('poster', $poster, $pdo::PARAM_STR);
+
+        $result = $statement->execute();
+        static::assertTrue($result);
+
+        $row = $statement->fetch();
+        static::assertTrue($row);
+        static::assertSame(1, $id);
+        static::assertSame('Kaidash’s Family', $title);
+        static::assertSame('', $status);
+        static::assertFalse($deleted);
+        static::assertNull($poster);
+
+        $row = $statement->fetch();
+        static::assertTrue($row);
+        static::assertSame(2, $id);
+        static::assertSame('Shadows of the Forgotten Ancestors', $title);
+        static::assertSame('', $status);
+        static::assertFalse($deleted);
+        static::assertNull($poster);
+
+        $row = $statement->fetch();
+        static::assertFalse($row);
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     */
+    public function itShouldHandleFetchInBoundModeWithStringifyFetches($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+
+        $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
+
+        $statement->setFetchMode($pdo::FETCH_BOUND);
+
+        $statement->bindValue(1, 0, $pdo::PARAM_BOOL);
+
+        $statement->bindColumn('id', $id, $pdo::PARAM_INT);
+        $statement->bindColumn('title', $title, $pdo::PARAM_STR);
+        $statement->bindColumn('status', $status, $pdo::PARAM_NULL);
+        $statement->bindColumn('deleted', $deleted, $pdo::PARAM_BOOL);
+        $statement->bindColumn('poster', $poster, $pdo::PARAM_STR);
+
+        $result = $statement->execute();
+        static::assertTrue($result);
+
+        $row = $statement->fetch();
+        static::assertTrue($row);
+        static::assertSame('1', $id);
+        static::assertSame('Kaidash’s Family', $title);
+        static::assertNull($status);
+        static::assertFalse($deleted);
+        static::assertNull($poster);
+
+        $row = $statement->fetch();
+        static::assertTrue($row);
+        static::assertSame('2', $id);
+        static::assertSame('Shadows of the Forgotten Ancestors', $title);
+        static::assertNull($status);
+        static::assertFalse($deleted);
+        static::assertNull($poster);
+
+        $row = $statement->fetch();
+        static::assertFalse($row);
+    }
+
     public static function contracts()
     {
         return [

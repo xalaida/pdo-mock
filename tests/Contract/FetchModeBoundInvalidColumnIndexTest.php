@@ -16,6 +16,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
     public function itShouldThrowValueExceptionWhenInvalidColumnIndex($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
 
         $statement = $pdo->prepare('select "title" from "books"');
 
@@ -28,7 +29,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
 
         static::assertTrue($result);
 
-        if (PHP_VERSION_ID < 70100) {
+        if (PHP_VERSION_ID < 70300) {
             try {
                 $statement->fetch();
 
@@ -46,7 +47,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
                 $this->fail('Expected exception was not thrown');
             } catch (\Throwable $e) {
                 static::assertSame("Kaidash’s Family", $title);
-                static::assertSame(null, $status);
+                static::assertSame('', $status);
 
                 static::assertInstanceOf(\ValueError::class, $e);
                 static::assertSame('Kaidash’s Family', $title);
