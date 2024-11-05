@@ -582,16 +582,46 @@ class PDOStatementMock extends PDOStatement
             $value = null;
         }
 
-        // FIXME: resolve stringify property correctly
-        if ($this->shouldStringifyFetch() && ($type === null || $type === PDO::PARAM_INT)) {
+        $shouldStringify = $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES);
+
+        if ($shouldStringify !== true) {
+            $shouldStringify = PHP_VERSION_ID < 80100;
+        }
+
+        if ($value !== null && $type === null && $shouldStringify) {
+            $type = PDO::PARAM_STR;
+        }
+
+        if ($type === PDO::PARAM_INT && $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES)) {
             $type = PDO::PARAM_STR;
         }
 
         if ($type !== null) {
-            $value = $this->applyParamType($value, $type);
+            switch ($type) {
+                case PDO::PARAM_NULL:
+                    $value = null;
+                    break;
+
+                case PDO::PARAM_INT:
+                    $value = (int) $value;
+                    break;
+
+                case PDO::PARAM_STR:
+                    if (!($value === null && $this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING)) {
+                        $value = (string) $value;
+                    }
+                    break;
+
+                case PDO::PARAM_BOOL:
+                    $value = (bool) $value;
+                    break;
+
+                default:
+                    throw new InvalidArgumentException('Unsupported column type: ' . $type);
+            }
         }
 
-        if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_TO_STRING && $value === null) {
+        if ($value === null && $this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_TO_STRING) {
             $value = '';
         }
 
