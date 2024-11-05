@@ -138,9 +138,58 @@ class FetchModeBoundTest extends TestCase
      * @dataProvider contracts
      * @param PDO $pdo
      */
-    public function itShouldHandleFetchInBoundModeWithStringifyFetches($pdo)
+    public function itShouldHandleFetchInBoundModeWithEnabledStringifyFetches($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+
+        $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
+
+        $statement->setFetchMode($pdo::FETCH_BOUND);
+
+        $statement->bindValue(1, 0, $pdo::PARAM_BOOL);
+
+        $statement->bindColumn('id', $id, $pdo::PARAM_INT);
+        $statement->bindColumn('title', $title, $pdo::PARAM_STR);
+        $statement->bindColumn('status', $status, $pdo::PARAM_NULL);
+        $statement->bindColumn('deleted', $deleted, $pdo::PARAM_BOOL);
+        $statement->bindColumn('poster', $poster, $pdo::PARAM_STR);
+
+        $result = $statement->execute();
+        static::assertTrue($result);
+
+        $row = $statement->fetch();
+        static::assertTrue($row);
+        static::assertSame('1', $id);
+        static::assertSame('Kaidash’s Family', $title);
+        if (PHP_VERSION_ID < 80100) {
+            static::assertNull($status);
+            static::assertFalse($deleted);
+        } else {
+            static::assertSame("published", $status);
+            static::assertSame('0', $deleted);
+        }
+        static::assertNull($poster);
+
+        $row = $statement->fetch();
+        static::assertTrue($row);
+        static::assertSame('2', $id);
+        static::assertSame('Shadows of the Forgotten Ancestors', $title);
+        if (PHP_VERSION_ID < 80100) {
+            static::assertNull($status);
+            static::assertFalse($deleted);
+        } else {
+            static::assertSame('draft', $status);
+            static::assertSame('0', $deleted);
+        }
+        static::assertNull($poster);
+
+        $row = $statement->fetch();
+        static::assertFalse($row);
+    }
+
+    public function itShouldHandleFetchInBoundModeWithDisabledStringifyFetches($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
 
         $statement = $pdo->prepare('select "id", "title", "status", "deleted" from "books" where "deleted" = ?');
 
@@ -218,8 +267,8 @@ class FetchModeBoundTest extends TestCase
         $pdo->expect('select "id", "title", "status", "deleted" from "books" where "deleted" = ?')
             ->withParam(1, 0, $pdo::PARAM_BOOL)
             ->andFetchRows([
-                ['id' => 1, 'title' => 'Kaidash’s Family', 'status' => 'published', 'deleted' => false],
-                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors', 'status' => 'draft', 'deleted' => false],
+                ['id' => 1, 'title' => 'Kaidash’s Family', 'status' => 'published', 'deleted' => 0],
+                ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors', 'status' => 'draft', 'deleted' => 0],
             ]);
 
         return $pdo;

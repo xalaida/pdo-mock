@@ -570,11 +570,13 @@ class PDOStatementMock extends PDOStatement
             return null;
         }
 
-        if ($this->shouldOverrideParamTypeToString($value, $type)) {
+        if ($value !== null && $this->shouldOverrideParamTypeToString($type)) {
             $type = PDO::PARAM_STR;
         }
 
-        $value = $this->applyParamType($value, $type);
+        if ($type !== null) {
+            $value = $this->applyParamType($value, $type);
+        }
 
         if ($value === null && $this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_TO_STRING) {
             return '';
@@ -584,26 +586,21 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param mixed $value
      * @param int|null $type
      * @return bool
      */
-    protected function shouldOverrideParamTypeToString($value, $type)
+    protected function shouldOverrideParamTypeToString($type)
     {
         if ($type === PDO::PARAM_INT && $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES)) {
             return true;
         }
 
-        if ($type !== null) {
-            return false;
-        }
-
-        if ($value === null) {
-            return false;
-        }
-
-        if (PHP_VERSION_ID < 80000) {
+        if ($this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES) && PHP_VERSION_ID >= 80100) {
             return true;
+        }
+
+        if (PHP_VERSION_ID < 80100) {
+            return $type === null;
         }
 
         return $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES) !== false;
