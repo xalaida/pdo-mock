@@ -30,7 +30,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
 
         static::assertTrue($result);
 
-        if (PHP_VERSION_ID < 70300) {
+        if (PHP_VERSION_ID < 80000) {
             try {
                 $statement->fetch();
 
@@ -48,7 +48,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
                 $this->fail('Expected exception was not thrown');
             } catch (\Throwable $e) {
                 static::assertSame("Kaidash’s Family", $title);
-                static::assertSame('', $status);
+                static::assertNull($status);
 
                 static::assertInstanceOf(\ValueError::class, $e);
                 static::assertSame('Kaidash’s Family', $title);
