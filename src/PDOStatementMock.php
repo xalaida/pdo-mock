@@ -602,7 +602,7 @@ class PDOStatementMock extends PDOStatement
             return false;
         }
 
-        if (PHP_VERSION_ID < 81000) {
+        if (PHP_VERSION_ID < 80000) {
             return true;
         }
 
