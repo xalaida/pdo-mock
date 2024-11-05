@@ -54,19 +54,18 @@ class PDOMock extends PDO
     {
         $this->expectationManager = new ExpectationManager();
         $this->attributes = [
+            PDO::ATTR_DRIVER_NAME => 'mock',
+            PDO::ATTR_SERVER_VERSION => '1.0.0',
+            PDO::ATTR_CLIENT_VERSION => '1.0.0',
             PDO::ATTR_ERRMODE => PHP_VERSION_ID < 80000
                 ? PDO::ERRMODE_SILENT
                 : PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_SERVER_VERSION => '1.0.0',
-            PDO::ATTR_CLIENT_VERSION => '1.0.0',
             PDO::ATTR_CASE => PDO::CASE_NATURAL,
             PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-            PDO::ATTR_PERSISTENT => false,
-            PDO::ATTR_STATEMENT_CLASS => [
-                PDOStatement::class
-            ],
-            PDO::ATTR_DRIVER_NAME => 'mock',
-            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80100,
+            PDO::ATTR_STATEMENT_CLASS => [PDOStatement::class],
+            PDO::ATTR_STRINGIFY_FETCHES => PHP_VERSION_ID < 80100
+                ? null
+                : false,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
         ] + $attributes;
     }
@@ -180,7 +179,8 @@ class PDOMock extends PDO
     public function getAttribute($attribute)
     {
         if (! isset($this->attributes[$attribute])) {
-            throw new PDOException('SQLSTATE[IM001]: Driver does not support this function: driver does not support that attribute');
+            return null;
+            // throw new PDOException('SQLSTATE[IM001]: Driver does not support this function: driver does not support that attribute');
         }
 
         return $this->attributes[$attribute];
