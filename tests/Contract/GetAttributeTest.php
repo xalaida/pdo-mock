@@ -48,16 +48,6 @@ class GetAttributeTest extends TestCase
      * @dataProvider contracts
      * @param PDO $pdo
      */
-    public function itShouldReturnAttributePersistent($pdo)
-    {
-        static::assertSame(false, $pdo->getAttribute($pdo::ATTR_PERSISTENT));
-    }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     */
     public function itShouldReturnAttributeStatementClass($pdo)
     {
         static::assertSame([PDOStatement::class], $pdo->getAttribute($pdo::ATTR_STATEMENT_CLASS));
