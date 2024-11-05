@@ -17,6 +17,7 @@ class FetchModeBoundInvalidColumnIndexTest extends TestCase
     {
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+        $pdo->setAttribute($pdo::ATTR_ORACLE_NULLS, $pdo::NULL_TO_STRING);
 
         $statement = $pdo->prepare('select "title" from "books"');
 

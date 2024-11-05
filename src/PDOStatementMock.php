@@ -403,18 +403,6 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @return bool
-     */
-    protected function shouldStringifyFetch()
-    {
-        if (PHP_VERSION_ID < 80100) {
-            return true;
-        }
-
-        return $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES);
-    }
-
-    /**
      * @param array $cols
      * @param array $row
      * @param int $mode
@@ -578,51 +566,18 @@ class PDOStatementMock extends PDOStatement
      */
     protected function castRowValue($value, $type = null)
     {
-        if ($this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING && $value === '') {
-            $value = null;
+        if ($value === '' && $this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING) {
+            return null;
         }
 
-        $shouldStringify = $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES);
-
-        if ($shouldStringify !== true) {
-            $shouldStringify = PHP_VERSION_ID < 80100;
-        }
-
-        if ($value !== null && $type === null && $shouldStringify) {
+        if ($this->shouldOverrideParamTypeToString($value, $type)) {
             $type = PDO::PARAM_STR;
         }
 
-        if ($type === PDO::PARAM_INT && $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES)) {
-            $type = PDO::PARAM_STR;
-        }
-
-        if ($type !== null) {
-            switch ($type) {
-                case PDO::PARAM_NULL:
-                    $value = null;
-                    break;
-
-                case PDO::PARAM_INT:
-                    $value = (int) $value;
-                    break;
-
-                case PDO::PARAM_STR:
-                    if (!($value === null && $this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING)) {
-                        $value = (string) $value;
-                    }
-                    break;
-
-                case PDO::PARAM_BOOL:
-                    $value = (bool) $value;
-                    break;
-
-                default:
-                    throw new InvalidArgumentException('Unsupported column type: ' . $type);
-            }
-        }
+        $value = $this->applyParamType($value, $type);
 
         if ($value === null && $this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_TO_STRING) {
-            $value = '';
+            return '';
         }
 
         return $value;
@@ -630,7 +585,33 @@ class PDOStatementMock extends PDOStatement
 
     /**
      * @param mixed $value
-     * @param int $type
+     * @param int|null $type
+     * @return bool
+     */
+    protected function shouldOverrideParamTypeToString($value, $type)
+    {
+        if ($type === PDO::PARAM_INT && $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES)) {
+            return true;
+        }
+
+        if ($type !== null) {
+            return false;
+        }
+
+        if ($value === null) {
+            return false;
+        }
+
+        if (PHP_VERSION_ID < 81000) {
+            return true;
+        }
+
+        return $this->pdo->getAttribute(PDO::ATTR_STRINGIFY_FETCHES) !== false;
+    }
+
+    /**
+     * @param mixed $value
+     * @param int|null $type
      * @return mixed
      */
     protected function applyParamType($value, $type)
@@ -649,7 +630,7 @@ class PDOStatementMock extends PDOStatement
                 return (bool) $value;
 
             default:
-                throw new InvalidArgumentException('Unsupported column type: ' . $type);
+                return $value;
         }
     }
 }
