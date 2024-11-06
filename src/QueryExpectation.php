@@ -65,6 +65,11 @@ class QueryExpectation
     protected $queryMatcher;
 
     /**
+     * @var QueryMatcherInterface|null
+     */
+    public static $defaultQueryMatcher;
+
+    /**
      * @param AssertionValidatorInterface $assertionValidator
      * @param string $query
      */
@@ -72,7 +77,7 @@ class QueryExpectation
     {
         $this->assertionValidator = $assertionValidator;
         $this->query = $query;
-        $this->queryMatcher = new QueryMatcherRegex();
+        $this->queryMatcher = static::$defaultQueryMatcher ?: new QueryMatcherRegex();
     }
 
     /**

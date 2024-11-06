@@ -27,4 +27,43 @@ class QueryMatchRegexTest extends TestCase
 
         $pdo->assertExpectationsFulfilled();
     }
+
+    /**
+     * @test
+     */
+    public function itShouldMatchRegex()
+    {
+        $pdo = new PDOMock();
+
+        $expectation = $pdo->expect('insert into "books" ({{ .* }}) values ({{ .* }})');
+
+        $expectation->toMatchRegex();
+
+        $statement = $pdo->prepare('insert into "books" ("title", "status", "year", "author") values (?, ?, ?, ?)');
+
+        $result = $statement->execute(['The Forest Song', 'published', 2020, 'Lesya']);
+
+        static::assertTrue($result);
+
+        $pdo->assertExpectationsFulfilled();
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldFailWhenRegexDoesNotMatch()
+    {
+        $pdo = new PDOMock();
+
+        $expectation = $pdo->expect('insert into "books" ({{ [0-9]+ }}) values (?, ?, ?, ?)');
+
+        $expectation->toMatchRegex();
+
+        $statement = $pdo->prepare('insert into "books" ("title", "status", "year", "author") values (?, ?, ?, ?)');
+
+        $this->expectException(static::getExpectationFailedExceptionClass());
+        $this->expectExceptionMessage('Query does not match.');
+
+        $statement->execute(['The Forest Song', 'published', 2020, 'Lesya']);
+    }
 }

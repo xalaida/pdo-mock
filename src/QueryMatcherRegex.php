@@ -20,9 +20,9 @@ class QueryMatcherRegex implements QueryMatcherInterface
             throw new InvalidArgumentException('Expected SQL cannot be empty.');
         }
 
-        $pattern = '/' . preg_quote($expectation, '/') . '/';
+        $pattern = $this->injectRegexComponents($expectation);
 
-        return (bool) preg_match($pattern, $reality);
+        return preg_match("/^" . $pattern . "$/u", $reality) === 1;
     }
 
     /**
@@ -32,5 +32,29 @@ class QueryMatcherRegex implements QueryMatcherInterface
     protected function normalizeQuery($query)
     {
         return trim(preg_replace('/\s+/', ' ', $query));
+    }
+
+    /**
+     * @param string $pattern
+     * @return string
+     */
+    protected function injectRegexComponents($pattern)
+    {
+        $counter = 0;
+        $regexes = [];
+
+        $patternWithPlaceholders = preg_replace_callback('/\{\{\s*(.*?)\s*\}\}/', function ($matches) use (&$counter, &$regexes) {
+            $regexes[] = $matches[1];
+
+            return '__PATTERN__' . (++$counter) . '__';
+        }, $pattern);
+
+        $escapedPattern = preg_quote($patternWithPlaceholders, '/');
+
+        foreach ($regexes as $index => $regex) {
+            $escapedPattern = preg_replace('/__PATTERN__' . ($index + 1) . '__/', $regex, $escapedPattern);
+        }
+
+        return $escapedPattern;
     }
 }
