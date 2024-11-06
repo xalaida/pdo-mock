@@ -7,9 +7,9 @@ use Xalaida\PDOMock\AssertionValidatorInterface;
 
 class AssertionValidator implements AssertionValidatorInterface
 {
-    public function assertQueryMatch($expectation, $reality)
+    public function assertQueryMatch($result)
     {
-        TestCase::assertEquals($expectation, $reality, 'Query does not match.');
+        TestCase::assertTrue($result, 'Query does not match.');
     }
 
     public function assertParamsMatch($expectation, $reality)

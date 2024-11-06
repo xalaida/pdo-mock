@@ -60,6 +60,11 @@ class QueryExpectation
     public $statement;
 
     /**
+     * @var QueryMatcherInterface
+     */
+    protected $queryMatcher;
+
+    /**
      * @param AssertionValidatorInterface $assertionValidator
      * @param string $query
      */
@@ -67,6 +72,34 @@ class QueryExpectation
     {
         $this->assertionValidator = $assertionValidator;
         $this->query = $query;
+        $this->queryMatcher = new QueryMatcherRegex();
+    }
+
+    /**
+     * @param QueryMatcherInterface $queryMatcher
+     * @return $this
+     */
+    public function usingQueryMatcher($queryMatcher)
+    {
+        $this->queryMatcher = $queryMatcher;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function toMatchRegex()
+    {
+        return $this->usingQueryMatcher(new QueryMatcherRegex());
+    }
+
+    /**
+     * @return $this
+     */
+    public function toBeExact()
+    {
+        return $this->usingQueryMatcher(new QueryMatcherExact());
     }
 
     /**
@@ -291,7 +324,11 @@ class QueryExpectation
      */
     public function assertQueryMatch($query)
     {
-        $this->assertionValidator->assertQueryMatch($this->query, $query);
+        // TODO: rework PHPUnit integration with this.
+
+        $result = $this->queryMatcher->match($this->query, $query);
+
+        $this->assertionValidator->assertQueryMatch($result);
     }
 
     /**

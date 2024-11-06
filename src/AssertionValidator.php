@@ -4,10 +4,11 @@ namespace Xalaida\PDOMock;
 
 class AssertionValidator implements AssertionValidatorInterface
 {
-    public function assertQueryMatch($expectation, $reality)
+    public function assertQueryMatch($result)
     {
-        if ($expectation !== $reality) {
-            throw new ExpectationFailedException('Unexpected query: ' . $reality);
+        if (! $result) {
+            // TODO: rewrite this.
+            throw new ExpectationFailedException('Unexpected query: ');
         }
     }
 
