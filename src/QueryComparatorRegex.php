@@ -4,14 +4,14 @@ namespace Xalaida\PDOMock;
 
 use InvalidArgumentException;
 
-class QueryMatcherRegex implements QueryMatcherInterface
+class QueryComparatorRegex implements QueryComparatorInterface
 {
     /**
      * @param string $expectation
      * @param string $reality
      * @return bool
      */
-    public function match($expectation, $reality)
+    public function compare($expectation, $reality)
     {
         $expectation = $this->normalizeQuery($expectation);
         $reality = $this->normalizeQuery($reality);

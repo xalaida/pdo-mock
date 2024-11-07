@@ -13,7 +13,7 @@ class ExpectationValidator implements ExpectationValidatorInterface
     public function assertQueryMatch($expectation, $reality)
     {
         PHPUnit::assertTrue(
-            $expectation->queryMatcher->match($expectation->query, $reality),
+            $expectation->queryComparator->compare($expectation->query, $reality),
             'Query does not match.'
         );
     }

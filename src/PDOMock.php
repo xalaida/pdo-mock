@@ -15,9 +15,9 @@ class PDOMock extends PDO
     public static $expectationValidator;
 
     /**
-     * @var QueryMatcherInterface|null
+     * @var QueryComparatorInterface|null
      */
-    public static $defaultQueryMatcher;
+    public static $defaultQueryComparator;
 
     /**
      * @var array<int, QueryExpectation|FunctionExpectation>
@@ -105,19 +105,19 @@ class PDOMock extends PDO
     }
 
     /**
-     * @param QueryMatcherInterface $defaultQueryMatcher
+     * @param QueryComparatorInterface $defaultQueryComparator
      */
-    public static function setDefaultQueryMatcher($defaultQueryMatcher)
+    public static function setDefaultQueryComparator($defaultQueryComparator)
     {
-        static::$defaultQueryMatcher = $defaultQueryMatcher;
+        static::$defaultQueryComparator = $defaultQueryComparator;
     }
 
     /**
-     * @return QueryMatcherInterface
+     * @return QueryComparatorInterface
      */
-    public static function getDefaultQueryMatcher()
+    public static function getDefaultQueryComparator()
     {
-        return static::$defaultQueryMatcher ?: new QueryMatcherExact();
+        return static::$defaultQueryComparator ?: new QueryComparatorExact();
     }
 
     /**
@@ -137,7 +137,7 @@ class PDOMock extends PDO
     {
         $expectation = new QueryExpectation(
             static::getExpectationValidator(),
-            static::getDefaultQueryMatcher(),
+            static::getDefaultQueryComparator(),
             $query
         );
 

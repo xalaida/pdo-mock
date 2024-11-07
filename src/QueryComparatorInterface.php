@@ -2,12 +2,12 @@
 
 namespace Xalaida\PDOMock;
 
-interface QueryMatcherInterface
+interface QueryComparatorInterface
 {
     /**
      * @param string $expectation
      * @param string $reality
      * @return bool
      */
-    public function match($expectation, $reality);
+    public function compare($expectation, $reality);
 }
