@@ -117,7 +117,7 @@ class PDOMock extends PDO
      */
     public static function getDefaultQueryMatcher()
     {
-        return static::$defaultQueryMatcher ?: new QueryMatcherRegex();
+        return static::$defaultQueryMatcher ?: new QueryMatcherExact();
     }
 
     /**
@@ -135,7 +135,11 @@ class PDOMock extends PDO
      */
     public function expectQuery($query)
     {
-        $expectation = new QueryExpectation(static::getExpectationValidator(), $query);
+        $expectation = new QueryExpectation(
+            static::getExpectationValidator(),
+            static::getDefaultQueryMatcher(),
+            $query
+        );
 
         $this->expectations[] = $expectation;
 

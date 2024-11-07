@@ -3,35 +3,24 @@
 namespace Xalaida\PDOMock\Adapter\PHPUnit;
 
 use Xalaida\PDOMock\ExpectationValidatorInterface;
-use Xalaida\PDOMock\PDOMock;
-use Xalaida\PDOMock\QueryMatcherInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class ExpectationValidator implements ExpectationValidatorInterface
 {
     /**
-     * @var QueryMatcherInterface
+     * @inheritDoc
      */
-    protected $queryMatcher;
-
-    public function setQueryMatcher($queryMatcher)
-    {
-        $this->queryMatcher = $queryMatcher;
-    }
-
-    public function getQueryMatcher()
-    {
-        return $this->queryMatcher ?: PDOMock::getDefaultQueryMatcher();
-    }
-
     public function assertQueryMatch($expectation, $reality)
     {
         PHPUnit::assertTrue(
-            $this->getQueryMatcher()->match($expectation, $reality),
+            $expectation->queryMatcher->match($expectation->query, $reality),
             'Query does not match.'
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertParamsMatch($expectation, $reality)
     {
         if (is_callable($expectation)) {
@@ -43,16 +32,25 @@ class ExpectationValidator implements ExpectationValidatorInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertIsPrepared($reality)
     {
         PHPUnit::assertTrue($reality, 'Statement is not prepared.');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertIsNotPrepared($reality)
     {
         PHPUnit::assertFalse($reality, 'Statement is prepared.');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertFunctionMatch($expectation, $reality)
     {
         PHPUnit::assertEquals($expectation, $reality, 'Function does not match');

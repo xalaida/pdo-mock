@@ -15,6 +15,11 @@ class QueryExpectation
     public $expectationValidator;
 
     /**
+     * @var QueryMatcherInterface
+     */
+    public $queryMatcher;
+
+    /**
      * @var string
      */
     public $query;
@@ -63,9 +68,10 @@ class QueryExpectation
      * @param ExpectationValidatorInterface $expectationValidator
      * @param string $query
      */
-    public function __construct($expectationValidator, $query)
+    public function __construct($expectationValidator, $queryMatcher, $query)
     {
         $this->expectationValidator = $expectationValidator;
+        $this->queryMatcher = $queryMatcher;
         $this->query = $query;
     }
 
@@ -75,7 +81,7 @@ class QueryExpectation
      */
     public function usingQueryMatcher($queryMatcher)
     {
-        $this->expectationValidator->setQueryMatcher($queryMatcher);
+        $this->queryMatcher = $queryMatcher;
 
         return $this;
     }
@@ -85,7 +91,9 @@ class QueryExpectation
      */
     public function toMatchRegex()
     {
-        return $this->usingQueryMatcher(new QueryMatcherRegex());
+        $this->queryMatcher = new QueryMatcherRegex();
+
+        return $this;
     }
 
     /**
@@ -93,7 +101,9 @@ class QueryExpectation
      */
     public function toBeExact()
     {
-        return $this->usingQueryMatcher(new QueryMatcherExact());
+        $this->queryMatcher = new QueryMatcherExact();
+
+        return $this;
     }
 
     /**
@@ -318,7 +328,7 @@ class QueryExpectation
      */
     public function assertQueryMatch($query)
     {
-        $this->expectationValidator->assertQueryMatch($this->query, $query);
+        $this->expectationValidator->assertQueryMatch($this, $query);
     }
 
     /**

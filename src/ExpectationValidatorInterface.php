@@ -5,13 +5,7 @@ namespace Xalaida\PDOMock;
 interface ExpectationValidatorInterface
 {
     /**
-     * @param QueryMatcherInterface $queryMatcher
-     * @return void
-     */
-    public function setQueryMatcher($queryMatcher);
-
-    /**
-     * @param string $expectation
+     * @param QueryExpectation $expectation
      * @param string $reality
      * @return void
      */

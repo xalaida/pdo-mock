@@ -5,22 +5,18 @@ namespace Xalaida\PDOMock;
 class ExpectationValidator implements ExpectationValidatorInterface
 {
     /**
-     * @var QueryMatcherInterface|null
+     * @inheritDoc
      */
-    protected $queryMatcher;
-
-    public function setQueryMatcher($queryMatcher)
-    {
-        $this->queryMatcher = $queryMatcher;
-    }
-
     public function assertQueryMatch($expectation, $reality)
     {
-        if (! $this->queryMatcher->match($expectation, $reality)) {
+        if (! $expectation->queryMatcher->match($expectation->query, $reality)) {
             throw new ExpectationFailedException('Unexpected query: ' . $reality);
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertParamsMatch($expectation, $reality)
     {
         if (is_callable($expectation)) {
@@ -36,6 +32,9 @@ class ExpectationValidator implements ExpectationValidatorInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertIsPrepared($reality)
     {
         if ($reality === false) {
@@ -43,6 +42,9 @@ class ExpectationValidator implements ExpectationValidatorInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertIsNotPrepared($reality)
     {
         if ($reality === true) {
@@ -50,6 +52,9 @@ class ExpectationValidator implements ExpectationValidatorInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertFunctionMatch($expectation, $reality)
     {
         if ($expectation !== $reality) {

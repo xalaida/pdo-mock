@@ -7,6 +7,9 @@ use Xalaida\PDOMock\PDOMock;
 
 class PHPUnitAdapter implements AdapterInterface
 {
+    /**
+     * @inheritDoc
+     */
     public function configure()
     {
         PDOMock::useExpectationValidator(new ExpectationValidator());
