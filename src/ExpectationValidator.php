@@ -2,13 +2,22 @@
 
 namespace Xalaida\PDOMock;
 
-class AssertionValidator implements AssertionValidatorInterface
+class ExpectationValidator implements ExpectationValidatorInterface
 {
-    public function assertQueryMatch($result)
+    /**
+     * @var QueryMatcherInterface|null
+     */
+    protected $queryMatcher;
+
+    public function setQueryMatcher($queryMatcher)
     {
-        if (! $result) {
-            // TODO: rewrite this.
-            throw new ExpectationFailedException('Unexpected query: ');
+        $this->queryMatcher = $queryMatcher;
+    }
+
+    public function assertQueryMatch($expectation, $reality)
+    {
+        if (! $this->queryMatcher->match($expectation, $reality)) {
+            throw new ExpectationFailedException('Unexpected query: ' . $reality);
         }
     }
 

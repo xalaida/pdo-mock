@@ -2,13 +2,20 @@
 
 namespace Xalaida\PDOMock;
 
-interface AssertionValidatorInterface
+interface ExpectationValidatorInterface
 {
     /**
-     * @param bool $result
+     * @param QueryMatcherInterface $queryMatcher
      * @return void
      */
-    public function assertQueryMatch($result);
+    public function setQueryMatcher($queryMatcher);
+
+    /**
+     * @param string $expectation
+     * @param string $reality
+     * @return void
+     */
+    public function assertQueryMatch($expectation, $reality);
 
     /**
      * @param string $expectation
