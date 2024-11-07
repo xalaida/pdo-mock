@@ -22,7 +22,7 @@ To do so, register the extension in your configuration file for PHPUnit:
 
 ```xml
 <extensions>
-    <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\Extension"/>
+    <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitExtension"/>
 </extensions>
 ```
 
