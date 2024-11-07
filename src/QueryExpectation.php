@@ -338,7 +338,7 @@ class QueryExpectation
     public function assertParamsMatch($params)
     {
         if (! is_null($this->params)) {
-            $this->expectationValidator->assertParamsMatch($this->params, $params);
+            $this->expectationValidator->assertParamsMatch($this, $params);
         }
     }
 

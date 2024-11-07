@@ -30,6 +30,6 @@ class FunctionExpectation
      */
     public function assertFunctionMatch($function)
     {
-        $this->expectationValidator->assertFunctionMatch($this->function, $function);
+        $this->expectationValidator->assertFunctionMatch($this, $function);
     }
 }
