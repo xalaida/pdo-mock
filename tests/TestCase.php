@@ -3,8 +3,8 @@
 namespace Tests\Xalaida\PDOMock;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Xalaida\PDOMock\ExpectationManager;
-use Xalaida\PDOMock\Adapter\PHPUnit\AssertionValidator;
+use Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitAdapter;
+use Xalaida\PDOMock\PDOMock;
 
 class TestCase extends BaseTestCase
 {
@@ -13,7 +13,7 @@ class TestCase extends BaseTestCase
      */
     public static function setUpPDOMock()
     {
-        ExpectationManager::useAssertionValidator(new AssertionValidator());
+        PDOMock::useAdapter(new PHPUnitAdapter());
     }
 
     /**
