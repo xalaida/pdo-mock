@@ -25,6 +25,6 @@
     </source>
 
     <extensions>
-        <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\Extension"/>
+        <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitExtension"/>
     </extensions>
 </phpunit>

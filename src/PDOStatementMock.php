@@ -368,7 +368,7 @@ class PDOStatementMock extends PDOStatement
 
         $allRows = [];
 
-        if ($this->executed) {
+        if ($this->executed && isset($this->expectation->resultSet)) {
             $cols = $this->applyFetchColumnCase($this->expectation->resultSet->cols);
 
             foreach ($this->expectation->resultSet->rows as $row) {

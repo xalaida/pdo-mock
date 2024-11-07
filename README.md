@@ -22,7 +22,7 @@ To do so, register the extension in your configuration file for PHPUnit:
 
 ```xml
 <extensions>
-    <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\Extension"/>
+    <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitExtension"/>
 </extensions>
 ```
 
@@ -30,14 +30,14 @@ Or manually configure it in your `TestCase` class:
 
 ```php
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Xalaida\PDOMock\ExpectationManager;
-use Xalaida\PDOMock\Adapter\PHPUnit\AssertionValidator;
+use Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitAdapter;
+use Xalaida\PDOMock\PDOMock;
 
 class TestCase extends BaseTestCase
 {
     public static function setUpBeforeClass()
     {
-        ExpectationManager::useAssertionValidator(new AssertionValidator());
+        PDOMock::useAdapter(new PHPUnitAdapter());
     }
 }
 ```

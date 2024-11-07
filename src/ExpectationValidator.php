@@ -2,30 +2,31 @@
 
 namespace Xalaida\PDOMock;
 
-class AssertionValidator implements AssertionValidatorInterface
+class ExpectationValidator implements ExpectationValidatorInterface
 {
+    /**
+     * @inheritDoc
+     */
     public function assertQueryMatch($expectation, $reality)
     {
-        if ($expectation !== $reality) {
+        if (! $expectation->queryComparator->compare($expectation->query, $reality)) {
             throw new ExpectationFailedException('Unexpected query: ' . $reality);
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertParamsMatch($expectation, $reality)
     {
-        if (is_callable($expectation)) {
-            $result = call_user_func($expectation, $reality);
-
-            if ($result === false) {
-                throw new ExpectationFailedException('Params do not match.');
-            }
-        } else {
-            if ($expectation != $reality) {
-                throw new ExpectationFailedException('Params do not match.');
-            }
+        if (! $expectation->paramsComparator->compare($expectation->params, $reality)) {
+            throw new ExpectationFailedException('Params do not match.');
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertIsPrepared($reality)
     {
         if ($reality === false) {
@@ -33,6 +34,9 @@ class AssertionValidator implements AssertionValidatorInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertIsNotPrepared($reality)
     {
         if ($reality === true) {
@@ -40,9 +44,12 @@ class AssertionValidator implements AssertionValidatorInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function assertFunctionMatch($expectation, $reality)
     {
-        if ($expectation !== $reality) {
+        if ($expectation->function !== $reality) {
             throw new ExpectationFailedException('Unexpected function: ' . $reality);
         }
     }
