@@ -10,9 +10,9 @@ use PDOException;
 class QueryExpectation
 {
     /**
-     * @var AssertionValidatorInterface
+     * @var ExpectationValidatorInterface
      */
-    public $assertionValidator;
+    public $expectationValidator;
 
     /**
      * @var string
@@ -60,24 +60,13 @@ class QueryExpectation
     public $statement;
 
     /**
-     * @var QueryMatcherInterface
-     */
-    protected $queryMatcher;
-
-    /**
-     * @var QueryMatcherInterface|null
-     */
-    public static $defaultQueryMatcher;
-
-    /**
-     * @param AssertionValidatorInterface $assertionValidator
+     * @param ExpectationValidatorInterface $expectationValidator
      * @param string $query
      */
-    public function __construct($assertionValidator, $query)
+    public function __construct($expectationValidator, $query)
     {
-        $this->assertionValidator = $assertionValidator;
+        $this->expectationValidator = $expectationValidator;
         $this->query = $query;
-        $this->queryMatcher = static::$defaultQueryMatcher ?: new QueryMatcherRegex();
     }
 
     /**
@@ -86,7 +75,7 @@ class QueryExpectation
      */
     public function usingQueryMatcher($queryMatcher)
     {
-        $this->queryMatcher = $queryMatcher;
+        $this->expectationValidator->setQueryMatcher($queryMatcher);
 
         return $this;
     }
@@ -329,11 +318,7 @@ class QueryExpectation
      */
     public function assertQueryMatch($query)
     {
-        // TODO: rework PHPUnit integration with this.
-
-        $result = $this->queryMatcher->match($this->query, $query);
-
-        $this->assertionValidator->assertQueryMatch($result);
+        $this->expectationValidator->assertQueryMatch($this->query, $query);
     }
 
     /**
@@ -343,7 +328,7 @@ class QueryExpectation
     public function assertParamsMatch($params)
     {
         if (! is_null($this->params)) {
-            $this->assertionValidator->assertParamsMatch($this->params, $params);
+            $this->expectationValidator->assertParamsMatch($this->params, $params);
         }
     }
 
@@ -353,7 +338,7 @@ class QueryExpectation
     public function assertIsPrepared()
     {
         if (! is_null($this->prepared)) {
-            $this->assertionValidator->assertIsPrepared($this->prepared);
+            $this->expectationValidator->assertIsPrepared($this->prepared);
         }
     }
 
@@ -363,7 +348,7 @@ class QueryExpectation
     public function assertIsNotPrepared()
     {
         if (! is_null($this->prepared)) {
-            $this->assertionValidator->assertIsNotPrepared($this->prepared);
+            $this->expectationValidator->assertIsNotPrepared($this->prepared);
         }
     }
 }
