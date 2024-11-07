@@ -23,13 +23,10 @@ class ExpectationValidator implements ExpectationValidatorInterface
      */
     public function assertParamsMatch($expectation, $reality)
     {
-        if (is_callable($expectation->params)) {
-            $result = call_user_func($expectation->params, $reality);
-
-            PHPUnit::assertNotFalse($result, 'Params do not match.');
-        } else {
-            PHPUnit::assertEquals($expectation->params, $reality, 'Params do not match.');
-        }
+        PHPUnit::assertTrue(
+            $expectation->paramsComparator->compare($expectation->params, $reality),
+            'Params do not match.'
+        );
     }
 
     /**

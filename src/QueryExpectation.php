@@ -20,6 +20,11 @@ class QueryExpectation
     public $queryMatcher;
 
     /**
+     * @var ParamsComparator
+     */
+    public $paramsComparator;
+
+    /**
      * @var string
      */
     public $query;
@@ -72,6 +77,7 @@ class QueryExpectation
     {
         $this->expectationValidator = $expectationValidator;
         $this->queryMatcher = $queryMatcher;
+        $this->paramsComparator = new ParamsComparator();
         $this->query = $query;
     }
 

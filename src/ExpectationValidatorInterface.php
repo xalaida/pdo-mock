@@ -13,7 +13,7 @@ interface ExpectationValidatorInterface
 
     /**
      * @param QueryExpectation $expectation
-     * @param string $reality
+     * @param array $reality
      * @return void
      */
     public function assertParamsMatch($expectation, $reality);
