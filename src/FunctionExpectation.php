@@ -5,9 +5,9 @@ namespace Xalaida\PDOMock;
 class FunctionExpectation
 {
     /**
-     * @var AssertionValidatorInterface
+     * @var ExpectationValidatorInterface
      */
-    public $assertionValidator;
+    public $expectationValidator;
 
     /**
      * @var string
@@ -15,12 +15,12 @@ class FunctionExpectation
     public $function;
 
     /**
-     * @param AssertionValidatorInterface $assertionValidator
+     * @param ExpectationValidatorInterface $expectationValidator
      * @param string $function
      */
-    public function __construct($assertionValidator, $function)
+    public function __construct($expectationValidator, $function)
     {
-        $this->assertionValidator = $assertionValidator;
+        $this->expectationValidator = $expectationValidator;
         $this->function = $function;
     }
 
@@ -30,6 +30,6 @@ class FunctionExpectation
      */
     public function assertFunctionMatch($function)
     {
-        $this->assertionValidator->assertFunctionMatch($this->function, $function);
+        $this->expectationValidator->assertFunctionMatch($this, $function);
     }
 }

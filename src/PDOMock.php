@@ -10,9 +10,19 @@ use RuntimeException;
 class PDOMock extends PDO
 {
     /**
-     * @var ExpectationManager
+     * @var ExpectationValidatorInterface
      */
-    public $expectationManager;
+    public static $expectationValidator;
+
+    /**
+     * @var QueryComparatorInterface|null
+     */
+    public static $defaultQueryComparator;
+
+    /**
+     * @var array<int, QueryExpectation|FunctionExpectation>
+     */
+    public $expectations = [];
 
     /**
      * @var bool
@@ -52,7 +62,6 @@ class PDOMock extends PDO
      */
     public function __construct($dsn = null, $username = null, $password = null, $attributes = [])
     {
-        $this->expectationManager = new ExpectationManager();
         $this->attributes = [
             PDO::ATTR_DRIVER_NAME => 'mock',
             PDO::ATTR_SERVER_VERSION => '1.0.0',
@@ -71,6 +80,47 @@ class PDOMock extends PDO
     }
 
     /**
+     * @param AdapterInterface $adapter
+     * @return void
+     */
+    public static function useAdapter($adapter)
+    {
+        $adapter->configure();
+    }
+
+    /**
+     * @param ExpectationValidatorInterface $expectationValidator
+     */
+    public static function useExpectationValidator($expectationValidator)
+    {
+        static::$expectationValidator = $expectationValidator;
+    }
+
+    /**
+     * @return ExpectationValidatorInterface
+     */
+    public static function getExpectationValidator()
+    {
+        return static::$expectationValidator ?: new ExpectationValidator();
+    }
+
+    /**
+     * @param QueryComparatorInterface $defaultQueryComparator
+     */
+    public static function setDefaultQueryComparator($defaultQueryComparator)
+    {
+        static::$defaultQueryComparator = $defaultQueryComparator;
+    }
+
+    /**
+     * @return QueryComparatorInterface
+     */
+    public static function getDefaultQueryComparator()
+    {
+        return static::$defaultQueryComparator ?: new QueryComparatorExact();
+    }
+
+    /**
      * @param bool $ignoreTransactions
      * @return void
      */
@@ -80,12 +130,73 @@ class PDOMock extends PDO
     }
 
     /**
-     * @param ExpectationManager $expectationManager
-     * @return void
+     * @param string $query
+     * @return QueryExpectation
      */
-    public function setExpectationManager($expectationManager)
+    public function expectQuery($query)
     {
-        $this->expectationManager = $expectationManager;
+        $expectation = new QueryExpectation(
+            static::getExpectationValidator(),
+            static::getDefaultQueryComparator(),
+            $query
+        );
+
+        $this->expectations[] = $expectation;
+
+        return $expectation;
+    }
+
+    /**
+     * @param string $function
+     * @return FunctionExpectation
+     */
+    public function expectFunction($function)
+    {
+        $expectation = new FunctionExpectation(static::getExpectationValidator(), $function);
+
+        $this->expectations[] = $expectation;
+
+        return $expectation;
+    }
+
+    /**
+     * @param string $query
+     * @return QueryExpectation
+     * @throws ExpectationFailedException
+     */
+    public function getExpectationForQuery($query)
+    {
+        if (empty($this->expectations)) {
+            throw new ExpectationFailedException('Unexpected query: ' . $query);
+        }
+
+        $expectation = array_shift($this->expectations);
+
+        if (! $expectation instanceof QueryExpectation) {
+            throw new ExpectationFailedException('Unexpected query: ' . $query);
+        }
+
+        return $expectation;
+    }
+
+    /**
+     * @param string $function
+     * @return FunctionExpectation
+     * @throws ExpectationFailedException
+     */
+    public function getExpectationForFunction($function)
+    {
+        if (empty($this->expectations)) {
+            throw new ExpectationFailedException('Unexpected function: ' . $function);
+        }
+
+        $expectation = array_shift($this->expectations);
+
+        if (! $expectation instanceof FunctionExpectation) {
+            throw new ExpectationFailedException('Unexpected function: ' . $function);
+        }
+
+        return $expectation;
     }
 
     /**
@@ -94,7 +205,7 @@ class PDOMock extends PDO
      */
     public function expect($query)
     {
-        return $this->expectationManager->expectQuery($query);
+        return $this->expectQuery($query);
     }
 
     /**
@@ -106,7 +217,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::beginTransaction() in ignore mode.');
         }
 
-        $this->expectationManager->expectFunction('PDO::beginTransaction()');
+        $this->expectFunction('PDO::beginTransaction()');
     }
 
     /**
@@ -118,7 +229,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::commit() in ignore mode.');
         }
 
-        $this->expectationManager->expectFunction('PDO::commit()');
+        $this->expectFunction('PDO::commit()');
     }
 
     /**
@@ -130,7 +241,7 @@ class PDOMock extends PDO
             throw new RuntimeException('Cannot expect PDO::rollback() in ignore mode.');
         }
 
-        $this->expectationManager->expectFunction('PDO::rollback()');
+        $this->expectFunction('PDO::rollback()');
     }
 
     /**
@@ -146,13 +257,14 @@ class PDOMock extends PDO
         $this->expectCommit();
     }
 
-
     /**
      * @return void
      */
     public function assertExpectationsFulfilled()
     {
-        $this->expectationManager->assertExpectationsFulfilled();
+        if (! empty($this->expectations)) {
+            throw new ExpectationFailedException('Some expectations were not fulfilled.');
+        }
     }
 
     /**
@@ -194,7 +306,7 @@ class PDOMock extends PDO
     #[\Override]
     public function exec($statement)
     {
-        $expectation = $this->expectationManager->getExpectationForQuery($statement);
+        $expectation = $this->getExpectationForQuery($statement);
 
         $expectation->assertQueryMatch($statement);
         $expectation->assertIsNotPrepared();
@@ -225,7 +337,7 @@ class PDOMock extends PDO
     #[\Override]
     public function prepare($query, $options = [])
     {
-        $expectation = $this->expectationManager->getExpectationForQuery($query);
+        $expectation = $this->getExpectationForQuery($query);
 
         if ($expectation->exceptionOnPrepare) {
             return $this->handleException($expectation->exceptionOnPrepare, 'PDO::prepare()');
@@ -278,7 +390,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        $expectation = $this->expectationManager->getExpectationForFunction('PDO::beginTransaction()');
+        $expectation = $this->getExpectationForFunction('PDO::beginTransaction()');
 
         $expectation->assertFunctionMatch('PDO::beginTransaction()');
 
@@ -302,7 +414,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        $expectation = $this->expectationManager->getExpectationForFunction('PDO::commit()');
+        $expectation = $this->getExpectationForFunction('PDO::commit()');
 
         $expectation->assertFunctionMatch('PDO::commit()');
 
@@ -326,7 +438,7 @@ class PDOMock extends PDO
             return true;
         }
 
-        $expectation = $this->expectationManager->getExpectationForFunction('PDO::rollback()');
+        $expectation = $this->getExpectationForFunction('PDO::rollback()');
 
         $expectation->assertFunctionMatch('PDO::rollback()');
 
