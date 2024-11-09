@@ -55,12 +55,9 @@ class PDOMock extends PDO
     protected $errorInfo = ['', null, null];
 
     /**
-     * @param string|null $dsn
-     * @param string|null $username
-     * @param string|null $password
      * @param array $attributes
      */
-    public function __construct($dsn = null, $username = null, $password = null, $attributes = [])
+    public function __construct($attributes = [])
     {
         $this->attributes = [
             PDO::ATTR_DRIVER_NAME => 'mock',
