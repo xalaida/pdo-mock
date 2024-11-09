@@ -406,7 +406,7 @@ class PDOStatementMock extends PDOStatement
      * @param array $cols
      * @param array $row
      * @param int $mode
-     * @return object|array|true
+     * @return mixed
      */
     protected function applyFetchMode($cols, $row, $mode)
     {
@@ -514,7 +514,7 @@ class PDOStatementMock extends PDOStatement
     /**
      * @param array $row
      * @param array $cols
-     * @return object
+     * @return mixed
      * @throws \ReflectionException
      */
     protected function applyFetchModeClass($row, $cols)
