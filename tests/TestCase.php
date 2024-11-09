@@ -25,6 +25,7 @@ class TestCase extends BaseTestCase
     {
         $warningTriggered = false;
 
+        // @phpstan-ignore-next-line
         set_error_handler(function ($errno, $errstr) use (&$warningTriggered, $message) {
             $warningTriggered = true;
 

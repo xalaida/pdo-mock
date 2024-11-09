@@ -42,6 +42,7 @@ class QueryTest extends TestCase
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
 
+        // @phpstan-ignore-next-line
         $statement = $pdo->query('select * from "books"', $pdo::FETCH_CLASS, BookForQuery::class);
 
         $row = $statement->fetch();

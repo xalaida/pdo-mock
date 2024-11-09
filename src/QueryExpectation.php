@@ -229,7 +229,7 @@ class QueryExpectation
     }
 
     /**
-     * @param string $insertId
+     * @param int|string $insertId
      * @return $this
      */
     public function withInsertId($insertId)
