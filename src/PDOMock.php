@@ -10,7 +10,7 @@ use RuntimeException;
 class PDOMock extends PDO
 {
     /**
-     * @var ExpectationValidatorInterface
+     * @var ExpectationValidatorInterface|null
      */
     public static $expectationValidator;
 

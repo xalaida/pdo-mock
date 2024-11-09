@@ -134,11 +134,7 @@ class QueryExpectation
             return $this->withParamsUsing($params);
         }
 
-        if (is_array($params)) {
-            return $this->withParams($params, $useParamValueType);
-        }
-
-        throw new InvalidArgumentException('Unsupported $params type.');
+        return $this->withParams($params, $useParamValueType);
     }
 
     /**
@@ -260,15 +256,11 @@ class QueryExpectation
      */
     public function andFetch($resultSet)
     {
-        if ($resultSet instanceof ResultSet) {
-            return $this->andFetchResultSet($resultSet);
-        }
-
         if (is_array($resultSet)) {
             return $this->andFetchRows($resultSet);
         }
 
-        throw new InvalidArgumentException('Unsupported $resultSet type.');
+        return $this->andFetchResultSet($resultSet);
     }
 
     /**
