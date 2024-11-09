@@ -16,11 +16,11 @@ class ResultSet
 
     /**
      * @param array $results
-     * @return static
+     * @return self
      */
     public static function fromArray($results)
     {
-        $resultSet = new static();
+        $resultSet = new self();
 
         $resultSet->setCols(array_keys($results[0]));
 
