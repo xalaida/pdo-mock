@@ -2,5 +2,5 @@
 /var/
 /vendor/
 /composer.lock
-/tools/php-cs-fixer/vendor/
-/tools/php-cs-fixer/composer.lock
+/tools/*/vendor/
+/tools/*/composer.lock
