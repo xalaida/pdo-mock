@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  ci:
+  phpunit:
     strategy:
       fail-fast: false
       matrix:
@@ -47,7 +47,7 @@ jobs:
       with:
         php-version: ${{ matrix.php-version }}
 
-    - name: Validate composer.json and composer.lock
+    - name: Validate composer.json file
       run: composer validate --strict
 
     - name: Get composer cache directory
@@ -66,3 +66,14 @@ jobs:
 
     - name: Run PHPUnit
       run: vendor/bin/phpunit -c ${{ matrix.phpunit-config }}
+
+  php-cs-fixer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: PHP-CS-Fixer
+        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3
+        with:
+          args: check

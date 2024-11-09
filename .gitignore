@@ -1,4 +1,6 @@
-.idea/
-var/
-vendor/
-composer.lock
+/.idea/
+/var/
+/vendor/
+/composer.lock
+/tools/php-cs-fixer/vendor/
+/tools/php-cs-fixer/composer.lock
