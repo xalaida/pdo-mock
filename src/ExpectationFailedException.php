@@ -4,6 +4,4 @@ namespace Xalaida\PDOMock;
 
 use RuntimeException;
 
-class ExpectationFailedException extends RuntimeException
-{
-}
+class ExpectationFailedException extends RuntimeException {}

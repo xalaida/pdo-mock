@@ -391,7 +391,7 @@ class PDOStatementMock extends PDOStatement
             foreach ($cols as $col) {
                 $result[$col] = strtoupper($col);
             }
-        } else if ($this->pdo->getAttribute(PDO::ATTR_CASE) === PDO::CASE_LOWER) {
+        } elseif ($this->pdo->getAttribute(PDO::ATTR_CASE) === PDO::CASE_LOWER) {
             foreach ($cols as $col) {
                 $result[$col] = strtolower($col);
             }
