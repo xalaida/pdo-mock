@@ -498,7 +498,7 @@ class PDOStatementMock extends PDOStatement
             return $this->applyFetchModeClassEarlyProps($row, $cols);
         }
 
-        if ($mode === PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE) {
+        if (($mode & (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) === (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) {
             return $this->applyFetchModeClassLateProps($row, $cols);
         }
 
