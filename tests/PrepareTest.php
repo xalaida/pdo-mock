@@ -166,7 +166,7 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->with(['published', 2024], [PDO::PARAM_STR, PDO::PARAM_INT]);;
+            ->with(['published', 2024], [PDO::PARAM_STR, PDO::PARAM_INT]);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
