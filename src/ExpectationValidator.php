@@ -9,7 +9,7 @@ class ExpectationValidator implements ExpectationValidatorInterface
      */
     public function assertQueryMatch($expectation, $reality)
     {
-        if (! $expectation->queryComparator->compare($expectation->query, $reality)) {
+        if (! $expectation->compareQuery($reality)) {
             throw new ExpectationFailedException('Unexpected query: ' . $reality);
         }
     }

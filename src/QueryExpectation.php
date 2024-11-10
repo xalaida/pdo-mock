@@ -332,6 +332,15 @@ class QueryExpectation
     }
 
     /**
+     * @param string $query
+     * @return bool
+     */
+    public function compareQuery($query)
+    {
+        return $this->queryComparator->compare($this->query, $query);
+    }
+
+    /**
      * @param array<int|string, mixed> $params
      * @param array<int|string, int> $types
      * @return void
