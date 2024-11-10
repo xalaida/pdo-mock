@@ -8,6 +8,7 @@ class QueryMatchExactTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldMatchExactQuery()
     {
@@ -25,6 +26,7 @@ class QueryMatchExactTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenExactQueryDoesNotMatch()
     {

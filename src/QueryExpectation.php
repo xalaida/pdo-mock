@@ -30,7 +30,7 @@ class QueryExpectation
     public $query;
 
     /**
-     * @var array|Closure|null
+     * @var array<int|string, array{value: mixed, type: int}>|Closure|null
      */
     public $params;
 
@@ -71,6 +71,7 @@ class QueryExpectation
 
     /**
      * @param ExpectationValidatorInterface $expectationValidator
+     * @param QueryComparatorInterface $queryComparator
      * @param string $query
      */
     public function __construct($expectationValidator, $queryComparator, $query)
@@ -124,7 +125,7 @@ class QueryExpectation
     }
 
     /**
-     * @param array|Closure $params
+     * @param array<int|string, int|string>|Closure $params
      * @param bool $useParamValueType
      * @return $this
      */
@@ -154,7 +155,7 @@ class QueryExpectation
     }
 
     /**
-     * @param array $params
+     * @param array<int|string, int|string> $params
      * @param bool $useParamValueType
      * @return $this
      */
@@ -176,7 +177,7 @@ class QueryExpectation
     }
 
     /**
-     * @param array $types
+     * @param array<int|string, int> $types
      * @return void
      */
     public function withTypes($types)
@@ -251,7 +252,7 @@ class QueryExpectation
     }
 
     /**
-     * @param ResultSet|array $resultSet
+     * @param ResultSet|array<array<int|string, int|string>> $resultSet
      * @return $this
      */
     public function andFetch($resultSet)
@@ -275,7 +276,7 @@ class QueryExpectation
     }
 
     /**
-     * @param array $rows
+     * @param array<array<int|string, int|string>> $rows
      * @return $this
      */
     public function andFetchRows($rows)
@@ -286,7 +287,7 @@ class QueryExpectation
     }
 
     /**
-     * @param array $row
+     * @param array<int|string, int|string> $row
      * @return $this
      */
     public function andFetchRow($row)
@@ -330,7 +331,7 @@ class QueryExpectation
     }
 
     /**
-     * @param array $params
+     * @param array<int|string, array{value: mixed, type: int}> $params
      * @return void
      */
     public function assertParamsMatch($params)

@@ -12,6 +12,7 @@ class ErrorInfoFreshTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldDisplayErrorInformationForPDOInstance($pdo)
     {
@@ -19,6 +20,9 @@ class ErrorInfoFreshTest extends TestCase
         static::assertSame(['', null, null], $pdo->errorInfo());
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -32,11 +36,17 @@ class ErrorInfoFreshTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         return new PDO('sqlite::memory:');
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         return new PDOMock();

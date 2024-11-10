@@ -13,6 +13,7 @@ class TransactionRollbackWithoutBeginTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFailOnCRollbackWithoutBeginTransaction($pdo)
     {
@@ -24,6 +25,9 @@ class TransactionRollbackWithoutBeginTest extends TestCase
         $pdo->rollBack();
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -37,11 +41,17 @@ class TransactionRollbackWithoutBeginTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         return new PDO('sqlite::memory:');
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

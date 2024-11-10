@@ -12,6 +12,7 @@ class ExecuteSelectTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldExecuteQuery($pdo)
     {
@@ -20,6 +21,9 @@ class ExecuteSelectTest extends TestCase
         static::assertSame(2, $result);
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -33,6 +37,9 @@ class ExecuteSelectTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -44,6 +51,9 @@ class ExecuteSelectTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

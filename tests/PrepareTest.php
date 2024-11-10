@@ -8,6 +8,7 @@ class PrepareTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldHandlePreparedStatement()
     {
@@ -25,6 +26,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailOnUnexpectedQuery()
     {
@@ -37,6 +39,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenStatementIsNotPrepared()
     {
@@ -53,6 +56,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleQueryParamsUsingBindParam()
     {
@@ -78,6 +82,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenQueryParamsDontMatch()
     {
@@ -103,6 +108,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleQueryParamsUsingAssociativeArray()
     {
@@ -125,6 +131,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenQueryParamsUsingAssociativeArrayDontMatch()
     {
@@ -148,6 +155,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleQueryNamedParams()
     {
@@ -170,6 +178,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleQueryNamedParamsUsingSingleAssociativeArray()
     {
@@ -196,6 +205,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenQueryNamedParamsUsingSingleAssociativeArrayDontMatch()
     {
@@ -223,6 +233,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleExecParams()
     {
@@ -242,6 +253,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleExecParamsTypes()
     {
@@ -260,6 +272,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenParamsOverwriteBoundValues()
     {
@@ -282,6 +295,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldVerifyParamsUsingCallableSyntax()
     {
@@ -308,6 +322,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenParamsCallbackReturnsFalse()
     {
@@ -331,6 +346,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldUseStatementFromPreviousExpectation()
     {

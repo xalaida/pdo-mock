@@ -12,6 +12,7 @@ class TransactionCommitTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldCommitTransaction($pdo)
     {
@@ -38,6 +39,9 @@ class TransactionCommitTest extends TestCase
         );
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -51,6 +55,9 @@ class TransactionCommitTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -60,6 +67,9 @@ class TransactionCommitTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

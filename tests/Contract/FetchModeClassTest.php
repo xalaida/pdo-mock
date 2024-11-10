@@ -12,6 +12,7 @@ class FetchModeClassTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFetchIntoClass($pdo)
     {
@@ -36,6 +37,7 @@ class FetchModeClassTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFetchIntoClassUsingDefaultFetchMode($pdo)
     {
@@ -62,6 +64,7 @@ class FetchModeClassTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFetchIntoClassWithConstructor($pdo)
     {
@@ -88,6 +91,9 @@ class FetchModeClassTest extends TestCase
         static::assertFalse($row->published);
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -101,6 +107,9 @@ class FetchModeClassTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -112,6 +121,9 @@ class FetchModeClassTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();
@@ -128,22 +140,44 @@ class FetchModeClassTest extends TestCase
 
 class BookForClassFetchMode
 {
+    /**
+     * @var int|string
+     */
     public $id;
 
+    /**
+     * @var string|null
+     */
     public $title;
 }
 
 
 class BookForClassFetchModeWithConstructor
 {
+    /**
+     * @var int|string
+     */
     public $id;
 
+    /**
+     * @var string|null
+     */
     public $title;
 
+    /**
+     * @var int|null
+     */
     public $price;
 
+    /**
+     * @var bool|null
+     */
     public $published;
 
+    /**
+     * @param int|null $price
+     * @param bool|null $published
+     */
     public function __construct($price, $published = false)
     {
         $this->price = $price;

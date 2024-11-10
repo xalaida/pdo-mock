@@ -12,6 +12,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted($pdo)
     {
@@ -26,6 +27,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFailOnFetchAllInLazyMode($pdo)
     {
@@ -58,6 +60,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchAllInAssocMode($pdo)
     {
@@ -88,6 +91,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchAllInNumMode($pdo)
     {
@@ -118,6 +122,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchAllInBothMode($pdo)
     {
@@ -140,6 +145,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchAllInObjMode($pdo)
     {
@@ -162,6 +168,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchAllInBothModeAsDefault($pdo)
     {
@@ -184,6 +191,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldUseCustomDefaultFetchMode($pdo)
     {
@@ -209,6 +217,7 @@ class FetchAllTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldUseCustomDefaultFetchModeForStatement($pdo)
     {
@@ -231,6 +240,9 @@ class FetchAllTest extends TestCase
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -244,6 +256,9 @@ class FetchAllTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -255,6 +270,9 @@ class FetchAllTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

@@ -14,6 +14,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFailWithIntegrityConstraintErrorExceptionUsingPreparedStatement($pdo)
     {
@@ -42,6 +43,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFailWithSyntaxErrorOnExecuteForPreparedStatementUsingWarningErrorMode($pdo)
     {
@@ -62,6 +64,9 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
         static::assertSame('00000', $pdo->errorCode());
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -75,6 +80,9 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -84,6 +92,9 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

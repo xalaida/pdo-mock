@@ -30,12 +30,12 @@ class PDOStatementMock extends PDOStatement
     public $query;
 
     /**
-     * @var array
+     * @var array<int|string, array{value: mixed, type: int}>
      */
     public $params = [];
 
     /**
-     * @var array
+     * @var array<int|string, array{value: mixed, type: int}>
      */
     public $columns = [];
 
@@ -50,7 +50,7 @@ class PDOStatementMock extends PDOStatement
     protected $fetchClassName;
 
     /**
-     * @var array
+     * @var array<int, mixed>
      */
     protected $fetchModeParams;
 
@@ -60,7 +60,7 @@ class PDOStatementMock extends PDOStatement
     protected $cursor = 0;
 
     /**
-     * @var array
+     * @var array{0: string|null, 1: int|string|null, 2: string|null}
      */
     protected $errorInfo;
 
@@ -98,7 +98,7 @@ class PDOStatementMock extends PDOStatement
     /**
      * @param int $mode
      * @param string|null $className
-     * @param ...$params
+     * @param array<int, mixed> ...$params
      * @return void
      */
     #[\ReturnTypeWillChange]
@@ -160,7 +160,7 @@ class PDOStatementMock extends PDOStatement
      * @param int $type
      * @param int $maxLength
      * @param mixed $driverOptions
-     * @return bool
+     * @return bool`
      */
     #[\ReturnTypeWillChange]
     #[\Override]
@@ -175,7 +175,7 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array|null $params
+     * @param array<int|string, mixed>|null $params
      * @return bool
      */
     #[\ReturnTypeWillChange]
@@ -208,8 +208,8 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $params
-     * @return array
+     * @param array<int|string, mixed> $params
+     * @return array<int|string, array{value: mixed, type: int}>
      */
     protected function prepareParams(array $params)
     {
@@ -287,7 +287,7 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @return array
+     * @return array{0: string|null, 1: int|string|null, 2: string|null}
      */
     #[\ReturnTypeWillChange]
     #[\Override]
@@ -340,7 +340,7 @@ class PDOStatementMock extends PDOStatement
 
     /**
      * @param int|null $mode
-     * @return array
+     * @return array<int, mixed>
      */
     #[\ReturnTypeWillChange]
     #[\Override]
@@ -380,8 +380,8 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $cols
-     * @return array
+     * @param array<int|string> $cols
+     * @return array<int|string>
      */
     protected function applyFetchColumnCase($cols)
     {
@@ -403,8 +403,8 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $cols
-     * @param array $row
+     * @param array<int|string> $cols
+     * @param array<int, mixed> $row
      * @param int $mode
      * @return mixed
      */
@@ -439,8 +439,8 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $row
-     * @return array
+     * @param array<int, mixed> $row
+     * @return array<int, mixed>
      */
     protected function applyFetchModeNum($row)
     {
@@ -448,9 +448,9 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $row
-     * @param array $cols
-     * @return array
+     * @param array<int, mixed> $row
+     * @param array<int|string> $cols
+     * @return array<int|string, mixed>
      */
     protected function applyFetchModeAssoc($row, $cols)
     {
@@ -458,8 +458,8 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $row
-     * @param array $cols
+     * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return object
      */
     protected function applyFetchModeObj($row, $cols)
@@ -468,9 +468,9 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $row
-     * @param array $cols
-     * @return array
+     * @param array<int, mixed> $row
+     * @param array<int|string> $cols
+     * @return array<int, mixed>
      */
     protected function applyFetchModeBoth($row, $cols)
     {
@@ -480,8 +480,8 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $row
-     * @param array $cols
+     * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return bool
      */
     protected function applyFetchModeBound($row, $cols)
@@ -512,10 +512,9 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $row
-     * @param array $cols
+     * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return mixed
-     * @throws \ReflectionException
      */
     protected function applyFetchModeClass($row, $cols)
     {
@@ -545,8 +544,8 @@ class PDOStatementMock extends PDOStatement
     }
 
     /**
-     * @param array $row
-     * @return array
+     * @param array<int, mixed> $row
+     * @return array<int, mixed>
      */
     protected function castRowValues($row)
     {

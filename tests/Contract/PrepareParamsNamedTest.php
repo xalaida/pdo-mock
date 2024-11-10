@@ -12,6 +12,7 @@ class PrepareParamsNamedTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleBindValue($pdo)
     {
@@ -36,6 +37,7 @@ class PrepareParamsNamedTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleBindParam($pdo)
     {
@@ -59,6 +61,9 @@ class PrepareParamsNamedTest extends TestCase
         static::assertCount(2, $statement->fetchAll());
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -72,6 +77,9 @@ class PrepareParamsNamedTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -83,6 +91,9 @@ class PrepareParamsNamedTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

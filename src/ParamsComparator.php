@@ -5,8 +5,8 @@ namespace Xalaida\PDOMock;
 class ParamsComparator
 {
     /**
-     * @param array|callable $expectation
-     * @param array $reality
+     * @param array<int|string, array{value: mixed, type: int}>|callable $expectation
+     * @param array<int|string, array{value: mixed, type: int}> $reality
      * @return bool
      */
     public function compare($expectation, $reality)
@@ -20,7 +20,7 @@ class ParamsComparator
 
     /**
      * @param callable $expectation
-     * @param array $reality
+     * @param array<int|string, array{value: mixed, type: int}> $reality
      * @return bool
      */
     protected function compareUsingCallback($expectation, $reality)

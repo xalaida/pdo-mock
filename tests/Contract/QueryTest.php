@@ -13,6 +13,7 @@ class QueryTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFetchAsObjects($pdo)
     {
@@ -37,6 +38,7 @@ class QueryTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFetchIntoClassUsingQuery($pdo)
     {
@@ -58,6 +60,9 @@ class QueryTest extends TestCase
         static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -71,6 +76,9 @@ class QueryTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -82,6 +90,9 @@ class QueryTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();
@@ -98,7 +109,13 @@ class QueryTest extends TestCase
 
 class BookForQuery
 {
+    /**
+     * @var int|string
+     */
     public $id;
 
+    /**
+     * @var string|null
+     */
     public $title;
 }

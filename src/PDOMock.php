@@ -50,12 +50,12 @@ class PDOMock extends PDO
     protected $errorCode;
 
     /**
-     * @var array
+     * @var array{0: string|null, 1: int|string|null, 2: string|null}
      */
     protected $errorInfo = ['', null, null];
 
     /**
-     * @param array $attributes
+     * @param array<int, mixed> $attributes
      */
     public function __construct($attributes = [])
     {
@@ -87,6 +87,7 @@ class PDOMock extends PDO
 
     /**
      * @param ExpectationValidatorInterface $expectationValidator
+     * @return void
      */
     public static function useExpectationValidator($expectationValidator)
     {
@@ -103,6 +104,7 @@ class PDOMock extends PDO
 
     /**
      * @param QueryComparatorInterface $defaultQueryComparator
+     * @return void
      */
     public static function setDefaultQueryComparator($defaultQueryComparator)
     {
@@ -327,7 +329,7 @@ class PDOMock extends PDO
 
     /**
      * @param string $query
-     * @param array $options
+     * @param array<int, mixed> $options
      * @return PDOStatementMock|false
      */
     #[\ReturnTypeWillChange]
@@ -474,7 +476,7 @@ class PDOMock extends PDO
     }
 
     /**
-     * @return array
+     * @return array{0: string|null, 1: int|string|null, 2: string|null}
      */
     #[\ReturnTypeWillChange]
     #[\Override]

@@ -14,6 +14,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFailWithSyntaxErrorException($pdo)
     {
@@ -37,6 +38,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldClearPreviousErrorInfoOnSuccessfulQuery($pdo)
     {
@@ -60,6 +62,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFailWithSyntaxErrorUsingSilentErrorMode($pdo)
     {
@@ -76,6 +79,7 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFailWithSyntaxErrorUsingWarningErrorMode($pdo)
     {
@@ -90,6 +94,9 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
         static::assertSame('HY000', $pdo->errorCode());
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -103,6 +110,9 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -112,6 +122,9 @@ class ErrorInfoInvalidSyntaxTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

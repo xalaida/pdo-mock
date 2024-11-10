@@ -12,6 +12,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetch($pdo)
     {
@@ -40,6 +41,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnFalseWhenStatementIsNotExecuted($pdo)
     {
@@ -54,6 +56,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchInAssocMode($pdo)
     {
@@ -84,6 +87,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldNotOverrideDefaultFetchMode($pdo)
     {
@@ -107,6 +111,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchInNumMode($pdo)
     {
@@ -133,6 +138,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchInBothMode($pdo)
     {
@@ -161,6 +167,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchInObjMode($pdo)
     {
@@ -189,6 +196,7 @@ class FetchTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldUseFetchAsIterator($pdo)
     {
@@ -224,6 +232,9 @@ class FetchTest extends TestCase
         static::assertFalse($iterator->valid());
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -237,6 +248,9 @@ class FetchTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -248,6 +262,9 @@ class FetchTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

@@ -9,6 +9,7 @@ class QueryTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldFetchRowsUsingQuery()
     {
@@ -35,6 +36,7 @@ class QueryTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenExpectParamsUsingQueryMethod()
     {
@@ -51,6 +53,7 @@ class QueryTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleQueryAsPreparedStatement()
     {
