@@ -23,14 +23,14 @@ class FetchModeClassTest extends TestCase
         $row = $statement->fetch($pdo::FETCH_CLASS);
 
         static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertEquals(1, $row->id);
-        static::assertSame('Kaidash’s Family', $row->title);
+        static::assertEquals(1, $row->getId());
+        static::assertSame('Kaidash’s Family', $row->getTitle());
 
         $row = $statement->fetch($pdo::FETCH_CLASS);
 
         static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertEquals(2, $row->id);
-        static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
+        static::assertEquals(2, $row->getId());
+        static::assertSame('Shadows of the Forgotten Ancestors', $row->getTitle());
     }
 
     /**
@@ -50,12 +50,12 @@ class FetchModeClassTest extends TestCase
         static::assertCount(2, $rows);
 
         static::assertInstanceOf(BookForClassFetchMode::class, $rows[0]);
-        static::assertEquals(1, $rows[0]->id);
-        static::assertSame('Kaidash’s Family', $rows[0]->title);
+        static::assertEquals(1, $rows[0]->getId());
+        static::assertSame('Kaidash’s Family', $rows[0]->getTitle());
 
         static::assertInstanceOf(BookForClassFetchMode::class, $rows[1]);
-        static::assertEquals(2, $rows[1]->id);
-        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->title);
+        static::assertEquals(2, $rows[1]->getId());
+        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->getTitle());
     }
 
     /**
@@ -75,14 +75,14 @@ class FetchModeClassTest extends TestCase
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertEquals(1, $row->id);
-        static::assertSame('Kaidash’s Family', $row->title);
+        static::assertEquals(1, $row->getId());
+        static::assertSame('Kaidash’s Family', $row->getTitle());
 
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertEquals(2, $row->id);
-        static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
+        static::assertEquals(2, $row->getId());
+        static::assertSame('Shadows of the Forgotten Ancestors', $row->getTitle());
     }
 
     /**
@@ -102,18 +102,18 @@ class FetchModeClassTest extends TestCase
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $row);
-        static::assertEquals(1, $row->id);
-        static::assertSame('Kaidash’s Family', $row->title);
-        static::assertSame(1000, $row->price);
-        static::assertFalse($row->published);
+        static::assertEquals(1, $row->getId());
+        static::assertSame('Kaidash’s Family', $row->getTitle());
+        static::assertSame(1000, $row->getPrice());
+        static::assertFalse($row->getPublished());
 
         $row = $statement->fetch();
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $row);
-        static::assertEquals(2, $row->id);
-        static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
-        static::assertSame(1000, $row->price);
-        static::assertFalse($row->published);
+        static::assertEquals(2, $row->getId());
+        static::assertSame('Shadows of the Forgotten Ancestors', $row->getTitle());
+        static::assertSame(1000, $row->getPrice());
+        static::assertFalse($row->getPublished());
     }
 
     /**
@@ -135,16 +135,16 @@ class FetchModeClassTest extends TestCase
         static::assertCount(2, $rows);
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[0]);
-        static::assertEquals(1, $rows[0]->id);
-        static::assertSame('Kaidash’s Family', $rows[0]->title);
-        static::assertSame(1000, $rows[0]->price);
-        static::assertFalse($rows[0]->published);
+        static::assertEquals(1, $rows[0]->getId());
+        static::assertSame('Kaidash’s Family', $rows[0]->getTitle());
+        static::assertSame(1000, $rows[0]->getPrice());
+        static::assertFalse($rows[0]->getPublished());
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[1]);
-        static::assertEquals(2, $rows[1]->id);
-        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->title);
-        static::assertSame(1000, $rows[1]->price);
-        static::assertFalse($rows[1]->published);
+        static::assertEquals(2, $rows[1]->getId());
+        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->getTitle());
+        static::assertSame(1000, $rows[1]->getPrice());
+        static::assertFalse($rows[1]->getPublished());
     }
 
     /**
@@ -166,16 +166,16 @@ class FetchModeClassTest extends TestCase
         static::assertCount(2, $rows);
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[0]);
-        static::assertEquals(1, $rows[0]->id);
-        static::assertSame('Kaidash’s Family', $rows[0]->title);
-        static::assertSame(1500, $rows[0]->price);
-        static::assertFalse($rows[0]->published);
+        static::assertEquals(1, $rows[0]->getId());
+        static::assertSame('Kaidash’s Family', $rows[0]->getTitle());
+        static::assertSame(1500, $rows[0]->getPrice());
+        static::assertFalse($rows[0]->getPublished());
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[1]);
-        static::assertEquals(2, $rows[1]->id);
-        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->title);
-        static::assertNull($rows[1]->price);
-        static::assertFalse($rows[1]->published);
+        static::assertEquals(2, $rows[1]->getId());
+        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->getTitle());
+        static::assertNull($rows[1]->getPrice());
+        static::assertFalse($rows[1]->getPublished());
     }
 
     /**
@@ -230,12 +230,28 @@ class BookForClassFetchMode
     /**
      * @var int|string
      */
-    public $id;
+    protected $id;
 
     /**
      * @var string|null
      */
-    public $title;
+    protected $title;
+
+    /**
+     * @return int|string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
 }
 
 
@@ -244,22 +260,22 @@ class BookForClassFetchModeWithConstructor
     /**
      * @var int|string
      */
-    public $id;
+    protected $id;
 
     /**
      * @var string|null
      */
-    public $title;
+    protected $title;
 
     /**
      * @var int|null
      */
-    public $price;
+    protected $price;
 
     /**
      * @var bool|null
      */
-    public $published;
+    protected $published;
 
     /**
      * @param int|null $price
@@ -269,5 +285,37 @@ class BookForClassFetchModeWithConstructor
     {
         $this->price = $price;
         $this->published = $published;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getPublished()
+    {
+        return $this->published;
     }
 }
