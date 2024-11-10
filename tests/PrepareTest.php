@@ -457,6 +457,26 @@ class PrepareTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
+            ->with(['published', 2024], [PDO::PARAM_STR, PDO::PARAM_INT])
+            ->toMatchParamsStrictly();
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $this->expectException(static::getExpectationFailedExceptionClass());
+        $this->expectExceptionMessage('Params do not match.');
+
+        $statement->execute(['published', 2024]);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldFailWhenBindParamsDoNotMatchUsingStrictComparator()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->with(['published', '2024'], [PDO::PARAM_STR, PDO::PARAM_STR])
             ->toMatchParamsStrictly();
 
