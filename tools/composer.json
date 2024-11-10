@@ -1,0 +1,7 @@
+{
+    "require": {
+        "php": ">=8.3",
+        "phpstan/phpstan": "^1.12",
+        "friendsofphp/php-cs-fixer": "^3.64"
+    }
+}

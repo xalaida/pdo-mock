@@ -10,6 +10,7 @@ class TestCase extends BaseTestCase
 {
     /**
      * @beforeClass
+     * @return void
      */
     public static function setUpPDOMock()
     {
@@ -25,6 +26,7 @@ class TestCase extends BaseTestCase
     {
         $warningTriggered = false;
 
+        // @phpstan-ignore-next-line
         set_error_handler(function ($errno, $errstr) use (&$warningTriggered, $message) {
             $warningTriggered = true;
 
@@ -44,16 +46,29 @@ class TestCase extends BaseTestCase
         return $result;
     }
 
+    /**
+     * @param mixed $actual
+     * @param string $message
+     * @return void
+     */
     protected static function assertIsArrayType($actual, $message = '')
     {
         static::assertTrue(is_array($actual), $message ?: gettype($actual) . ' is of type array');
     }
 
+    /**
+     * @param mixed $actual
+     * @param string $message
+     * @return void
+     */
     protected static function assertIsObjectType($actual, $message = '')
     {
         static::assertTrue(is_object($actual), $message ?: gettype($actual) . ' is of type object');
     }
 
+    /**
+     * @return string
+     */
     public static function getExpectationFailedExceptionClass()
     {
         if (class_exists(\PHPUnit\Framework\ExpectationFailedException::class)) {

@@ -10,6 +10,7 @@ class FailedQueryTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWithQueryException()
     {
@@ -45,6 +46,7 @@ class FailedQueryTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailUsingCustomErrorException()
     {

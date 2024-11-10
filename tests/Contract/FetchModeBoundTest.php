@@ -12,6 +12,7 @@ class FetchModeBoundTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchInBoundModeUsingColumns($pdo)
     {
@@ -51,6 +52,7 @@ class FetchModeBoundTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchInBoundModeUsingNamedColumns($pdo)
     {
@@ -93,6 +95,7 @@ class FetchModeBoundTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchInBoundModeWithOracleNullToEmptyString($pdo)
     {
@@ -137,6 +140,7 @@ class FetchModeBoundTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleFetchInBoundModeWithEnabledStringifyFetches($pdo)
     {
@@ -187,6 +191,12 @@ class FetchModeBoundTest extends TestCase
         static::assertFalse($row);
     }
 
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
     public function itShouldHandleFetchInBoundModeWithDisabledStringifyFetches($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
@@ -208,7 +218,7 @@ class FetchModeBoundTest extends TestCase
 
         $row = $statement->fetch();
         static::assertTrue($row);
-        static::assertSame('1', $id);
+        static::assertSame(1, $id);
         static::assertSame('Kaidash’s Family', $title);
         static::assertNull($status);
         static::assertFalse($deleted);
@@ -216,7 +226,7 @@ class FetchModeBoundTest extends TestCase
 
         $row = $statement->fetch();
         static::assertTrue($row);
-        static::assertSame('2', $id);
+        static::assertSame(2, $id);
         static::assertSame('Shadows of the Forgotten Ancestors', $title);
         static::assertNull($status);
         static::assertFalse($deleted);
@@ -226,6 +236,9 @@ class FetchModeBoundTest extends TestCase
         static::assertFalse($row);
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -239,6 +252,9 @@ class FetchModeBoundTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -260,6 +276,9 @@ class FetchModeBoundTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

@@ -10,14 +10,19 @@ use RuntimeException;
 class PDOMock extends PDO
 {
     /**
-     * @var ExpectationValidatorInterface
+     * @var ExpectationValidatorInterface|null
      */
     public static $expectationValidator;
 
     /**
      * @var QueryComparatorInterface|null
      */
-    public static $defaultQueryComparator;
+    public static $queryComparator;
+
+    /**
+     * @var ParamComparatorInterface|null
+     */
+    public static $paramComparator;
 
     /**
      * @var array<int, QueryExpectation|FunctionExpectation>
@@ -50,17 +55,14 @@ class PDOMock extends PDO
     protected $errorCode;
 
     /**
-     * @var array
+     * @var array{0: string|null, 1: int|string|null, 2: string|null}
      */
     protected $errorInfo = ['', null, null];
 
     /**
-     * @param string|null $dsn
-     * @param string|null $username
-     * @param string|null $password
-     * @param array $attributes
+     * @param array<int, mixed> $attributes
      */
-    public function __construct($dsn = null, $username = null, $password = null, $attributes = [])
+    public function __construct($attributes = [])
     {
         $this->attributes = [
             PDO::ATTR_DRIVER_NAME => 'mock',
@@ -90,6 +92,7 @@ class PDOMock extends PDO
 
     /**
      * @param ExpectationValidatorInterface $expectationValidator
+     * @return void
      */
     public static function useExpectationValidator($expectationValidator)
     {
@@ -105,19 +108,29 @@ class PDOMock extends PDO
     }
 
     /**
-     * @param QueryComparatorInterface $defaultQueryComparator
+     * @param QueryComparatorInterface $queryComparator
+     * @return void
      */
-    public static function setDefaultQueryComparator($defaultQueryComparator)
+    public static function useQueryComparator($queryComparator)
     {
-        static::$defaultQueryComparator = $defaultQueryComparator;
+        static::$queryComparator = $queryComparator;
     }
 
     /**
      * @return QueryComparatorInterface
      */
-    public static function getDefaultQueryComparator()
+    public static function getQueryComparator()
     {
-        return static::$defaultQueryComparator ?: new QueryComparatorExact();
+        return static::$queryComparator ?: new QueryComparatorExact();
+    }
+
+    /**
+     * @param ParamComparatorInterface $paramComparator
+     * @return void
+     */
+    public static function useParamComparator($paramComparator)
+    {
+        static::$paramComparator = $paramComparator;
     }
 
     /**
@@ -135,10 +148,14 @@ class PDOMock extends PDO
      */
     public function expectQuery($query)
     {
-        $expectation = new QueryExpectation(
-            static::getExpectationValidator(),
-            static::getDefaultQueryComparator(),
-            $query
+        $expectation = new QueryExpectation(static::getExpectationValidator(), $query);
+
+        $expectation->usingQueryComparator(
+            static::$queryComparator ?: new QueryComparatorExact()
+        );
+
+        $expectation->usingParamComparator(
+            static::$paramComparator ?: new ParamComparatorStrict()
         );
 
         $this->expectations[] = $expectation;
@@ -292,7 +309,6 @@ class PDOMock extends PDO
     {
         if (! isset($this->attributes[$attribute])) {
             return null;
-            // throw new PDOException('SQLSTATE[IM001]: Driver does not support this function: driver does not support that attribute');
         }
 
         return $this->attributes[$attribute];
@@ -330,7 +346,7 @@ class PDOMock extends PDO
 
     /**
      * @param string $query
-     * @param array $options
+     * @param array<int, mixed> $options
      * @return PDOStatementMock|false
      */
     #[\ReturnTypeWillChange]
@@ -477,7 +493,7 @@ class PDOMock extends PDO
     }
 
     /**
-     * @return array
+     * @return array{0: string|null, 1: int|string|null, 2: string|null}
      */
     #[\ReturnTypeWillChange]
     #[\Override]

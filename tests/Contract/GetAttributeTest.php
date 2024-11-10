@@ -13,6 +13,7 @@ class GetAttributeTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnAttributeErrorMode($pdo)
     {
@@ -27,6 +28,7 @@ class GetAttributeTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnAttributeCase($pdo)
     {
@@ -37,6 +39,7 @@ class GetAttributeTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnAttributeOracleNulls($pdo)
     {
@@ -47,6 +50,7 @@ class GetAttributeTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnAttributeStatementClass($pdo)
     {
@@ -57,12 +61,16 @@ class GetAttributeTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnAttributeDefaultFetchMode($pdo)
     {
         static::assertSame($pdo::FETCH_BOTH, $pdo->getAttribute($pdo::ATTR_DEFAULT_FETCH_MODE));
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -76,11 +84,17 @@ class GetAttributeTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         return new PDO('sqlite::memory:');
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         return new PDOMock();

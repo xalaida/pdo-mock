@@ -12,6 +12,7 @@ class LastInsertIdFreshTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnZeroAsLastInsertId($pdo)
     {
@@ -19,6 +20,9 @@ class LastInsertIdFreshTest extends TestCase
         static::assertSame('0', $pdo->lastInsertId());
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -32,11 +36,17 @@ class LastInsertIdFreshTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         return new PDO('sqlite::memory:');
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         return new PDOMock();

@@ -3,7 +3,6 @@
 namespace Xalaida\PDOMock;
 
 use Closure;
-use InvalidArgumentException;
 use PDO;
 use PDOException;
 
@@ -20,9 +19,9 @@ class QueryExpectation
     public $queryComparator;
 
     /**
-     * @var ParamsComparator
+     * @var ParamComparatorInterface`
      */
-    public $paramsComparator;
+    public $paramComparator;
 
     /**
      * @var string
@@ -30,9 +29,14 @@ class QueryExpectation
     public $query;
 
     /**
-     * @var array|Closure|null
+     * @var array<int|string, mixed>|Closure|null
      */
     public $params;
+
+    /**
+     * @var array<int|string, int>
+     */
+    public $types;
 
     /**
      * @var bool|null
@@ -73,17 +77,15 @@ class QueryExpectation
      * @param ExpectationValidatorInterface $expectationValidator
      * @param string $query
      */
-    public function __construct($expectationValidator, $queryComparator, $query)
+    public function __construct($expectationValidator, $query)
     {
         $this->expectationValidator = $expectationValidator;
-        $this->queryComparator = $queryComparator;
-        $this->paramsComparator = new ParamsComparator();
         $this->query = $query;
     }
 
     /**
      * @param QueryComparatorInterface $queryComparator
-     * @return $this
+     * @return self
      */
     public function usingQueryComparator($queryComparator)
     {
@@ -93,7 +95,7 @@ class QueryExpectation
     }
 
     /**
-     * @return $this
+     * @return self
      */
     public function toMatchRegex()
     {
@@ -103,7 +105,7 @@ class QueryExpectation
     }
 
     /**
-     * @return $this
+     * @return self
      */
     public function toBeExact()
     {
@@ -113,8 +115,49 @@ class QueryExpectation
     }
 
     /**
+     * @param ParamComparatorInterface $paramComparator
+     * @return self
+     */
+    public function usingParamComparator($paramComparator)
+    {
+        $this->paramComparator = $paramComparator;
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function toMatchParamsStrictly()
+    {
+        $this->paramComparator = new ParamComparatorStrict();
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function toMatchParamsLoosely()
+    {
+        $this->paramComparator = new ParamComparatorLoose();
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function toMatchParamsNaturally()
+    {
+        $this->paramComparator = new ParamComparatorNatural();
+
+        return $this;
+    }
+
+    /**
      * @param bool $prepared
-     * @return $this
+     * @return self
      */
     public function toBePrepared($prepared = true)
     {
@@ -124,64 +167,58 @@ class QueryExpectation
     }
 
     /**
-     * @param array|Closure $params
-     * @param bool $useParamValueType
-     * @return $this
+     * @param array<int|string, int|string>|Closure $params
+     * @param array<int|string, int> $types
+     * @return self
      */
-    public function with($params, $useParamValueType = false)
+    public function with($params, $types = [])
     {
         if (is_callable($params)) {
             return $this->withParamsUsing($params);
         }
 
-        if (is_array($params)) {
-            return $this->withParams($params, $useParamValueType);
-        }
+        $this->withParams($params, $types);
 
-        throw new InvalidArgumentException('Unsupported $params type.');
+        return $this;
     }
 
     /**
      * @param string|int $param
      * @param mixed $value
      * @param int $type
-     * @return $this
+     * @return self
      */
     public function withParam($param, $value, $type = PDO::PARAM_STR)
     {
-        $this->params[$param] = [
-            'value' => $value,
-            'type' => $type,
-        ];
+        $this->params[$param] = $value;
+        $this->types[$param] = $type;
 
         return $this;
     }
 
     /**
-     * @param array $params
-     * @param bool $useParamValueType
-     * @return $this
+     * @param array<int|string, int|string> $params
+     * @param array<int|string, int> $types
+     * @return self
      */
-    public function withParams($params, $useParamValueType = false)
+    public function withParams($params, $types = [])
     {
         foreach ($params as $key => $value) {
             $param = is_int($key)
                 ? $key + 1
                 : $key;
 
-            $type = $useParamValueType
-                ? $this->getTypeFromValue($value)
-                : PDO::PARAM_STR;
-
-            $this->withParam($param, $value, $type);
+            $this->withParam($param, $value);
         }
+
+        $this->withTypes($types);
 
         return $this;
     }
 
     /**
-     * @param array $types
-     * @return void
+     * @param array<int|string, int> $types
+     * @return self
      */
     public function withTypes($types)
     {
@@ -190,17 +227,15 @@ class QueryExpectation
                 ? $key + 1
                 : $key;
 
-            if (! isset($this->params[$param])) {
-                throw new InvalidArgumentException("Param is not set: " . $param);
-            }
-
-            $this->params[$param]['type'] = $type;
+            $this->types[$param] = $type;
         }
+
+        return $this;
     }
 
     /**
      * @param callable $callback
-     * @return $this
+     * @return self
      */
     public function withParamsUsing($callback)
     {
@@ -210,31 +245,8 @@ class QueryExpectation
     }
 
     /**
-     * @param mixed $value
-     * @return int
-     */
-    protected function getTypeFromValue($value)
-    {
-        $type = gettype($value);
-
-        switch ($type) {
-            case 'string':
-                return PDO::PARAM_STR;
-
-            case 'integer':
-                return PDO::PARAM_INT;
-
-            case 'boolean':
-                return PDO::PARAM_BOOL;
-
-            default:
-                throw new InvalidArgumentException('Unsupported type: ' . $type);
-        }
-    }
-
-    /**
-     * @param string $insertId
-     * @return $this
+     * @param int|string $insertId
+     * @return self
      */
     public function withInsertId($insertId)
     {
@@ -245,7 +257,7 @@ class QueryExpectation
 
     /**
      * @param int $rowCount
-     * @return $this
+     * @return self
      */
     public function affecting($rowCount)
     {
@@ -255,25 +267,21 @@ class QueryExpectation
     }
 
     /**
-     * @param ResultSet|array $resultSet
-     * @return $this
+     * @param ResultSet|array<array<int|string, int|string>> $resultSet
+     * @return self
      */
     public function andFetch($resultSet)
     {
-        if ($resultSet instanceof ResultSet) {
-            return $this->andFetchResultSet($resultSet);
-        }
-
         if (is_array($resultSet)) {
             return $this->andFetchRows($resultSet);
         }
 
-        throw new InvalidArgumentException('Unsupported $resultSet type.');
+        return $this->andFetchResultSet($resultSet);
     }
 
     /**
      * @param ResultSet $resultSet
-     * @return $this
+     * @return self
      */
     public function andFetchResultSet($resultSet)
     {
@@ -283,8 +291,8 @@ class QueryExpectation
     }
 
     /**
-     * @param array $rows
-     * @return $this
+     * @param array<array<int|string, int|string>> $rows
+     * @return self
      */
     public function andFetchRows($rows)
     {
@@ -294,8 +302,8 @@ class QueryExpectation
     }
 
     /**
-     * @param array $row
-     * @return $this
+     * @param array<int|string, int|string> $row
+     * @return self
      */
     public function andFetchRow($row)
     {
@@ -308,7 +316,7 @@ class QueryExpectation
 
     /**
      * @param PDOException $exception
-     * @return $this
+     * @return self
      */
     public function andFailOnExecute($exception)
     {
@@ -319,7 +327,7 @@ class QueryExpectation
 
     /**
      * @param PDOException $exception
-     * @return $this
+     * @return self
      */
     public function andFailOnPrepare($exception)
     {
@@ -338,14 +346,54 @@ class QueryExpectation
     }
 
     /**
-     * @param array $params
+     * @param string $query
+     * @return bool
+     */
+    public function compareQuery($query)
+    {
+        return $this->queryComparator->compare($this->query, $query);
+    }
+
+    /**
+     * @param array<int|string, mixed> $params
+     * @param array<int|string, int> $types
      * @return void
      */
-    public function assertParamsMatch($params)
+    public function assertParamsMatch($params, $types)
     {
         if (! is_null($this->params)) {
-            $this->expectationValidator->assertParamsMatch($this, $params);
+            $this->expectationValidator->assertParamsMatch($this, $params, $types);
         }
+    }
+
+    /**
+     * @param array<int|string, mixed> $params
+     * @param array<int|string, int> $types
+     * @return bool
+     */
+    public function compareParams($params, $types)
+    {
+        if (is_callable($this->params)) {
+            return call_user_func($this->params, $params, $types) !== false;
+        }
+
+        $expectation = [];
+
+        foreach ($this->params as $param => $value) {
+            $expectation[$param]['value'] = $value;
+            $expectation[$param]['type'] = isset($this->types[$param])
+                ? $this->types[$param]
+                : null;
+        }
+
+        $reality = [];
+
+        foreach ($params as $param => $value) {
+            $reality[$param]['value'] = $value;
+            $reality[$param]['type'] = $types[$param];
+        }
+
+        return $this->paramComparator->compare($expectation, $reality);
     }
 
     /**

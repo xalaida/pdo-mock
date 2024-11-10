@@ -12,6 +12,7 @@ class PrepareParamsTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleBindValue($pdo)
     {
@@ -36,6 +37,7 @@ class PrepareParamsTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldHandleBindParam($pdo)
     {
@@ -59,6 +61,104 @@ class PrepareParamsTest extends TestCase
         static::assertCount(2, $statement->fetchAll());
     }
 
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
+    public function itShouldFailOnBindValueWithZeroBasedIndex($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
+
+        $statement = $pdo->prepare('select * from "books" where "id" = ?');
+
+        if (PHP_VERSION_ID < 80000) {
+            try {
+                $statement->bindValue(0, 7);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\PDOException $e) {
+                static::assertSame('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based', $e->getMessage());
+            }
+        } else {
+            try {
+                $statement->bindValue(0, 7);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\ValueError $e) {
+                static::assertSame('PDOStatement::bindValue(): Argument #1 ($param) must be greater than or equal to 1', $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
+    public function itShouldFailOnBindParamWithZeroBasedIndex($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
+
+        $statement = $pdo->prepare('select * from "books" where "id" = ?');
+
+        $id = 7;
+
+        if (PHP_VERSION_ID < 80000) {
+            try {
+                $statement->bindParam(0, $id);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\PDOException $e) {
+                static::assertSame('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based', $e->getMessage());
+            }
+        } else {
+            try {
+                $statement->bindParam(0, $id);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\ValueError $e) {
+                static::assertSame('PDOStatement::bindParam(): Argument #1 ($param) must be greater than or equal to 1', $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
+    public function itShouldFailOnBindColumnWithZeroBasedIndex($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        if (PHP_VERSION_ID < 80000) {
+            try {
+                $statement->bindColumn(0, $id);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\PDOException $e) {
+                static::assertSame('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based', $e->getMessage());
+            }
+        } else {
+            try {
+                $statement->bindColumn(0, $id);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\ValueError $e) {
+                static::assertSame('PDOStatement::bindColumn(): Argument #1 ($column) must be greater than or equal to 1', $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -72,6 +172,9 @@ class PrepareParamsTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -83,6 +186,9 @@ class PrepareParamsTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

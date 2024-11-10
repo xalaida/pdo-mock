@@ -2,12 +2,14 @@
 
 namespace Tests\Xalaida\PDOMock;
 
+use PDO;
 use Xalaida\PDOMock\PDOMock;
 
 class PrepareTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldHandlePreparedStatement()
     {
@@ -25,6 +27,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailOnUnexpectedQuery()
     {
@@ -37,6 +40,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenStatementIsNotPrepared()
     {
@@ -53,6 +57,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleQueryParamsUsingBindParam()
     {
@@ -78,6 +83,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenQueryParamsDontMatch()
     {
@@ -103,14 +109,18 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
-    public function itShouldHandleQueryParamsUsingAssociativeArray()
+    public function itShouldHandleQueryParamsUsingShortSyntax()
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->with(['active', 2024, true], true);
+            ->with(
+                ['active', 2024, true],
+                [$pdo::PARAM_STR, $pdo::PARAM_INT, $pdo::PARAM_BOOL]
+            );
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
@@ -125,8 +135,54 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
-    public function itShouldFailWhenQueryParamsUsingAssociativeArrayDontMatch()
+    public function itShouldHandleParamsTypes()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
+            ->toBePrepared()
+            ->withParams(['published', 2024])
+            ->withTypes([PDO::PARAM_STR, PDO::PARAM_INT]);
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $statement->bindValue(1, 'published', $pdo::PARAM_STR);
+        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldHandleParamsTypesUsingShortSyntax()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
+            ->toBePrepared()
+            ->with(['published', 2024], [PDO::PARAM_STR, PDO::PARAM_INT]);
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $statement->bindValue(1, 'published', $pdo::PARAM_STR);
+        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldFailWhenQueryParamsUsingShortSyntaxDontMatch()
     {
         $pdo = new PDOMock();
 
@@ -148,6 +204,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleQueryNamedParams()
     {
@@ -170,6 +227,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleQueryNamedParamsUsingSingleAssociativeArray()
     {
@@ -181,7 +239,11 @@ class PrepareTest extends TestCase
                 'status' => 'active',
                 'year' => 2024,
                 'published' => true,
-            ], true);
+            ], [
+                'status' => $pdo::PARAM_STR,
+                'year' => $pdo::PARAM_INT,
+                'published' => $pdo::PARAM_BOOL,
+            ]);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year and "published" = :published');
 
@@ -196,6 +258,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenQueryNamedParamsUsingSingleAssociativeArrayDontMatch()
     {
@@ -223,13 +286,13 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleExecParams()
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
-            ->toBePrepared()
             ->withParam(1, 'published')
             ->withParam(2, 2024);
 
@@ -242,14 +305,15 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
-    public function itShouldHandleExecParamsTypes()
+    public function itShouldHandleExecParamsUsingShortSyntax()
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->with(['published', 2024]);
+            ->with(['published', 2024], [PDO::PARAM_STR, PDO::PARAM_STR]);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
@@ -260,6 +324,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenParamsOverwriteBoundValues()
     {
@@ -282,17 +347,18 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldVerifyParamsUsingCallableSyntax()
     {
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
-            ->with(function (array $params) use ($pdo) {
-                static::assertSame('draft', $params[1]['value']);
-                static::assertSame($pdo::PARAM_STR, $params[1]['type']);
-                static::assertSame(2024, $params[2]['value']);
-                static::assertSame($pdo::PARAM_INT, $params[2]['type']);
+            ->with(function ($params, $types) use ($pdo) {
+                static::assertSame('draft', $params[1]);
+                static::assertSame($pdo::PARAM_STR, $types[1]);
+                static::assertSame(2024, $params[2]);
+                static::assertSame($pdo::PARAM_INT, $types[2]);
             });
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
@@ -308,6 +374,7 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenParamsCallbackReturnsFalse()
     {
@@ -331,17 +398,18 @@ class PrepareTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
-    public function itShouldUseStatementFromPreviousExpectation()
+    public function itShouldUseStatementFromAnotherStatement()
     {
         $pdo = new PDOMock();
 
         $insertBookExpectation = $pdo->expect('insert into "books" values ("id", "title") values (:id, :title)');
 
         $pdo->expect('update "books" set "status" = :status where "id" = :id')
-            ->with(function (array $params) use ($insertBookExpectation) {
-                static::assertSame($insertBookExpectation->statement->params['id']['value'], $params['id']['value']);
-                static::assertSame('published', $params['status']['value']);
+            ->with(function ($params) use ($insertBookExpectation) {
+                static::assertSame($insertBookExpectation->statement->params['id'], $params['id']);
+                static::assertSame('published', $params['status']);
             });
 
         $statement = $pdo->prepare('insert into "books" values ("id", "title") values (:id, :title)');

@@ -5,22 +5,22 @@ namespace Xalaida\PDOMock;
 class ResultSet
 {
     /**
-     * @var array
+     * @var array<int|string>
      */
     public $cols = [];
 
     /**
-     * @var array
+     * @var array<array<int|string>>
      */
     public $rows = [];
 
     /**
-     * @param array $results
-     * @return static
+     * @param array<array<int|string, int|string>> $results
+     * @return self
      */
     public static function fromArray($results)
     {
-        $resultSet = new static();
+        $resultSet = new self();
 
         $resultSet->setCols(array_keys($results[0]));
 
@@ -32,7 +32,7 @@ class ResultSet
     }
 
     /**
-     * @param array $cols
+     * @param array<int|string> $cols
      * @return $this
      */
     public function setCols($cols)
@@ -43,7 +43,7 @@ class ResultSet
     }
 
     /**
-     * @param array $rows
+     * @param array<array<int|string>> $rows
      * @return $this
      */
     public function setRows($rows)
@@ -54,7 +54,7 @@ class ResultSet
     }
 
     /**
-     * @param array $row
+     * @param array<int|string> $row
      * @return $this
      */
     public function addRow($row)

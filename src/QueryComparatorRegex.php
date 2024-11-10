@@ -7,9 +7,7 @@ use InvalidArgumentException;
 class QueryComparatorRegex implements QueryComparatorInterface
 {
     /**
-     * @param string $expectation
-     * @param string $reality
-     * @return bool
+     * @inheritDoc
      */
     public function compare($expectation, $reality)
     {

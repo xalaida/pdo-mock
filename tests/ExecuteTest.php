@@ -8,6 +8,7 @@ class ExecuteTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldExecuteQuery()
     {
@@ -22,6 +23,7 @@ class ExecuteTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldCalculatesRowCountUsingFetchRows()
     {
@@ -41,6 +43,7 @@ class ExecuteTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailOnUnexpectedQuery()
     {
@@ -53,6 +56,7 @@ class ExecuteTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenQueryDoesntMatch()
     {
@@ -67,6 +71,7 @@ class ExecuteTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenQueryIsNotExecuted()
     {

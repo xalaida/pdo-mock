@@ -10,6 +10,7 @@ class FetchAllTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleFetchAll()
     {
@@ -42,6 +43,7 @@ class FetchAllTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleFetchOne()
     {
@@ -70,6 +72,7 @@ class FetchAllTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleFetchUsingResultSetInstance()
     {
@@ -100,6 +103,7 @@ class FetchAllTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenColumnsAreMissingForAssocMode()
     {

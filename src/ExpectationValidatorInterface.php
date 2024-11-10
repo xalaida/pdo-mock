@@ -13,10 +13,11 @@ interface ExpectationValidatorInterface
 
     /**
      * @param QueryExpectation $expectation
-     * @param array $reality
+     * @param array<int|string, mixed> $params
+     * @param array<int|string, int> $types
      * @return void
      */
-    public function assertParamsMatch($expectation, $reality);
+    public function assertParamsMatch($expectation, $params, $types);
 
     /**
      * @param bool $reality

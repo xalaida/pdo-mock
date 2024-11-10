@@ -13,6 +13,7 @@ class TransactionCommitWithoutBeginTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldFailOnCommitWithoutBeginTransaction($pdo)
     {
@@ -24,6 +25,9 @@ class TransactionCommitWithoutBeginTest extends TestCase
         $pdo->commit();
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -37,11 +41,17 @@ class TransactionCommitWithoutBeginTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         return new PDO('sqlite::memory:');
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

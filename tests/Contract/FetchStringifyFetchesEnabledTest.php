@@ -12,6 +12,7 @@ class FetchStringifyFetchesEnabledTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnNumericValuesAsStrings($pdo)
     {
@@ -30,6 +31,9 @@ class FetchStringifyFetchesEnabledTest extends TestCase
         static::assertSame('0', $row->published);
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -43,6 +47,9 @@ class FetchStringifyFetchesEnabledTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -54,6 +61,9 @@ class FetchStringifyFetchesEnabledTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

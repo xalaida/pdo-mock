@@ -12,6 +12,7 @@ class ErrorInfoPrepareTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldDisplayErrorInformationForSuccessfullyPreparedStatement($pdo)
     {
@@ -28,6 +29,7 @@ class ErrorInfoPrepareTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldDisplayErrorInformationForSuccessfullyExecutedPreparedStatement($pdo)
     {
@@ -42,6 +44,9 @@ class ErrorInfoPrepareTest extends TestCase
         static::assertSame(['00000', null, null], $pdo->errorInfo());
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -55,6 +60,9 @@ class ErrorInfoPrepareTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -64,6 +72,9 @@ class ErrorInfoPrepareTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

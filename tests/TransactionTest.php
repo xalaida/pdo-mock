@@ -8,6 +8,7 @@ class TransactionTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldCommitTransaction()
     {
@@ -36,6 +37,7 @@ class TransactionTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldRollbackTransaction()
     {
@@ -53,6 +55,7 @@ class TransactionTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenQueryExecutedWithoutTransaction()
     {
@@ -69,6 +72,7 @@ class TransactionTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldExpectTransactionUsingCallableSyntax()
     {
@@ -88,6 +92,7 @@ class TransactionTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenTransactionalQueryIsNotExecuted()
     {
@@ -108,6 +113,7 @@ class TransactionTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldIgnoreTransactionsWhenModeIsEnabled()
     {

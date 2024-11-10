@@ -8,6 +8,7 @@ class QueryMatchRegexTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldMatchMultilineQuery()
     {
@@ -30,6 +31,7 @@ class QueryMatchRegexTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldMatchRegex()
     {
@@ -50,6 +52,7 @@ class QueryMatchRegexTest extends TestCase
 
     /**
      * @test
+     * @return void
      */
     public function itShouldFailWhenRegexDoesNotMatch()
     {

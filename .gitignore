@@ -1,4 +1,8 @@
-.idea/
-var/
-vendor/
-composer.lock
+/.idea/
+/var/
+/vendor/
+/composer.lock
+/tools/vendor/
+/phpstan.neon
+/phpunit.xml
+/phpunit-*.xml

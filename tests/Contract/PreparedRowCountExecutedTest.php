@@ -12,6 +12,7 @@ class PreparedRowCountExecutedTest extends TestCase
      * @test
      * @dataProvider contracts
      * @param PDO $pdo
+     * @return void
      */
     public function itShouldReturnAffectedRowsUsingPreparedStatement($pdo)
     {
@@ -22,6 +23,9 @@ class PreparedRowCountExecutedTest extends TestCase
         static::assertSame(2, $statement->rowCount());
     }
 
+    /**
+     * @return array<string, array<int, PDO>>
+     */
     public static function contracts()
     {
         return [
@@ -35,6 +39,9 @@ class PreparedRowCountExecutedTest extends TestCase
         ];
     }
 
+    /**
+     * @return PDO
+     */
     protected static function configureSqlite()
     {
         $pdo = new PDO('sqlite::memory:');
@@ -44,6 +51,9 @@ class PreparedRowCountExecutedTest extends TestCase
         return $pdo;
     }
 
+    /**
+     * @return PDOMock
+     */
     protected static function configureMock()
     {
         $pdo = new PDOMock();

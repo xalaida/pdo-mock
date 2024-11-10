@@ -8,6 +8,7 @@ class FetchTest extends TestCase
 {
     /**
      * @test
+     * @return void
      */
     public function itShouldHandleFetch()
     {

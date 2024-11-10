@@ -9,7 +9,7 @@ class ExpectationValidator implements ExpectationValidatorInterface
      */
     public function assertQueryMatch($expectation, $reality)
     {
-        if (! $expectation->queryComparator->compare($expectation->query, $reality)) {
+        if (! $expectation->compareQuery($reality)) {
             throw new ExpectationFailedException('Unexpected query: ' . $reality);
         }
     }
@@ -17,9 +17,9 @@ class ExpectationValidator implements ExpectationValidatorInterface
     /**
      * @inheritDoc
      */
-    public function assertParamsMatch($expectation, $reality)
+    public function assertParamsMatch($expectation, $params, $types)
     {
-        if (! $expectation->paramsComparator->compare($expectation->params, $reality)) {
+        if (! $expectation->compareParams($params, $types)) {
             throw new ExpectationFailedException('Params do not match.');
         }
     }

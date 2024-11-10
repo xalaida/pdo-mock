@@ -11,7 +11,7 @@ class PDOExceptionMock extends PDOException
      * @param string $code
      * @param string $driverMessage
      * @param int $driverCode
-     * @return static
+     * @return self
      */
     public static function fromErrorInfo($message, $code, $driverMessage, $driverCode)
     {
