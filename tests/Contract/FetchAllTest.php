@@ -40,8 +40,7 @@ class FetchAllTest extends TestCase
                 $statement->fetchAll($pdo::FETCH_LAZY);
 
                 $this->fail('Expected exception is not thrown');
-            } catch (\Exception $e) {
-                static::assertInstanceOf(\PDOException::class, $e);
+            } catch (\PDOException $e) {
                 static::assertSame("SQLSTATE[HY000]: General error: PDO::FETCH_LAZY can't be used with PDOStatement::fetchAll()", $e->getMessage());
             }
         } else {
@@ -49,8 +48,7 @@ class FetchAllTest extends TestCase
                 $statement->fetchAll($pdo::FETCH_LAZY);
 
                 $this->fail('Expected exception is not thrown');
-            } catch (\Throwable $e) {
-                static::assertInstanceOf(\ValueError::class, $e);
+            } catch (\ValueError $e) {
                 static::assertSame('PDOStatement::fetchAll(): Argument #1 ($mode) cannot be PDO::FETCH_LAZY in PDOStatement::fetchAll()', $e->getMessage());
             }
         }

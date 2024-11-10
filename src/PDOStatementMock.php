@@ -94,7 +94,6 @@ class PDOStatementMock extends PDOStatement
         $this->fetchMode = PDO::FETCH_BOTH;
         $this->executed = false;
 
-        // This property does not work on PHP v8.0 because it is impossible to override internally readonly property.
         if (PHP_VERSION_ID > 80100) {
             $this->queryString = $query;
         }
@@ -131,6 +130,14 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function bindValue($param, $value, $type = PDO::PARAM_STR)
     {
+        if ($param === 0) {
+            if (PHP_VERSION_ID < 80000) {
+                throw new PDOException('PDOStatement::bindValue(): Argument #1 ($param) must be greater than or equal to 1');
+            } else {
+                throw new ValueError('PDOStatement::bindValue(): Argument #1 ($param) must be greater than or equal to 1');
+            }
+        }
+
         $this->params[$param] = $value;
         $this->types[$param] = $type;
 
@@ -149,6 +156,14 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
     {
+        if ($param === 0) {
+            if (PHP_VERSION_ID < 80000) {
+                throw new PDOException('PDOStatement::bindParam(): Argument #1 ($param) must be greater than or equal to 1');
+            } else {
+                throw new ValueError('PDOStatement::bindParam(): Argument #1 ($param) must be greater than or equal to 1');
+            }
+        }
+
         $this->params[$param] = $var;
         $this->types[$param] = $type;
 
@@ -167,6 +182,14 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function bindColumn($column, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
     {
+        if ($column === 0) {
+            if (PHP_VERSION_ID < 80000) {
+                throw new PDOException('PDOStatement::bindColumn(): Argument #1 ($column) must be greater than or equal to 1');
+            } else {
+                throw new ValueError('PDOStatement::bindColumn(): Argument #1 ($column) must be greater than or equal to 1');
+            }
+        }
+
         $this->columns[$column] = [
             'value' => &$var,
             'type' => $type,
@@ -219,28 +242,6 @@ class PDOStatementMock extends PDOStatement
         }
 
         return true;
-    }
-
-    /**
-     * @param array<int|string, mixed> $params
-     * @return array<int|string, array{value: mixed, type: int}>
-     */
-    protected function prepareParams(array $params)
-    {
-        $result = [];
-
-        foreach ($params as $key => $value) {
-            $param = is_int($key)
-                ? $key + 1
-                : $key;
-
-            $result[$param] = [
-                'value' => $value,
-                'type' => PDO::PARAM_STR,
-            ];
-        }
-
-        return $result;
     }
 
     /**
