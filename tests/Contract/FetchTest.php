@@ -14,81 +14,6 @@ class FetchTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
-    public function itShouldHandleFetch($pdo)
-    {
-        $statement = $pdo->prepare('select * from "books"');
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
-
-        $row = $statement->fetch();
-
-        static::assertIsArrayType($row);
-        static::assertEquals([0 => '1', 'id' => '1', 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
-
-        $row = $statement->fetch();
-
-        static::assertIsArrayType($row);
-        static::assertEquals([0 => '2', 'id' => '2', 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
-
-        static::assertFalse(
-            $statement->fetch()
-        );
-    }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     * @return void
-     */
-    public function itShouldReturnFalseWhenStatementIsNotExecuted($pdo)
-    {
-        $statement = $pdo->prepare('select * from "books"');
-
-        $row = $statement->fetch($pdo::FETCH_ASSOC);
-
-        static::assertFalse($row);
-    }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     * @return void
-     */
-    public function itShouldHandleFetchInAssocMode($pdo)
-    {
-        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
-
-        $statement = $pdo->prepare('select * from "books"');
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
-
-        $row = $statement->fetch($pdo::FETCH_ASSOC);
-
-        static::assertIsArrayType($row);
-        static::assertSame(['id' => '1', 'title' => 'Kaidash’s Family'], $row);
-
-        $row = $statement->fetch($pdo::FETCH_ASSOC);
-
-        static::assertIsArrayType($row);
-        static::assertSame(['id' => '2', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
-
-        $row = $statement->fetch($pdo::FETCH_ASSOC);
-
-        static::assertFalse($row);
-    }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     * @return void
-     */
     public function itShouldNotOverrideDefaultFetchMode($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
@@ -105,91 +30,6 @@ class FetchTest extends TestCase
         static::assertIsObjectType(
             $statement->fetch()
         );
-    }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     * @return void
-     */
-    public function itShouldHandleFetchInNumMode($pdo)
-    {
-        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
-
-        $statement = $pdo->prepare('select * from "books"');
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
-
-        $row = $statement->fetch($pdo::FETCH_NUM);
-
-        static::assertIsArrayType($row);
-        static::assertSame(['1', 'Kaidash’s Family'], $row);
-
-        $row = $statement->fetch($pdo::FETCH_NUM);
-
-        static::assertIsArrayType($row);
-        static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $row);
-    }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     * @return void
-     */
-    public function itShouldHandleFetchInBothMode($pdo)
-    {
-        $statement = $pdo->prepare('select * from "books"');
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
-
-        $row = $statement->fetch($pdo::FETCH_BOTH);
-
-        static::assertIsArrayType($row);
-        static::assertEquals([0 => 1, 'id' => 1, 1 => 'Kaidash’s Family', 'title' => 'Kaidash’s Family'], $row);
-
-        $row = $statement->fetch($pdo::FETCH_BOTH);
-
-        static::assertIsArrayType($row);
-        static::assertEquals([0 => 2, 'id' => 2, 1 => 'Shadows of the Forgotten Ancestors', 'title' => 'Shadows of the Forgotten Ancestors'], $row);
-
-        $row = $statement->fetch($pdo::FETCH_BOTH);
-
-        static::assertFalse($row);
-    }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     * @return void
-     */
-    public function itShouldHandleFetchInObjMode($pdo)
-    {
-        $statement = $pdo->prepare('select * from "books"');
-
-        $result = $statement->execute();
-
-        static::assertTrue($result);
-
-        $row = $statement->fetch($pdo::FETCH_OBJ);
-
-        static::assertIsObjectType($row);
-        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $row);
-
-        $row = $statement->fetch($pdo::FETCH_OBJ);
-
-        static::assertIsObjectType($row);
-        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $row);
-
-        $row = $statement->fetch($pdo::FETCH_OBJ);
-
-        static::assertFalse($row);
     }
 
     /**
@@ -230,6 +70,21 @@ class FetchTest extends TestCase
 
         static::assertNull($iterator->current());
         static::assertFalse($iterator->valid());
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
+    public function itShouldReturnFalseWhenStatementIsNotExecuted($pdo)
+    {
+        $statement = $pdo->prepare('select * from "books"');
+
+        $row = $statement->fetch($pdo::FETCH_ASSOC);
+
+        static::assertFalse($row);
     }
 
     /**

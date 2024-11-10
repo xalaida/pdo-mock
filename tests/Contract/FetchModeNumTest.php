@@ -6,7 +6,7 @@ use PDO;
 use Tests\Xalaida\PDOMock\TestCase;
 use Xalaida\PDOMock\PDOMock;
 
-class FetchAllTest extends TestCase
+class FetchModeNumTest extends TestCase
 {
     /**
      * @test
@@ -14,10 +14,9 @@ class FetchAllTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
-    public function itShouldUseCustomDefaultFetchMode($pdo)
+    public function itShouldHandleFetchInNumMode($pdo)
     {
-        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
-        $pdo->setAttribute($pdo::ATTR_DEFAULT_FETCH_MODE, $pdo::FETCH_OBJ);
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
 
         $statement = $pdo->prepare('select * from "books"');
 
@@ -25,13 +24,15 @@ class FetchAllTest extends TestCase
 
         static::assertTrue($result);
 
-        $rows = $statement->fetchAll();
+        $row = $statement->fetch($pdo::FETCH_NUM);
 
-        static::assertCount(2, $rows);
-        static::assertIsObjectType($rows[0]);
-        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsObjectType($rows[1]);
-        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        static::assertIsArrayType($row);
+        static::assertSame(['1', 'Kaidash’s Family'], $row);
+
+        $row = $statement->fetch($pdo::FETCH_NUM);
+
+        static::assertIsArrayType($row);
+        static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $row);
     }
 
     /**
@@ -40,40 +41,29 @@ class FetchAllTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
-    public function itShouldUseCustomDefaultFetchModeForStatement($pdo)
+    public function itShouldHandleFetchAllInNumMode($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
 
         $statement = $pdo->prepare('select * from "books"');
 
-        $statement->setFetchMode($pdo::FETCH_OBJ);
-
         $result = $statement->execute();
 
         static::assertTrue($result);
 
-        $rows = $statement->fetchAll();
+        $rows = $statement->fetchAll($pdo::FETCH_NUM);
 
         static::assertCount(2, $rows);
-        static::assertIsObjectType($rows[0]);
-        static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
-        static::assertIsObjectType($rows[1]);
-        static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
-    }
+        static::assertIsArrayType($rows[0]);
+        static::assertIsArrayType($rows[1]);
 
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     * @return void
-     */
-    public function itShouldReturnEmptyRowsWhenStatementIsNotExecuted($pdo)
-    {
-        $statement = $pdo->prepare('select * from "books"');
-
-        $rows = $statement->fetchAll();
-
-        static::assertSame([], $rows);
+        if (PHP_VERSION_ID < 80100) {
+            static::assertSame(['1', 'Kaidash’s Family'], $rows[0]);
+            static::assertSame(['2', 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        } else {
+            static::assertSame([1, 'Kaidash’s Family'], $rows[0]);
+            static::assertSame([2, 'Shadows of the Forgotten Ancestors'], $rows[1]);
+        }
     }
 
     /**
