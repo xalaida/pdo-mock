@@ -69,6 +69,8 @@ class PrepareParamsTest extends TestCase
      */
     public function itShouldFailOnBindValueWithZeroBasedIndex($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
+
         $statement = $pdo->prepare('select * from "books" where "id" = ?');
 
         if (PHP_VERSION_ID < 80000) {
@@ -98,6 +100,8 @@ class PrepareParamsTest extends TestCase
      */
     public function itShouldFailOnBindParamWithZeroBasedIndex($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
+
         $statement = $pdo->prepare('select * from "books" where "id" = ?');
 
         $id = 7;
@@ -129,6 +133,8 @@ class PrepareParamsTest extends TestCase
      */
     public function itShouldFailOnBindColumnWithZeroBasedIndex($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
+
         $statement = $pdo->prepare('select * from "books"');
 
         if (PHP_VERSION_ID < 80000) {
@@ -137,7 +143,7 @@ class PrepareParamsTest extends TestCase
 
                 $this->fail('Expected exception is not thrown');
             } catch (\PDOException $e) {
-                static::assertSame('PDOStatement::bindColumn(): SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based', $e->getMessage());
+                static::assertSame('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based', $e->getMessage());
             }
         } else {
             try {
