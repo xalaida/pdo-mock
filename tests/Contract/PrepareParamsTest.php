@@ -77,7 +77,7 @@ class PrepareParamsTest extends TestCase
 
                 $this->fail('Expected exception is not thrown');
             } catch (\PDOException $e) {
-                static::assertSame('PDOStatement::bindValue(): Argument #1 ($param) must be greater than or equal to 1', $e->getMessage());
+                static::assertSame('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based', $e->getMessage());
             }
         } else {
             try {
@@ -108,7 +108,7 @@ class PrepareParamsTest extends TestCase
 
                 $this->fail('Expected exception is not thrown');
             } catch (\PDOException $e) {
-                static::assertSame('PDOStatement::bindParam(): Argument #1 ($param) must be greater than or equal to 1', $e->getMessage());
+                static::assertSame('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based', $e->getMessage());
             }
         } else {
             try {
@@ -137,7 +137,7 @@ class PrepareParamsTest extends TestCase
 
                 $this->fail('Expected exception is not thrown');
             } catch (\PDOException $e) {
-                static::assertSame('PDOStatement::bindColumn(): Argument #1 ($column) must be greater than or equal to 1', $e->getMessage());
+                static::assertSame('PDOStatement::bindColumn(): SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based', $e->getMessage());
             }
         } else {
             try {

@@ -166,7 +166,7 @@ class PDOStatementMock extends PDOStatement
     {
         if ($param === 0) {
             if (PHP_VERSION_ID < 80000) {
-                throw new PDOException('PDOStatement::bindValue(): Argument #1 ($param) must be greater than or equal to 1');
+                throw new PDOException('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based');
             } else {
                 throw new ValueError('PDOStatement::bindValue(): Argument #1 ($param) must be greater than or equal to 1');
             }
@@ -192,7 +192,7 @@ class PDOStatementMock extends PDOStatement
     {
         if ($param === 0) {
             if (PHP_VERSION_ID < 80000) {
-                throw new PDOException('PDOStatement::bindParam(): Argument #1 ($param) must be greater than or equal to 1');
+                throw new PDOException('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based');
             } else {
                 throw new ValueError('PDOStatement::bindParam(): Argument #1 ($param) must be greater than or equal to 1');
             }
@@ -218,7 +218,7 @@ class PDOStatementMock extends PDOStatement
     {
         if ($column === 0) {
             if (PHP_VERSION_ID < 80000) {
-                throw new PDOException('PDOStatement::bindColumn(): Argument #1 ($column) must be greater than or equal to 1');
+                throw new PDOException('SQLSTATE[HY093]: Invalid parameter number: Columns/Parameters are 1-based');
             } else {
                 throw new ValueError('PDOStatement::bindColumn(): Argument #1 ($column) must be greater than or equal to 1');
             }
