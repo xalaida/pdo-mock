@@ -117,7 +117,10 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = ? and "year" = ? and "published" = ?')
             ->toBePrepared()
-            ->with(['active', 2024, true], true);
+            ->with(
+                ['active', 2024, true],
+                [$pdo::PARAM_STR, $pdo::PARAM_INT, $pdo::PARAM_BOOL]
+            );
 
         $statement = $pdo->prepare('select * from "books" where "status" = ? and "year" = ? and "published" = ?');
 
@@ -236,7 +239,11 @@ class PrepareTest extends TestCase
                 'status' => 'active',
                 'year' => 2024,
                 'published' => true,
-            ], true);
+            ], [
+                'status' => $pdo::PARAM_STR,
+                'year' => $pdo::PARAM_INT,
+                'published' => $pdo::PARAM_BOOL,
+            ]);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year and "published" = :published');
 
@@ -348,11 +355,11 @@ class PrepareTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
-            ->with(function (array $params) use ($pdo) {
-                static::assertSame('draft', $params[1]['value']);
-                static::assertSame($pdo::PARAM_STR, $params[1]['type']);
-                static::assertSame(2024, $params[2]['value']);
-                static::assertSame($pdo::PARAM_INT, $params[2]['type']);
+            ->with(function (array $params, array $types) use ($pdo) {
+                static::assertSame('draft', $params[1]);
+                static::assertSame($pdo::PARAM_STR, $types[1]);
+                static::assertSame(2024, $params[2]);
+                static::assertSame($pdo::PARAM_INT, $types[2]);
             });
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
@@ -402,8 +409,8 @@ class PrepareTest extends TestCase
 
         $pdo->expect('update "books" set "status" = :status where "id" = :id')
             ->with(function (array $params) use ($insertBookExpectation) {
-                static::assertSame($insertBookExpectation->statement->params['id']['value'], $params['id']['value']);
-                static::assertSame('published', $params['status']['value']);
+                static::assertSame($insertBookExpectation->statement->params['id']['value'], $params['id']);
+                static::assertSame('published', $params['status']);
             });
 
         $statement = $pdo->prepare('insert into "books" values ("id", "title") values (:id, :title)');

@@ -25,6 +25,14 @@ class ParamsComparator
      */
     protected function compareUsingCallback($expectation, $reality)
     {
-        return call_user_func($expectation, $reality) !== false;
+        $params = array_map(function ($param) {
+            return $param['value'];
+        }, $reality);
+
+        $types = array_map(function ($param) {
+            return $param['type'];
+        }, $reality);
+
+        return call_user_func($expectation, $params, $types) !== false;
     }
 }

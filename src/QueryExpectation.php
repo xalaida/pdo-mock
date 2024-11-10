@@ -135,7 +135,7 @@ class QueryExpectation
             return $this->withParamsUsing($params);
         }
 
-        $this->withParams($params, $types);
+        $this->withParams($params);
 
         if (is_array($types)) {
             $this->withTypes($types);
