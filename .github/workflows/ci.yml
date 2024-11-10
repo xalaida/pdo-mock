@@ -76,16 +76,10 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Get composer cache directory
-              id: composer-cache
-              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-            - name: Cache Composer packages
-              uses: actions/cache@v4
+            - name: Install PHP
+              uses: shivammathur/setup-php@v2
               with:
-                  path: ${{ steps.composer-cache.outputs.dir }}
-                  key: composer-tools-${{ runner.os }}-${{ hashFiles('composer.lock') }}
-                  restore-keys: composer-tools-${{ runner.os }}-
+                  php-version: '8.3'
 
             - name: Install Composer packages
               run: composer install --working-dir=tools --prefer-dist --no-progress
@@ -105,18 +99,10 @@ jobs:
               with:
                   php-version: '8.3'
 
-            - name: Get composer cache directory
-              id: composer-cache
-              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-            - name: Cache Composer packages
-              uses: actions/cache@v4
-              with:
-                  path: ${{ steps.composer-cache.outputs.dir }}
-                  key: composer-tools-${{ runner.os }}-${{ hashFiles('tools/composer.lock') }}
-                  restore-keys: composer-tools-${{ runner.os }}-
-
             - name: Install Composer packages
+              run: composer install --prefer-dist --no-progress
+
+            - name: Install Composer packages for tools
               run: composer install --working-dir=tools --prefer-dist --no-progress
 
             - name: Run PHPStan
