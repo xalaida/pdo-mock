@@ -470,28 +470,35 @@ class PDOStatementMock extends PDOStatement
             throw new RuntimeException('ResultSet columns were not set.');
         }
 
-        switch ($mode) {
-            case PDO::FETCH_NUM:
-                return $this->applyFetchModeNum($row);
-
-            case PDO::FETCH_ASSOC:
-                return $this->applyFetchModeAssoc($row, $cols);
-
-            case PDO::FETCH_OBJ:
-                return $this->applyFetchModeObj($row, $cols);
-
-            case PDO::FETCH_BOTH:
-                return $this->applyFetchModeBoth($row, $cols);
-
-            case PDO::FETCH_BOUND:
-                return $this->applyFetchModeBound($row, $cols);
-
-            case PDO::FETCH_CLASS:
-                return $this->applyFetchModeClass($row, $cols);
-
-            default:
-                throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
+        if ($mode === PDO::FETCH_NUM) {
+            return $this->applyFetchModeNum($row);
         }
+
+        if ($mode === PDO::FETCH_ASSOC) {
+            return $this->applyFetchModeAssoc($row, $cols);
+        }
+
+        if ($mode === PDO::FETCH_OBJ) {
+            return $this->applyFetchModeObj($row, $cols);
+        }
+
+        if ($mode === PDO::FETCH_BOTH) {
+            return $this->applyFetchModeBoth($row, $cols);
+        }
+
+        if ($mode === PDO::FETCH_BOUND) {
+            return $this->applyFetchModeBound($row, $cols);
+        }
+
+        if ($mode === PDO::FETCH_CLASS) {
+            return $this->applyFetchModeClassEarlyProps($row, $cols);
+        }
+
+        if ($mode === PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE) {
+            return $this->applyFetchModeClassLateProps($row, $cols);
+        }
+
+        throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
     }
 
     /**
@@ -572,7 +579,7 @@ class PDOStatementMock extends PDOStatement
      * @param array<int|string> $cols
      * @return mixed
      */
-    protected function applyFetchModeClass($row, $cols)
+    protected function applyFetchModeClassEarlyProps($row, $cols)
     {
         if (! $this->fetchClassName) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
@@ -594,6 +601,32 @@ class PDOStatementMock extends PDOStatement
 
         if ($constructor) {
             $constructor->invokeArgs($classInstance, $this->fetchParams);
+        }
+
+        return $classInstance;
+    }
+
+    /**
+     * @param array<int, mixed> $row
+     * @param array<int|string> $cols
+     * @return mixed
+     */
+    protected function applyFetchModeClassLateProps($row, $cols)
+    {
+        if (! $this->fetchClassName) {
+            throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
+        }
+
+        $reflectionClass = new ReflectionClass($this->fetchClassName);
+
+        $classInstance = $reflectionClass->newInstanceArgs($this->fetchParams);
+
+        foreach ($cols as $key => $col) {
+            if ($reflectionClass->hasProperty($col)) {
+                $prop = $reflectionClass->getProperty($col);
+                $prop->setAccessible(true);
+                $prop->setValue($classInstance, $this->castRowValue($row[$key]));
+            }
         }
 
         return $classInstance;
