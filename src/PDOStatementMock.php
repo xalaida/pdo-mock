@@ -52,7 +52,7 @@ class PDOStatementMock extends PDOStatement
     /**
      * @var array<int, mixed>
      */
-    protected $fetchModeParams;
+    protected $fetchParams = [];
 
     /**
      * @var int
@@ -112,7 +112,7 @@ class PDOStatementMock extends PDOStatement
         }
 
         if ($params) {
-            $this->fetchModeParams = $params;
+            $this->fetchParams = $params[0];
         }
     }
 
@@ -345,16 +345,23 @@ class PDOStatementMock extends PDOStatement
     #[\ReturnTypeWillChange]
     #[\Override]
     // @phpstan-ignore-next-line
-    #[PHP8] public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$args) /*
-    public function fetchAll($mode = null, $class_name = null, $ctor_args = null) # */
+    #[PHP8] public function fetchAll($mode = PDO::FETCH_DEFAULT, ...$params) /*
+    public function fetchAll($mode = null, $className = null, $params = null) # */
     {
         if (PHP_VERSION_ID < 80000) {
             if ($mode === null) {
                 $mode = $this->fetchMode;
+            } else {
+                // @phpstan-ignore-next-line
+                $this->fetchClassName = $className;
+                $this->fetchParams = $params;
             }
         } else {
             if ($mode === PDO::FETCH_DEFAULT) {
                 $mode = $this->fetchMode;
+            } else {
+                $this->fetchClassName = $params[0] ?? null;
+                $this->fetchParams = $params[1] ?? [];
             }
         }
 
@@ -537,7 +544,7 @@ class PDOStatementMock extends PDOStatement
         $constructor = $reflectionClass->getConstructor();
 
         if ($constructor) {
-            $constructor->invokeArgs($classInstance, ...$this->fetchModeParams);
+            $constructor->invokeArgs($classInstance, $this->fetchParams);
         }
 
         return $classInstance;

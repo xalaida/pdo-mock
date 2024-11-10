@@ -39,6 +39,31 @@ class FetchModeClassTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
+    public function itShouldFetchAllIntoClass($pdo)
+    {
+        $statement = $pdo->prepare('select * from "books"');
+
+        $statement->execute();
+
+        $rows = $statement->fetchAll($pdo::FETCH_CLASS, BookForClassFetchMode::class);
+
+        static::assertCount(2, $rows);
+
+        static::assertInstanceOf(BookForClassFetchMode::class, $rows[0]);
+        static::assertEquals(1, $rows[0]->id);
+        static::assertSame('Kaidash’s Family', $rows[0]->title);
+
+        static::assertInstanceOf(BookForClassFetchMode::class, $rows[1]);
+        static::assertEquals(2, $rows[1]->id);
+        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->title);
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
     public function itShouldFetchIntoClassUsingDefaultFetchMode($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
@@ -89,6 +114,37 @@ class FetchModeClassTest extends TestCase
         static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
         static::assertSame(1000, $row->price);
         static::assertFalse($row->published);
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
+    public function itShouldFetchAllIntoClassWithConstructor($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        $statement->execute();
+
+        $rows = $statement->fetchAll($pdo::FETCH_CLASS, BookForClassFetchModeWithConstructor::class, [1000, false]);
+
+        static::assertCount(2, $rows);
+
+        static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[0]);
+        static::assertEquals(1, $rows[0]->id);
+        static::assertSame('Kaidash’s Family', $rows[0]->title);
+        static::assertSame(1000, $rows[0]->price);
+        static::assertFalse($rows[0]->published);
+
+        static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[1]);
+        static::assertEquals(2, $rows[1]->id);
+        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->title);
+        static::assertSame(1000, $rows[1]->price);
+        static::assertFalse($rows[1]->published);
     }
 
     /**
