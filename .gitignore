@@ -2,8 +2,7 @@
 /var/
 /vendor/
 /composer.lock
-/tools/*/vendor/
-/tools/*/composer.lock
+/tools/vendor/
 /phpstan.neon
 /phpunit.xml
 /phpunit-*.xml
