@@ -16,6 +16,8 @@ class LastInsertIdTest extends TestCase
      */
     public function itShouldUseLastInsertIdFromQuery($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+
         $pdo->exec('insert into "books" ("id", "title") values (777, "Kaidash’s Family")');
 
         static::assertSame('777', $pdo->lastInsertId());
