@@ -126,6 +126,10 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function getAttribute($name)
     {
+        if (! isset($this->attributes[$name])) {
+            return null;
+        }
+
         return $this->attributes[$name];
     }
 

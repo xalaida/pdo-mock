@@ -309,7 +309,6 @@ class PDOMock extends PDO
     {
         if (! isset($this->attributes[$attribute])) {
             return null;
-            // throw new PDOException('SQLSTATE[IM001]: Driver does not support this function: driver does not support that attribute');
         }
 
         return $this->attributes[$attribute];
