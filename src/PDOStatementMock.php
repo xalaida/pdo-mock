@@ -52,7 +52,7 @@ class PDOStatementMock extends PDOStatement
     /**
      * @var int
      */
-    protected $fetchMode;
+    protected $fetchMode = PDO::FETCH_BOTH;
 
     /**
      * @var string|null
@@ -72,17 +72,17 @@ class PDOStatementMock extends PDOStatement
     /**
      * @var array{0: string|null, 1: int|string|null, 2: string|null}
      */
-    protected $errorInfo;
+    protected $errorInfo = ['', null, null];
 
     /**
      * @var string|null
      */
-    protected $errorCode;
+    protected $errorCode = null;
 
     /**
      * @var bool
      */
-    protected $executed;
+    protected $executed = false;
 
     /**
      * @param PDOMock $pdo
@@ -94,10 +94,6 @@ class PDOStatementMock extends PDOStatement
         $this->pdo = $pdo;
         $this->expectation = $expectation;
         $this->query = $query;
-        $this->errorInfo = ['', null, null];
-        $this->errorCode = null;
-        $this->fetchMode = PDO::FETCH_BOTH;
-        $this->executed = false;
 
         if (PHP_VERSION_ID > 80100) {
             $this->queryString = $query;
