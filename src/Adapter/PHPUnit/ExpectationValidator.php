@@ -21,10 +21,10 @@ class ExpectationValidator implements ExpectationValidatorInterface
     /**
      * @inheritDoc
      */
-    public function assertParamsMatch($expectation, $reality)
+    public function assertParamsMatch($expectation, $params, $types)
     {
         PHPUnit::assertTrue(
-            $expectation->paramsComparator->compare($expectation->params, $reality),
+            $expectation->compareParams($params, $types),
             'Params do not match.'
         );
     }

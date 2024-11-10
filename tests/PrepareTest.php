@@ -314,7 +314,7 @@ class PrepareTest extends TestCase
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
             ->toBePrepared()
-            ->with(['published', 2024]);
+            ->with(['published', 2024], [PDO::PARAM_STR, PDO::PARAM_STR]);
 
         $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
 
@@ -355,7 +355,7 @@ class PrepareTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
-            ->with(function (array $params, array $types) use ($pdo) {
+            ->with(function ($params, $types) use ($pdo) {
                 static::assertSame('draft', $params[1]);
                 static::assertSame($pdo::PARAM_STR, $types[1]);
                 static::assertSame(2024, $params[2]);
@@ -401,15 +401,15 @@ class PrepareTest extends TestCase
      * @test
      * @return void
      */
-    public function itShouldUseStatementFromPreviousExpectation()
+    public function itShouldUseStatementFromAnotherStatement()
     {
         $pdo = new PDOMock();
 
         $insertBookExpectation = $pdo->expect('insert into "books" values ("id", "title") values (:id, :title)');
 
         $pdo->expect('update "books" set "status" = :status where "id" = :id')
-            ->with(function (array $params) use ($insertBookExpectation) {
-                static::assertSame($insertBookExpectation->statement->params['id']['value'], $params['id']);
+            ->with(function ($params) use ($insertBookExpectation) {
+                static::assertSame($insertBookExpectation->statement->params['id'], $params['id']);
                 static::assertSame('published', $params['status']);
             });
 
@@ -424,5 +424,50 @@ class PrepareTest extends TestCase
         $statement->execute();
 
         $pdo->assertExpectationsFulfilled();
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldHandleParamsUsingStrictComparator()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
+            ->with(['published', 2024], [PDO::PARAM_STR, PDO::PARAM_INT])
+            ->toMatchParamsStrictly();
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $statement->bindValue(1, 'published', PDO::PARAM_STR);
+        $statement->bindValue(2, 2024, PDO::PARAM_INT);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldFailWhenParamsDoNotMatchUsingStrictComparator()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
+            ->with(['published', '2024'], [PDO::PARAM_STR, PDO::PARAM_STR])
+            ->toMatchParamsStrictly();
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $statement->bindValue(1, 'published', PDO::PARAM_STR);
+        $statement->bindValue(2, 2024, PDO::PARAM_INT);
+
+        $this->expectException(static::getExpectationFailedExceptionClass());
+        $this->expectExceptionMessage('Params do not match.');
+
+        $statement->execute();
     }
 }

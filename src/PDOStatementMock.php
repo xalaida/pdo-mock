@@ -30,9 +30,14 @@ class PDOStatementMock extends PDOStatement
     public $query;
 
     /**
-     * @var array<int|string, array{value: mixed, type: int}>
+     * @var array<int|string, mixed>
      */
     public $params = [];
+
+    /**
+     * @var array<int|string, int>
+     */
+    public $types = [];
 
     /**
      * @var array<int|string, array{value: mixed, type: int}>
@@ -126,10 +131,8 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function bindValue($param, $value, $type = PDO::PARAM_STR)
     {
-        $this->params[$param] = [
-            'value' => $value,
-            'type' => $type,
-        ];
+        $this->params[$param] = $value;
+        $this->types[$param] = $type;
 
         return true;
     }
@@ -146,10 +149,8 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function bindParam($param, &$var, $type = PDO::PARAM_STR, $maxLength = 0, $driverOptions = null)
     {
-        $this->params[$param] = [
-            'value' => $var,
-            'type' => $type,
-        ];
+        $this->params[$param] = $var;
+        $this->types[$param] = $type;
 
         return true;
     }
@@ -182,12 +183,25 @@ class PDOStatementMock extends PDOStatement
     #[\Override]
     public function execute($params = null)
     {
-        $params = $params !== null
-            ? $this->prepareParams($params)
-            : $this->params;
+        if ($params !== null) {
+            $normalizedParams = [];
+            $normalizedTypes = [];
+
+            foreach ($params as $key => $value) {
+                $param = is_int($key)
+                    ? $key + 1
+                    : $key;
+
+                $normalizedParams[$param] = $value;
+                $normalizedTypes[$param] = PDO::PARAM_STR;
+            }
+        } else {
+            $normalizedParams = $this->params;
+            $normalizedTypes = $this->types;
+        }
 
         $this->expectation->assertQueryMatch($this->query);
-        $this->expectation->assertParamsMatch($params);
+        $this->expectation->assertParamsMatch($normalizedParams, $normalizedTypes);
         $this->expectation->assertIsPrepared();
 
         $this->executed = true;
