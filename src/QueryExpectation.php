@@ -127,6 +127,9 @@ class QueryExpectation
         return $this;
     }
 
+    /**
+     * @return self
+     */
     public function toMatchParamsStrictly()
     {
         $this->paramComparator = new ParamComparatorStrict();
@@ -134,6 +137,9 @@ class QueryExpectation
         return $this;
     }
 
+    /**
+     * @return self
+     */
     public function toMatchParamsLoosely()
     {
         $this->paramComparator = new ParamComparatorLoose();
