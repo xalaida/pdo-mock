@@ -30,6 +30,11 @@ class PDOStatementMock extends PDOStatement
     public $query;
 
     /**
+     * @var array<int, mixed>
+     */
+    protected $attributes = [];
+
+    /**
      * @var array<int|string, mixed>
      */
     public $params = [];
@@ -97,6 +102,31 @@ class PDOStatementMock extends PDOStatement
         if (PHP_VERSION_ID > 80100) {
             $this->queryString = $query;
         }
+    }
+
+    /**
+     * @param int $attribute
+     * @param mixed $value
+     * @return true
+     */
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    public function setAttribute($attribute, $value)
+    {
+        $this->attributes[$attribute] = $value;
+
+        return true;
+    }
+
+    /**
+     * @param int $name
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    public function getAttribute($name)
+    {
+        return $this->attributes[$name];
     }
 
     /**
