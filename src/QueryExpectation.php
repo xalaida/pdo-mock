@@ -126,16 +126,22 @@ class QueryExpectation
 
     /**
      * @param array<int|string, int|string>|Closure $params
-     * @param bool $useParamValueType
+     * @param array<int|string, int> $types
      * @return $this
      */
-    public function with($params, $useParamValueType = false)
+    public function with($params, $types = [])
     {
         if (is_callable($params)) {
             return $this->withParamsUsing($params);
         }
 
-        return $this->withParams($params, $useParamValueType);
+        $this->withParams($params, $types);
+
+        if (is_array($types)) {
+            $this->withTypes($types);
+        }
+
+        return $this;
     }
 
     /**

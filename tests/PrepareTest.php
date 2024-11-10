@@ -2,6 +2,7 @@
 
 namespace Tests\Xalaida\PDOMock;
 
+use PDO;
 use Xalaida\PDOMock\PDOMock;
 
 class PrepareTest extends TestCase
@@ -110,7 +111,7 @@ class PrepareTest extends TestCase
      * @test
      * @return void
      */
-    public function itShouldHandleQueryParamsUsingAssociativeArray()
+    public function itShouldHandleQueryParamsUsingShortSyntax()
     {
         $pdo = new PDOMock();
 
@@ -133,7 +134,52 @@ class PrepareTest extends TestCase
      * @test
      * @return void
      */
-    public function itShouldFailWhenQueryParamsUsingAssociativeArrayDontMatch()
+    public function itShouldHandleParamsTypes()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
+            ->toBePrepared()
+            ->withParams(['published', 2024])
+            ->withTypes([PDO::PARAM_STR, PDO::PARAM_INT]);
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $statement->bindValue(1, 'published', $pdo::PARAM_STR);
+        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldHandleParamsTypesUsingShortSyntax()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
+            ->toBePrepared()
+            ->with(['published', 2024], [PDO::PARAM_STR, PDO::PARAM_INT]);;
+
+        $statement = $pdo->prepare('select * from "books" where "status" = :status and "year" = :year');
+
+        $statement->bindValue(1, 'published', $pdo::PARAM_STR);
+        $statement->bindValue(2, 2024, $pdo::PARAM_INT);
+
+        $result = $statement->execute();
+
+        static::assertTrue($result);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldFailWhenQueryParamsUsingShortSyntaxDontMatch()
     {
         $pdo = new PDOMock();
 
@@ -255,7 +301,7 @@ class PrepareTest extends TestCase
      * @test
      * @return void
      */
-    public function itShouldHandleExecParamsTypes()
+    public function itShouldHandleExecParamsUsingShortSyntax()
     {
         $pdo = new PDOMock();
 
