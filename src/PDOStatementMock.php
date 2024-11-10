@@ -360,8 +360,12 @@ class PDOStatementMock extends PDOStatement
             if ($mode === PDO::FETCH_DEFAULT) {
                 $mode = $this->fetchMode;
             } else {
-                $this->fetchClassName = $params[0] ?? null;
-                $this->fetchParams = $params[1] ?? [];
+                $this->fetchClassName = isset($params[0])
+                    ? $params[0]
+                    : null;
+                $this->fetchParams = isset($params[1])
+                    ? $params[1]
+                    : [];
             }
         }
 
