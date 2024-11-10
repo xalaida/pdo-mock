@@ -155,7 +155,7 @@ class FetchModeClassTest extends TestCase
      */
     public function itShouldFetchAllIntoClassWithConstructorLateProps($pdo)
     {
-        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
 
         $statement = $pdo->prepare('select * from "books"');
 
@@ -166,13 +166,13 @@ class FetchModeClassTest extends TestCase
         static::assertCount(2, $rows);
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[0]);
-        static::assertEquals(1, $rows[0]->getId());
+        static::assertSame('1', $rows[0]->getId());
         static::assertSame('Kaidash’s Family', $rows[0]->getTitle());
-        static::assertSame(1500, $rows[0]->getPrice());
+        static::assertSame('1500', $rows[0]->getPrice());
         static::assertFalse($rows[0]->getPublished());
 
         static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[1]);
-        static::assertEquals(2, $rows[1]->getId());
+        static::assertSame('2', $rows[1]->getId());
         static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->getTitle());
         static::assertNull($rows[1]->getPrice());
         static::assertFalse($rows[1]->getPublished());
