@@ -293,7 +293,6 @@ class PrepareTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books" where "status" = :status and "year" = :year')
-            ->toBePrepared()
             ->withParam(1, 'published')
             ->withParam(2, 2024);
 

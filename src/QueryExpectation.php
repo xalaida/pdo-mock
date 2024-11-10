@@ -3,6 +3,7 @@
 namespace Xalaida\PDOMock;
 
 use Closure;
+use PDO;
 use PDOException;
 
 class QueryExpectation
@@ -18,7 +19,7 @@ class QueryExpectation
     public $queryComparator;
 
     /**
-     * @var ParamComparatorInterface
+     * @var ParamComparatorInterface`
      */
     public $paramComparator;
 
@@ -74,14 +75,11 @@ class QueryExpectation
 
     /**
      * @param ExpectationValidatorInterface $expectationValidator
-     * @param QueryComparatorInterface $queryComparator
      * @param string $query
      */
-    public function __construct($expectationValidator, $queryComparator, $query)
+    public function __construct($expectationValidator, $query)
     {
         $this->expectationValidator = $expectationValidator;
-        $this->queryComparator = $queryComparator;
-        $this->paramComparator = new ParamComparatorLoose();
         $this->query = $query;
     }
 
@@ -190,7 +188,7 @@ class QueryExpectation
      * @param int $type
      * @return self
      */
-    public function withParam($param, $value, $type = null)
+    public function withParam($param, $value, $type = PDO::PARAM_STR)
     {
         $this->params[$param] = $value;
         $this->types[$param] = $type;

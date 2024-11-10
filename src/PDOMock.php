@@ -17,7 +17,12 @@ class PDOMock extends PDO
     /**
      * @var QueryComparatorInterface|null
      */
-    public static $defaultQueryComparator;
+    public static $queryComparator;
+
+    /**
+     * @var ParamComparatorInterface|null
+     */
+    public static $paramComparator;
 
     /**
      * @var array<int, QueryExpectation|FunctionExpectation>
@@ -103,20 +108,29 @@ class PDOMock extends PDO
     }
 
     /**
-     * @param QueryComparatorInterface $defaultQueryComparator
+     * @param QueryComparatorInterface $queryComparator
      * @return void
      */
-    public static function setDefaultQueryComparator($defaultQueryComparator)
+    public static function useQueryComparator($queryComparator)
     {
-        static::$defaultQueryComparator = $defaultQueryComparator;
+        static::$queryComparator = $queryComparator;
     }
 
     /**
      * @return QueryComparatorInterface
      */
-    public static function getDefaultQueryComparator()
+    public static function getQueryComparator()
     {
-        return static::$defaultQueryComparator ?: new QueryComparatorExact();
+        return static::$queryComparator ?: new QueryComparatorExact();
+    }
+
+    /**
+     * @param ParamComparatorInterface $paramComparator
+     * @return void
+     */
+    public static function useParamComparator($paramComparator)
+    {
+        static::$paramComparator = $paramComparator;
     }
 
     /**
@@ -134,10 +148,14 @@ class PDOMock extends PDO
      */
     public function expectQuery($query)
     {
-        $expectation = new QueryExpectation(
-            static::getExpectationValidator(),
-            static::getDefaultQueryComparator(),
-            $query
+        $expectation = new QueryExpectation(static::getExpectationValidator(), $query);
+
+        $expectation->usingQueryComparator(
+            static::$queryComparator ?: new QueryComparatorExact()
+        );
+
+        $expectation->usingParamComparator(
+            static::$paramComparator ?: new ParamComparatorStrict()
         );
 
         $this->expectations[] = $expectation;
