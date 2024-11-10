@@ -148,6 +148,16 @@ class QueryExpectation
     }
 
     /**
+     * @return self
+     */
+    public function toMatchParamsNaturally()
+    {
+        $this->paramComparator = new ParamComparatorNatural();
+
+        return $this;
+    }
+
+    /**
      * @param bool $prepared
      * @return self
      */
