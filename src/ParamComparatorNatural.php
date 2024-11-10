@@ -41,9 +41,7 @@ class ParamComparatorNatural implements ParamComparatorInterface
     }
 
     /**
-     * @param array<int|string, array{value: mixed, type: int}> $expectation
-     * @param array<int|string, array{value: mixed, type: int}> $reality
-     * @return bool
+     * @inheritDoc
      */
     public function compare($expectation, $reality)
     {
