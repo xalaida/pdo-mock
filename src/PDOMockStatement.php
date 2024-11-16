@@ -45,9 +45,9 @@ class PDOMockStatement extends PDOStatement
     public $types = [];
 
     /**
-     * @var array<int|string, array{value: mixed, type: int}>
+     * @var array<int|string, array{ref: mixed, type: int}>
      */
-    public $columns = [];
+    public $cols = [];
 
     /**
      * @var int
@@ -225,8 +225,8 @@ class PDOMockStatement extends PDOStatement
             }
         }
 
-        $this->columns[$column] = [
-            'value' => &$var,
+        $this->cols[$column] = [
+            'ref' => &$var,
             'type' => $type,
         ];
 
@@ -385,11 +385,7 @@ class PDOMockStatement extends PDOStatement
             $mode = $this->fetchMode;
         }
 
-        $row = $this->applyFetchMode(
-            $mode,
-            $this->fetchRowsIterator->current(),
-            $this->fetchCols
-        );
+        $row = $this->applyFetchMode($mode, $this->fetchRowsIterator->current());
 
         $this->fetchRowsIterator->next();
 
@@ -439,7 +435,7 @@ class PDOMockStatement extends PDOStatement
 
         if ($this->fetchRowsIterator !== null && $this->fetchRowsIterator->valid()) {
             foreach ($this->fetchRowsIterator as $row) {
-                $rows[] = $this->applyFetchMode($mode, $row, $this->fetchCols);
+                $rows[] = $this->applyFetchMode($mode, $row);
             }
         }
 
@@ -472,12 +468,11 @@ class PDOMockStatement extends PDOStatement
     /**
      * @param int $mode
      * @param array<int, mixed> $row
-     * @param array<int|string> $cols
      * @return mixed
      */
-    protected function applyFetchMode($mode, $row, $cols)
+    protected function applyFetchMode($mode, $row)
     {
-        if ($mode !== PDO::FETCH_NUM && empty($cols)) {
+        if ($mode !== PDO::FETCH_NUM && empty($this->fetchCols)) {
             throw new RuntimeException('ResultSet columns were not set.');
         }
 
@@ -486,27 +481,27 @@ class PDOMockStatement extends PDOStatement
         }
 
         if ($mode === PDO::FETCH_ASSOC) {
-            return $this->applyFetchModeAssoc($row, $cols);
+            return $this->applyFetchModeAssoc($row);
         }
 
         if ($mode === PDO::FETCH_OBJ) {
-            return $this->applyFetchModeObj($row, $cols);
+            return $this->applyFetchModeObj($row);
         }
 
         if ($mode === PDO::FETCH_BOTH) {
-            return $this->applyFetchModeBoth($row, $cols);
+            return $this->applyFetchModeBoth($row);
         }
 
         if ($mode === PDO::FETCH_BOUND) {
-            return $this->applyFetchModeBound($row, $cols);
+            return $this->applyFetchModeBound($row);
         }
 
         if ($mode === PDO::FETCH_CLASS) {
-            return $this->applyFetchModeClassEarlyProps($row, $cols);
+            return $this->applyFetchModeClassEarlyProps($row);
         }
 
         if (($mode & (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) === (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) {
-            return $this->applyFetchModeClassLateProps($row, $cols);
+            return $this->applyFetchModeClassLateProps($row);
         }
 
         throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
@@ -523,44 +518,40 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param array<int, mixed> $row
-     * @param array<int|string> $cols
      * @return array<int|string, mixed>
      */
-    protected function applyFetchModeAssoc($row, $cols)
+    protected function applyFetchModeAssoc($row)
     {
-        return array_combine($cols, $this->castRowValues($row));
+        return array_combine($this->fetchCols, $this->castRowValues($row));
     }
 
     /**
      * @param array<int, mixed> $row
-     * @param array<int|string> $cols
      * @return object
      */
-    protected function applyFetchModeObj($row, $cols)
+    protected function applyFetchModeObj($row)
     {
-        return (object) array_combine($cols, $this->castRowValues($row));
+        return (object) array_combine($this->fetchCols, $this->castRowValues($row));
     }
 
     /**
      * @param array<int, mixed> $row
-     * @param array<int|string> $cols
      * @return array<int, mixed>
      */
-    protected function applyFetchModeBoth($row, $cols)
+    protected function applyFetchModeBoth($row)
     {
         $values = $this->castRowValues($row);
 
-        return array_merge($values, array_combine($cols, $values));
+        return array_merge($values, array_combine($this->fetchCols, $values));
     }
 
     /**
      * @param array<int, mixed> $row
-     * @param array<int|string> $cols
      * @return bool
      */
-    protected function applyFetchModeBound($row, $cols)
+    protected function applyFetchModeBound($row)
     {
-        foreach ($this->columns as $column => $params) {
+        foreach ($this->cols as $column => $params) {
             if (is_int($column)) {
                 $index = $column - 1;
 
@@ -572,13 +563,13 @@ class PDOMockStatement extends PDOStatement
                     }
                 }
             } else {
-                $index = array_search($column, $cols, true);
+                $index = array_search($column, $this->fetchCols, true);
             }
 
             if ($index === false) {
-                $params['value'] = null;
+                $params['ref'] = null;
             } else {
-                $params['value'] = $this->castRowValue($row[$index], $params['type']);
+                $params['ref'] = $this->castRowValue($row[$index], $params['type']);
             }
         }
 
@@ -587,10 +578,9 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param array<int, mixed> $row
-     * @param array<int|string> $cols
      * @return mixed
      */
-    protected function applyFetchModeClassEarlyProps($row, $cols)
+    protected function applyFetchModeClassEarlyProps($row)
     {
         if (! $this->fetchClassName) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
@@ -600,7 +590,7 @@ class PDOMockStatement extends PDOStatement
 
         $classInstance = $reflectionClass->newInstanceWithoutConstructor();
 
-        foreach ($cols as $key => $col) {
+        foreach ($this->fetchCols as $key => $col) {
             if ($reflectionClass->hasProperty($col)) {
                 $prop = $reflectionClass->getProperty($col);
                 $prop->setAccessible(true);
@@ -619,10 +609,9 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param array<int, mixed> $row
-     * @param array<int|string> $cols
      * @return mixed
      */
-    protected function applyFetchModeClassLateProps($row, $cols)
+    protected function applyFetchModeClassLateProps($row)
     {
         if (! $this->fetchClassName) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
@@ -632,7 +621,7 @@ class PDOMockStatement extends PDOStatement
 
         $classInstance = $reflectionClass->newInstanceArgs($this->fetchParams);
 
-        foreach ($cols as $key => $col) {
+        foreach ($this->fetchCols as $key => $col) {
             if ($reflectionClass->hasProperty($col)) {
                 $prop = $reflectionClass->getProperty($col);
                 $prop->setAccessible(true);
