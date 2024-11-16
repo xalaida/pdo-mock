@@ -75,9 +75,9 @@ class PDOMockStatement extends PDOStatement
     protected $errorCode = null;
 
     /**
-     * @var bool
+     * @var int
      */
-    protected $executed = false;
+    protected $rowCount = 0;
 
     /**
      * @var ArrayIterator|null
@@ -91,7 +91,7 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param PDOMock $pdo
-     * @param QueryExpectation $expectation
+     * @param QueryExpectation `$expectation
      * @param string $query
      */
     public function __construct($pdo, $expectation, $query)
@@ -262,14 +262,10 @@ class PDOMockStatement extends PDOStatement
         $this->expectation->assertParamsMatch($normalizedParams, $normalizedTypes);
         $this->expectation->assertIsPrepared();
 
-        $this->executed = true;
+        $this->rowCount = $this->expectation->rowCount;
 
         if ($this->expectation->resultSet !== null) {
-            $this->fetchCols = $this->applyFetchColumnCase($this->expectation->resultSet->cols);
-
-            $this->fetchRowsIterator = ($this->expectation->resultSet->rows instanceof Iterator)
-                ? $this->expectation->resultSet->rows
-                : new ArrayIterator($this->expectation->resultSet->rows);
+            $this->initResultSet($this->expectation->resultSet);
         }
 
         $this->expectation->statement = $this;
@@ -285,6 +281,21 @@ class PDOMockStatement extends PDOStatement
         }
 
         return true;
+    }
+
+    /**
+     * @param ResultSet $resultSet
+     * @return void
+     */
+    protected function initResultSet($resultSet)
+    {
+        $this->fetchCols = $this->applyFetchColumnCase($resultSet->cols);
+
+        if ($resultSet->rows instanceof Iterator) {
+            $this->fetchRowsIterator = $resultSet->rows;
+        } else {
+            $this->fetchRowsIterator = new ArrayIterator($resultSet->rows);
+        }
     }
 
     /**
@@ -327,11 +338,7 @@ class PDOMockStatement extends PDOStatement
     #[\Override]
     public function rowCount()
     {
-        if (! $this->executed) {
-            return 0;
-        }
-
-        return $this->expectation->rowCount;
+        return $this->rowCount;
     }
 
     /**
@@ -377,12 +384,12 @@ class PDOMockStatement extends PDOStatement
     #[\Override]
     public function fetch($mode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
-        if ($this->fetchRowsIterator === null || ! $this->fetchRowsIterator->valid()) {
-            return false;
-        }
-
         if ($mode === null) {
             $mode = $this->fetchMode;
+        }
+
+        if ($this->fetchRowsIterator === null || ! $this->fetchRowsIterator->valid()) {
+            return false;
         }
 
         $row = $this->applyFetchMode($mode, $this->fetchRowsIterator->current());
