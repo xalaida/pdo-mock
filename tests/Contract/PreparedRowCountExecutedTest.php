@@ -59,7 +59,7 @@ class PreparedRowCountExecutedTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('insert into "books" ("title") values ("Shadows of the Forgotten Ancestors"), ("Kaidash’s Family")')
-            ->affecting(2);
+            ->willAffect(2);
 
         return $pdo;
     }

@@ -248,7 +248,7 @@ class QueryExpectation
      * @param int|string $insertId
      * @return self
      */
-    public function withInsertId($insertId)
+    public function willInsertId($insertId)
     {
         $this->insertId = (string) $insertId;
 
@@ -259,7 +259,7 @@ class QueryExpectation
      * @param int $rowCount
      * @return self
      */
-    public function affecting($rowCount)
+    public function willAffect($rowCount)
     {
         $this->rowCount = $rowCount;
 
@@ -270,20 +270,20 @@ class QueryExpectation
      * @param ResultSet|array<array<int|string, int|string>> $resultSet
      * @return self
      */
-    public function andFetch($resultSet)
+    public function willFetch($resultSet)
     {
         if (is_array($resultSet)) {
-            return $this->andFetchRows($resultSet);
+            return $this->willFetchRows($resultSet);
         }
 
-        return $this->andFetchResultSet($resultSet);
+        return $this->willFetchResultSet($resultSet);
     }
 
     /**
      * @param ResultSet $resultSet
      * @return self
      */
-    public function andFetchResultSet($resultSet)
+    public function willFetchResultSet($resultSet)
     {
         $this->resultSet = $resultSet;
 
@@ -294,9 +294,9 @@ class QueryExpectation
      * @param array<array<int|string, int|string>> $rows
      * @return self
      */
-    public function andFetchRows($rows)
+    public function willFetchRows($rows)
     {
-        return $this->andFetchResultSet(
+        return $this->willFetchResultSet(
             ResultSet::fromArray($rows)
         );
     }
@@ -305,9 +305,9 @@ class QueryExpectation
      * @param array<int|string, int|string> $row
      * @return self
      */
-    public function andFetchRow($row)
+    public function willFetchRow($row)
     {
-        return $this->andFetchResultSet(
+        return $this->willFetchResultSet(
             ResultSet::fromArray([
                 $row,
             ])
@@ -318,7 +318,7 @@ class QueryExpectation
      * @param PDOException $exception
      * @return self
      */
-    public function andFailOnExecute($exception)
+    public function willFailOnExecute($exception)
     {
         $this->exceptionOnExecute = $exception;
 
@@ -329,7 +329,7 @@ class QueryExpectation
      * @param PDOException $exception
      * @return self
      */
-    public function andFailOnPrepare($exception)
+    public function willFailOnPrepare($exception)
     {
         $this->exceptionOnPrepare = $exception;
 

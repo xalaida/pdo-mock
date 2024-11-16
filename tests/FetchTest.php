@@ -16,7 +16,7 @@ class FetchTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);

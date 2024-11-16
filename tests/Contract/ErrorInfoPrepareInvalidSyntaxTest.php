@@ -90,7 +90,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select table "books"')
-            ->andFailOnPrepare(PDOExceptionMock::fromErrorInfo(
+            ->willFailOnPrepare(PDOExceptionMock::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',

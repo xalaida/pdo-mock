@@ -60,7 +60,7 @@ class LastInsertIdTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('insert into "books" ("id", "title") values (777, "Kaidash’s Family")')
-            ->withInsertId(777);
+            ->willInsertId(777);
 
         return $pdo;
     }

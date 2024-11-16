@@ -57,7 +57,7 @@ class PreparedRowCountNotExecutedTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('delete from "books"')
-            ->affecting(2);
+            ->willAffect(2);
 
         return $pdo;
     }
