@@ -100,28 +100,12 @@ class PDOMock extends PDO
     }
 
     /**
-     * @return ExpectationValidatorInterface
-     */
-    public static function getExpectationValidator()
-    {
-        return static::$expectationValidator ?: new ExpectationValidator();
-    }
-
-    /**
      * @param QueryComparatorInterface $queryComparator
      * @return void
      */
     public static function useQueryComparator($queryComparator)
     {
         static::$queryComparator = $queryComparator;
-    }
-
-    /**
-     * @return QueryComparatorInterface
-     */
-    public static function getQueryComparator()
-    {
-        return static::$queryComparator ?: new QueryComparatorExact();
     }
 
     /**
@@ -148,7 +132,9 @@ class PDOMock extends PDO
      */
     public function expectQuery($query)
     {
-        $expectation = new QueryExpectation(static::getExpectationValidator(), $query);
+        $expectation = new QueryExpectation(
+            static::$expectationValidator ?: new ExpectationValidator(), $query
+        );
 
         $expectation->usingQueryComparator(
             static::$queryComparator ?: new QueryComparatorExact()
@@ -169,7 +155,9 @@ class PDOMock extends PDO
      */
     public function expectFunction($function)
     {
-        $expectation = new FunctionExpectation(static::getExpectationValidator(), $function);
+        $expectation = new FunctionExpectation(
+            static::$expectationValidator ?: new ExpectationValidator(), $function
+        );
 
         $this->expectations[] = $expectation;
 
