@@ -80,12 +80,12 @@ class PDOMockStatement extends PDOStatement
     protected $executed = false;
 
     /**
-     * @var Iterator
+     * @var ArrayIterator|null
      */
-    protected $fetchRows;
+    protected $fetchRowsIterator;
 
     /**
-     * @var array<int|string>
+     * @var array<int, string>
      */
     protected $fetchCols;
 
@@ -265,8 +265,11 @@ class PDOMockStatement extends PDOStatement
         $this->executed = true;
 
         if ($this->expectation->resultSet !== null) {
-            $this->fetchCols = $this->expectation->resultSet->cols;
-            $this->fetchRows = $this->expectation->resultSet->getRows();
+            $this->fetchCols = $this->applyFetchColumnCase($this->expectation->resultSet->cols);
+
+            $this->fetchRowsIterator = ($this->expectation->resultSet->rows instanceof Iterator)
+                ? $this->expectation->resultSet->rows
+                : new ArrayIterator($this->expectation->resultSet->rows);
         }
 
         $this->expectation->statement = $this;
@@ -374,7 +377,7 @@ class PDOMockStatement extends PDOStatement
     #[\Override]
     public function fetch($mode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
-        if ($this->fetchRows === null || ! $this->fetchRows->valid()) {
+        if ($this->fetchRowsIterator === null || ! $this->fetchRowsIterator->valid()) {
             return false;
         }
 
@@ -383,12 +386,12 @@ class PDOMockStatement extends PDOStatement
         }
 
         $row = $this->applyFetchMode(
-            $this->applyFetchColumnCase($this->fetchCols),
-            $this->fetchRows->current(),
-            $mode
+            $mode,
+            $this->fetchRowsIterator->current(),
+            $this->fetchCols
         );
 
-        $this->fetchRows->next();
+        $this->fetchRowsIterator->next();
 
         return $row;
     }
@@ -434,11 +437,9 @@ class PDOMockStatement extends PDOStatement
 
         $rows = [];
 
-        if ($this->fetchRows !== null && $this->fetchRows->valid()) {
-            $cols = $this->applyFetchColumnCase($this->fetchCols);
-
-            foreach ($this->fetchRows as $row) {
-                $rows[] = $this->applyFetchMode($cols, $row, $mode);
+        if ($this->fetchRowsIterator !== null && $this->fetchRowsIterator->valid()) {
+            foreach ($this->fetchRowsIterator as $row) {
+                $rows[] = $this->applyFetchMode($mode, $row, $this->fetchCols);
             }
         }
 
@@ -469,12 +470,12 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
-     * @param array<int|string> $cols
-     * @param array<int, mixed> $row
      * @param int $mode
+     * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return mixed
      */
-    protected function applyFetchMode($cols, $row, $mode)
+    protected function applyFetchMode($mode, $row, $cols)
     {
         if ($mode !== PDO::FETCH_NUM && empty($cols)) {
             throw new RuntimeException('ResultSet columns were not set.');

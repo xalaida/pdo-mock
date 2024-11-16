@@ -54,11 +54,4 @@ class ResultSet
 
         return $this;
     }
-
-    public function getRows()
-    {
-        foreach ($this->rows as $row) {
-            yield $row;
-        }
-    }
 }
