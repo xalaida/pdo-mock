@@ -297,7 +297,7 @@ class QueryExpectation
     public function willFetchRows($rows)
     {
         return $this->willFetchResultSet(
-            ResultSet::fromArray($rows)
+            ResultSet::fromAssociativeArray($rows)
         );
     }
 
@@ -308,7 +308,7 @@ class QueryExpectation
     public function willFetchRow($row)
     {
         return $this->willFetchResultSet(
-            ResultSet::fromArray([
+            ResultSet::fromAssociativeArray([
                 $row,
             ])
         );

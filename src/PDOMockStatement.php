@@ -65,11 +65,6 @@ class PDOMockStatement extends PDOStatement
     protected $fetchParams = [];
 
     /**
-     * @var int
-     */
-    protected $cursor = 0;
-
-    /**
      * @var array{0: string|null, 1: int|string|null, 2: string|null}
      */
     protected $errorInfo = ['', null, null];
@@ -83,6 +78,16 @@ class PDOMockStatement extends PDOStatement
      * @var bool
      */
     protected $executed = false;
+
+    /**
+     * @var Iterator
+     */
+    protected $fetchRows;
+
+    /**
+     * @var array<int|string>
+     */
+    protected $fetchCols;
 
     /**
      * @param PDOMock $pdo
@@ -259,6 +264,11 @@ class PDOMockStatement extends PDOStatement
 
         $this->executed = true;
 
+        if ($this->expectation->resultSet !== null) {
+            $this->fetchCols = $this->expectation->resultSet->cols;
+            $this->fetchRows = $this->expectation->resultSet->getRows();
+        }
+
         $this->expectation->statement = $this;
 
         if ($this->expectation->exceptionOnExecute) {
@@ -364,21 +374,21 @@ class PDOMockStatement extends PDOStatement
     #[\Override]
     public function fetch($mode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
+        if ($this->fetchRows === null || ! $this->fetchRows->valid()) {
+            return false;
+        }
+
         if ($mode === null) {
             $mode = $this->fetchMode;
         }
 
-        $row = false;
+        $row = $this->applyFetchMode(
+            $this->applyFetchColumnCase($this->fetchCols),
+            $this->fetchRows->current(),
+            $mode
+        );
 
-        if ($this->executed && isset($this->expectation->resultSet->rows[$this->cursor])) {
-            $row = $this->applyFetchMode(
-                $this->applyFetchColumnCase($this->expectation->resultSet->cols),
-                $this->expectation->resultSet->rows[$this->cursor],
-                $mode
-            );
-
-            $this->cursor++;
-        }
+        $this->fetchRows->next();
 
         return $row;
     }
@@ -422,17 +432,17 @@ class PDOMockStatement extends PDOStatement
             }
         }
 
-        $allRows = [];
+        $rows = [];
 
-        if ($this->executed && isset($this->expectation->resultSet)) {
-            $cols = $this->applyFetchColumnCase($this->expectation->resultSet->cols);
+        if ($this->fetchRows !== null && $this->fetchRows->valid()) {
+            $cols = $this->applyFetchColumnCase($this->fetchCols);
 
-            foreach ($this->expectation->resultSet->rows as $row) {
-                $allRows[] = $this->applyFetchMode($cols, $row, $mode);
+            foreach ($this->fetchRows as $row) {
+                $rows[] = $this->applyFetchMode($cols, $row, $mode);
             }
         }
 
-        return $allRows;
+        return $rows;
     }
 
     /**
