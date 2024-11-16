@@ -3,7 +3,7 @@
 namespace Tests\Xalaida\PDOMock;
 
 use PDOException;
-use Xalaida\PDOMock\PDOExceptionMock;
+use Xalaida\PDOMock\PDOMockException;
 use Xalaida\PDOMock\PDOMock;
 
 class FailedQueryTest extends TestCase
@@ -18,7 +18,7 @@ class FailedQueryTest extends TestCase
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
 
         $pdo->expect('insert into "books" ("id", "title") values (1, null)')
-            ->willFailOnExecute(PDOExceptionMock::fromErrorInfo(
+            ->willFailOnExecute(PDOMockException::fromErrorInfo(
                 'Query exception',
                 '000',
                 'Invalid syntax',

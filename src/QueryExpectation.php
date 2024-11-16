@@ -69,7 +69,7 @@ class QueryExpectation
     public $exceptionOnPrepare;
 
     /**
-     * @var PDOStatementMock|null
+     * @var PDOMockStatement|null
      */
     public $statement;
 

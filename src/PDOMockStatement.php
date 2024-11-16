@@ -12,7 +12,7 @@ use ReflectionClass;
 use RuntimeException;
 use ValueError;
 
-class PDOStatementMock extends PDOStatement
+class PDOMockStatement extends PDOStatement
 {
     /**
      * @var PDOMock

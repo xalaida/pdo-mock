@@ -5,7 +5,7 @@ namespace Tests\Xalaida\PDOMock\Contract;
 use PDO;
 use PDOException;
 use Tests\Xalaida\PDOMock\TestCase;
-use Xalaida\PDOMock\PDOExceptionMock;
+use Xalaida\PDOMock\PDOMockException;
 use Xalaida\PDOMock\PDOMock;
 
 class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
@@ -90,7 +90,7 @@ class ErrorInfoPrepareInvalidSyntaxTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select table "books"')
-            ->willFailOnPrepare(PDOExceptionMock::fromErrorInfo(
+            ->willFailOnPrepare(PDOMockException::fromErrorInfo(
                 'SQLSTATE[HY000]: General error: 1 near "table": syntax error',
                 'HY000',
                 'near "table": syntax error',

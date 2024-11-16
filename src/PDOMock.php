@@ -347,7 +347,7 @@ class PDOMock extends PDO
     /**
      * @param string $query
      * @param array<int, mixed> $options
-     * @return PDOStatementMock|false
+     * @return PDOMockStatement|false
      */
     #[\ReturnTypeWillChange]
     #[\Override]
@@ -361,7 +361,7 @@ class PDOMock extends PDO
 
         $this->clearErrorInfo();
 
-        $statement = new PDOStatementMock($this, $expectation, $query);
+        $statement = new PDOMockStatement($this, $expectation, $query);
 
         $statement->setFetchMode(
             $this->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE)
