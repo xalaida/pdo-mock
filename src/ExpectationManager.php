@@ -16,7 +16,8 @@ class ExpectationManager
     public function pushQueryExpectation($query)
     {
         $expectation = new QueryExpectation(
-            PDOMock::$expectationValidator ?: new ExpectationValidator(), $query
+            PDOMock::$expectationValidator ?: new ExpectationValidator(),
+            $query
         );
 
         $this->expectations[] = $expectation;
@@ -51,7 +52,8 @@ class ExpectationManager
     public function pushFunctionExpectation($function)
     {
         $expectation = new FunctionExpectation(
-            PDOMock::$expectationValidator ?: new ExpectationValidator(), $function
+            PDOMock::$expectationValidator ?: new ExpectationValidator(),
+            $function
         );
 
         $this->expectations[] = $expectation;
