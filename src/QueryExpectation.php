@@ -310,6 +310,14 @@ class QueryExpectation
     }
 
     /**
+     * @return self
+     */
+    public function willFetchNothing()
+    {
+        return $this->willFetch(new ResultSet());
+    }
+
+    /**
      * @param PDOException $exception
      * @return self
      */
