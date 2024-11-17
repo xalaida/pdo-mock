@@ -35,7 +35,7 @@ class ResultSet
 
     /**
      * @param array<int|string> $cols
-     * @return $this
+     * @return self
      */
     public function setCols($cols)
     {
@@ -46,7 +46,7 @@ class ResultSet
 
     /**
      * @param iterable<array<int|string>> $rows
-     * @return $this
+     * @return self
      */
     public function setRows($rows)
     {

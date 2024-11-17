@@ -2,6 +2,7 @@
 
 namespace Tests\Xalaida\PDOMock;
 
+use RuntimeException;
 use Xalaida\PDOMock\PDOMock;
 use Xalaida\PDOMock\ResultSet;
 
@@ -41,6 +42,48 @@ class FetchTest extends TestCase
         static::assertFalse(
             $statement->fetch()
         );
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldThrowExceptionWhenFetchResultIsNotSet()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books"')
+            ->toBePrepared();
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        $statement->execute();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('ResultSet was not set. Use "willFetch" method to specify fetch results.');
+
+        $statement->fetch($pdo::FETCH_OBJ);
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function itShouldFetchNothing()
+    {
+        $pdo = new PDOMock();
+
+        $pdo->expect('select * from "books"')
+            ->toBePrepared()
+            ->willFetchNothing();
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        $statement->execute();
+
+        $row = $statement->fetch($pdo::FETCH_OBJ);
+
+        static::assertFalse($row);
     }
 
     /**

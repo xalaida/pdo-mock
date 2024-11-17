@@ -62,7 +62,7 @@ class PDOMockStatement extends PDOStatement
     /**
      * @var string|null
      */
-    protected $errorCode = null;
+    protected $errorCode;
 
     /**
      * @var int
@@ -70,14 +70,14 @@ class PDOMockStatement extends PDOStatement
     protected $rowCount = 0;
 
     /**
-     * @var ArrayIterator<int, array<int, mixed>>|null
+     * @var ResultSetIterator|null
      */
-    protected $fetchRowsIterator;
+    protected $resultSetIterator;
 
     /**
-     * @var array<int, string>
+     * @var bool
      */
-    protected $fetchCols;
+    protected $executed = false;
 
     /**
      * @var ExpectationManager
@@ -271,7 +271,7 @@ class PDOMockStatement extends PDOStatement
         $this->clearErrorInfo();
 
         if ($expectation->resultSet !== null) {
-            $this->initResultSet($expectation->resultSet);
+            $this->resultSetIterator = ResultSetIterator::fromResultSet($expectation->resultSet);
         }
 
         if (! is_null($expectation->insertId)) {
@@ -282,22 +282,9 @@ class PDOMockStatement extends PDOStatement
 
         $expectation->statement = $this;
 
+        $this->executed = true;
+
         return true;
-    }
-
-    /**
-     * @param ResultSet $resultSet
-     * @return void
-     */
-    protected function initResultSet($resultSet)
-    {
-        $this->fetchCols = $this->applyFetchColumnCase($resultSet->cols);
-
-        if ($resultSet->rows instanceof Iterator) {
-            $this->fetchRowsIterator = $resultSet->rows;
-        } else {
-            $this->fetchRowsIterator = new ArrayIterator($resultSet->rows);
-        }
     }
 
     /**
@@ -390,13 +377,25 @@ class PDOMockStatement extends PDOStatement
             $mode = $this->fetchMode;
         }
 
-        if ($this->fetchRowsIterator === null || ! $this->fetchRowsIterator->valid()) {
+        if (! $this->executed) {
             return false;
         }
 
-        $row = $this->applyFetchMode($mode, $this->fetchRowsIterator->current());
+        if ($this->resultSetIterator === null) {
+            throw new RuntimeException('ResultSet was not set. Use "willFetch" method to specify fetch results.');
+        }
 
-        $this->fetchRowsIterator->next();
+        if (! $this->resultSetIterator->valid()) {
+            return false;
+        }
+
+        $row = $this->applyFetchMode(
+            $mode,
+            $this->resultSetIterator->current(),
+            $this->applyFetchColumnCase($this->resultSetIterator->cols())
+        );
+
+        $this->resultSetIterator->next();
 
         return $row;
     }
@@ -442,13 +441,37 @@ class PDOMockStatement extends PDOStatement
 
         $rows = [];
 
-        if ($this->fetchRowsIterator !== null && $this->fetchRowsIterator->valid()) {
-            foreach ($this->fetchRowsIterator as $row) {
-                $rows[] = $this->applyFetchMode($mode, $row);
+        if (! $this->executed) {
+            return $rows;
+        }
+
+        if ($this->resultSetIterator === null) {
+            throw new RuntimeException('ResultSet was not set. Use "willFetch" method to specify fetch results.');
+        }
+
+        if ($this->resultSetIterator->valid()) {
+            $cols = $this->applyFetchColumnCase($this->resultSetIterator->cols());
+
+            foreach ($this->resultSetIterator as $row) {
+                $rows[] = $this->applyFetchMode($mode, $row, $cols);
             }
         }
 
         return $rows;
+    }
+
+    /**
+     * @return true
+     */
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    public function closeCursor()
+    {
+        if ($this->resultSetIterator) {
+            $this->resultSetIterator->close();
+        }
+
+        return true;
     }
 
     /**
@@ -477,11 +500,12 @@ class PDOMockStatement extends PDOStatement
     /**
      * @param int $mode
      * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return mixed
      */
-    protected function applyFetchMode($mode, $row)
+    protected function applyFetchMode($mode, $row, $cols)
     {
-        if ($mode !== PDO::FETCH_NUM && empty($this->fetchCols)) {
+        if ($mode !== PDO::FETCH_NUM && empty($cols)) {
             throw new RuntimeException('ResultSet columns were not set.');
         }
 
@@ -490,27 +514,27 @@ class PDOMockStatement extends PDOStatement
         }
 
         if ($mode === PDO::FETCH_ASSOC) {
-            return $this->applyFetchModeAssoc($row);
+            return $this->applyFetchModeAssoc($row, $cols);
         }
 
         if ($mode === PDO::FETCH_OBJ) {
-            return $this->applyFetchModeObj($row);
+            return $this->applyFetchModeObj($row, $cols);
         }
 
         if ($mode === PDO::FETCH_BOTH) {
-            return $this->applyFetchModeBoth($row);
+            return $this->applyFetchModeBoth($row, $cols);
         }
 
         if ($mode === PDO::FETCH_BOUND) {
-            return $this->applyFetchModeBound($row);
+            return $this->applyFetchModeBound($row, $cols);
         }
 
         if ($mode === PDO::FETCH_CLASS) {
-            return $this->applyFetchModeClassEarlyProps($row);
+            return $this->applyFetchModeClassEarlyProps($row, $cols);
         }
 
         if (($mode & (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) === (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) {
-            return $this->applyFetchModeClassLateProps($row);
+            return $this->applyFetchModeClassLateProps($row, $cols);
         }
 
         throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
@@ -527,38 +551,42 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return array<int|string, mixed>
      */
-    protected function applyFetchModeAssoc($row)
+    protected function applyFetchModeAssoc($row, $cols)
     {
-        return array_combine($this->fetchCols, $this->castRowValues($row));
+        return array_combine($cols, $this->castRowValues($row));
     }
 
     /**
      * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return object
      */
-    protected function applyFetchModeObj($row)
+    protected function applyFetchModeObj($row, $cols)
     {
-        return (object) array_combine($this->fetchCols, $this->castRowValues($row));
+        return (object) array_combine($cols, $this->castRowValues($row));
     }
 
     /**
      * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return array<int, mixed>
      */
-    protected function applyFetchModeBoth($row)
+    protected function applyFetchModeBoth($row, $cols)
     {
         $values = $this->castRowValues($row);
 
-        return array_merge($values, array_combine($this->fetchCols, $values));
+        return array_merge($values, array_combine($cols, $values));
     }
 
     /**
      * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return bool
      */
-    protected function applyFetchModeBound($row)
+    protected function applyFetchModeBound($row, $cols)
     {
         foreach ($this->cols as $column => $params) {
             if (is_int($column)) {
@@ -572,7 +600,7 @@ class PDOMockStatement extends PDOStatement
                     }
                 }
             } else {
-                $index = array_search($column, $this->fetchCols, true);
+                $index = array_search($column, $cols, true);
             }
 
             if ($index === false) {
@@ -587,9 +615,10 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return mixed
      */
-    protected function applyFetchModeClassEarlyProps($row)
+    protected function applyFetchModeClassEarlyProps($row, $cols)
     {
         if (! $this->fetchClassName) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
@@ -599,7 +628,7 @@ class PDOMockStatement extends PDOStatement
 
         $classInstance = $reflectionClass->newInstanceWithoutConstructor();
 
-        foreach ($this->fetchCols as $key => $col) {
+        foreach ($cols as $key => $col) {
             if ($reflectionClass->hasProperty($col)) {
                 $prop = $reflectionClass->getProperty($col);
                 $prop->setAccessible(true);
@@ -618,9 +647,10 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param array<int, mixed> $row
+     * @param array<int|string> $cols
      * @return mixed
      */
-    protected function applyFetchModeClassLateProps($row)
+    protected function applyFetchModeClassLateProps($row, $cols)
     {
         if (! $this->fetchClassName) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
@@ -630,7 +660,7 @@ class PDOMockStatement extends PDOStatement
 
         $classInstance = $reflectionClass->newInstanceArgs($this->fetchParams);
 
-        foreach ($this->fetchCols as $key => $col) {
+        foreach ($cols as $key => $col) {
             if ($reflectionClass->hasProperty($col)) {
                 $prop = $reflectionClass->getProperty($col);
                 $prop->setAccessible(true);
