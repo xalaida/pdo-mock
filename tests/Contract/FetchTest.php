@@ -38,7 +38,7 @@ class FetchTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
-    public function itShouldUseFetchAsIterator($pdo)
+    public function itShouldBuildIterator($pdo)
     {
         if (PHP_VERSION_ID < 80000) {
             $this->markTestSkipped('PDOStatement::getIterator() is available only on PHP >= 8.0');
@@ -125,7 +125,7 @@ class FetchTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books"')
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);

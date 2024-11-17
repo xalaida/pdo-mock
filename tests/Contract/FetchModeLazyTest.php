@@ -77,7 +77,7 @@ class FetchModeLazyTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books"')
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family', 'price' => 1500],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors', 'price' => null],
             ]);

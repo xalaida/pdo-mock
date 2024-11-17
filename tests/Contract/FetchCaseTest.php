@@ -133,7 +133,7 @@ class FetchCaseTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books"')
-            ->andFetchRows([
+            ->willFetchRows([
                 ['Id' => 1, 'Title' => 'Kaidash’s Family'],
                 ['Id' => 2, 'Title' => 'Shadows of the Forgotten Ancestors'],
             ]);

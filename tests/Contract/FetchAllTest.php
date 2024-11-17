@@ -32,6 +32,10 @@ class FetchAllTest extends TestCase
         static::assertEquals((object) ['id' => 1, 'title' => 'Kaidash’s Family'], $rows[0]);
         static::assertIsObjectType($rows[1]);
         static::assertEquals((object) ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'], $rows[1]);
+
+        $rows = $statement->fetchAll();
+
+        static::assertEquals([], $rows);
     }
 
     /**
@@ -114,7 +118,7 @@ class FetchAllTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books"')
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);

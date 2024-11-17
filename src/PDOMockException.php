@@ -4,7 +4,7 @@ namespace Xalaida\PDOMock;
 
 use PDOException;
 
-class PDOExceptionMock extends PDOException
+class PDOMockException extends PDOException
 {
     /**
      * @param string $message

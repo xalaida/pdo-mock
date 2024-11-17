@@ -197,7 +197,7 @@ class PrepareParamsTest extends TestCase
             ->toBePrepared()
             ->withParam(1, 'published', $pdo::PARAM_STR)
             ->withParam(2, 2024, $pdo::PARAM_INT)
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);

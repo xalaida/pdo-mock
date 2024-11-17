@@ -85,7 +85,7 @@ class BookServiceTest
 
         $pdo->expect('select * from "books" where "id" = :id')
             ->with(['id' => 7])
-            ->andFetch([
+            ->willFetch([
                 ['id' => 7, 'title' => 'The Forest Song']
             ]);
 
@@ -93,8 +93,8 @@ class BookServiceTest
 
         $book = $bookService->findById(7);
 
-        static::assertEquals(7, $book->id);
-        static::assertEquals('The Forest Song', $book->title);
+        static::assertEquals(7, $book['id']);
+        static::assertEquals('The Forest Song', $book['title']);
     }
 }
 ```

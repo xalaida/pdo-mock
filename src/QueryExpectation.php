@@ -61,15 +61,10 @@ class QueryExpectation
     /**
      * @var PDOException|null
      */
-    public $exceptionOnExecute;
+    public $failException;
 
     /**
-     * @var PDOException|null
-     */
-    public $exceptionOnPrepare;
-
-    /**
-     * @var PDOStatementMock|null
+     * @var PDOMockStatement|null
      */
     public $statement;
 
@@ -248,7 +243,7 @@ class QueryExpectation
      * @param int|string $insertId
      * @return self
      */
-    public function withInsertId($insertId)
+    public function willInsertId($insertId)
     {
         $this->insertId = (string) $insertId;
 
@@ -259,7 +254,7 @@ class QueryExpectation
      * @param int $rowCount
      * @return self
      */
-    public function affecting($rowCount)
+    public function willAffect($rowCount)
     {
         $this->rowCount = $rowCount;
 
@@ -270,20 +265,20 @@ class QueryExpectation
      * @param ResultSet|array<array<int|string, int|string>> $resultSet
      * @return self
      */
-    public function andFetch($resultSet)
+    public function willFetch($resultSet)
     {
         if (is_array($resultSet)) {
-            return $this->andFetchRows($resultSet);
+            return $this->willFetchRows($resultSet);
         }
 
-        return $this->andFetchResultSet($resultSet);
+        return $this->willFetchResultSet($resultSet);
     }
 
     /**
      * @param ResultSet $resultSet
      * @return self
      */
-    public function andFetchResultSet($resultSet)
+    public function willFetchResultSet($resultSet)
     {
         $this->resultSet = $resultSet;
 
@@ -294,10 +289,10 @@ class QueryExpectation
      * @param array<array<int|string, int|string>> $rows
      * @return self
      */
-    public function andFetchRows($rows)
+    public function willFetchRows($rows)
     {
-        return $this->andFetchResultSet(
-            ResultSet::fromArray($rows)
+        return $this->willFetchResultSet(
+            ResultSet::fromAssociativeArray($rows)
         );
     }
 
@@ -305,10 +300,10 @@ class QueryExpectation
      * @param array<int|string, int|string> $row
      * @return self
      */
-    public function andFetchRow($row)
+    public function willFetchRow($row)
     {
-        return $this->andFetchResultSet(
-            ResultSet::fromArray([
+        return $this->willFetchResultSet(
+            ResultSet::fromAssociativeArray([
                 $row,
             ])
         );
@@ -318,20 +313,9 @@ class QueryExpectation
      * @param PDOException $exception
      * @return self
      */
-    public function andFailOnExecute($exception)
+    public function willFail($exception)
     {
-        $this->exceptionOnExecute = $exception;
-
-        return $this;
-    }
-
-    /**
-     * @param PDOException $exception
-     * @return self
-     */
-    public function andFailOnPrepare($exception)
-    {
-        $this->exceptionOnPrepare = $exception;
+        $this->failException = $exception;
 
         return $this;
     }

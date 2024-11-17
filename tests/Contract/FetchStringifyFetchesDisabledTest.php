@@ -77,7 +77,7 @@ class FetchStringifyFetchesDisabledTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books"')
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family', 'year' => 2024, 'price' => 9.99, 'published' => 0],
             ]);
 

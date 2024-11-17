@@ -10,7 +10,7 @@ class ResultSet
     public $cols = [];
 
     /**
-     * @var array<array<int|string>>
+     * @var iterable<array<int|string>>
      */
     public $rows = [];
 
@@ -18,17 +18,19 @@ class ResultSet
      * @param array<array<int|string, int|string>> $results
      * @return self
      */
-    public static function fromArray($results)
+    public static function fromAssociativeArray($results)
     {
-        $resultSet = new self();
+        $cols = array_keys($results[0]);
 
-        $resultSet->setCols(array_keys($results[0]));
+        $rows = [];
 
         foreach ($results as $result) {
-            $resultSet->addRow(array_values($result));
+            $rows[] = array_values($result);
         }
 
-        return $resultSet;
+        return (new self())
+            ->setCols($cols)
+            ->setRows($rows);
     }
 
     /**
@@ -43,23 +45,12 @@ class ResultSet
     }
 
     /**
-     * @param array<array<int|string>> $rows
+     * @param iterable<array<int|string>> $rows
      * @return $this
      */
     public function setRows($rows)
     {
         $this->rows = $rows;
-
-        return $this;
-    }
-
-    /**
-     * @param array<int|string> $row
-     * @return $this
-     */
-    public function addRow($row)
-    {
-        $this->rows[] = $row;
 
         return $this;
     }

@@ -19,7 +19,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family'],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors'],
             ]);
@@ -52,7 +52,7 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetchRow([
+            ->willFetchRow([
                 'id' => 1,
                 'title' => 'Kaidash’s Family',
             ]);
@@ -81,11 +81,13 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetch(
+            ->willFetch(
                 (new ResultSet())
                     ->setCols(['id', 'title'])
-                    ->addRow([1, 'Kaidash’s Family'])
-                    ->addRow([2, 'Shadows of the Forgotten Ancestors'])
+                    ->setRows([
+                        [1, 'Kaidash’s Family'],
+                        [2, 'Shadows of the Forgotten Ancestors']
+                    ])
             );
 
         $statement = $pdo->prepare('select * from "books"');
@@ -111,10 +113,12 @@ class FetchAllTest extends TestCase
 
         $pdo->expect('select * from "books"')
             ->toBePrepared()
-            ->andFetch(
+            ->willFetch(
                 (new ResultSet())
-                    ->addRow([1, 'Kaidash’s Family'])
-                    ->addRow([2, 'Shadows of the Forgotten Ancestors'])
+                    ->setRows([
+                        [1, 'Kaidash’s Family'],
+                        [2, 'Shadows of the Forgotten Ancestors']
+                    ])
             );
 
         $statement = $pdo->prepare('select * from "books"');

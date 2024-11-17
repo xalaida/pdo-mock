@@ -285,7 +285,7 @@ class FetchModeBoundTest extends TestCase
 
         $pdo->expect('select "id", "title", "status", "deleted" from "books" where "deleted" = ?')
             ->withParam(1, 0, $pdo::PARAM_BOOL)
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => 'Kaidash’s Family', 'status' => 'published', 'deleted' => 0],
                 ['id' => 2, 'title' => 'Shadows of the Forgotten Ancestors', 'status' => 'draft', 'deleted' => 0],
             ]);

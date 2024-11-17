@@ -164,7 +164,7 @@ class FetchOracleNullsTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('select * from "books"')
-            ->andFetchRows([
+            ->willFetchRows([
                 ['id' => 1, 'title' => ''],
                 ['id' => 2, 'title' => null],
             ]);
