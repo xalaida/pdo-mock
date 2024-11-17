@@ -28,8 +28,7 @@ class DB
 
         $pdo = new PDOMock();
 
-        $connector = new class ($pdo) extends Connector implements ConnectorInterface
-        {
+        $connector = new class ($pdo) extends Connector implements ConnectorInterface {
             protected $pdo;
 
             public function __construct($pdo)
