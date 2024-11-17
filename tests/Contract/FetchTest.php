@@ -88,6 +88,33 @@ class FetchTest extends TestCase
     }
 
     /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
+    public function itShouldCloseCursor($pdo)
+    {
+        $statement = $pdo->prepare('select * from "books"');
+
+        static::assertTrue($statement->closeCursor());
+
+        $statement->execute();
+
+        $row = $statement->fetch($pdo::FETCH_ASSOC);
+
+        static::assertEquals(['id' => '1', 'title' => 'Kaidash’s Family'], $row);
+
+        static::assertTrue($statement->closeCursor());
+
+        static::assertTrue($statement->closeCursor());
+
+        $row = $statement->fetch($pdo::FETCH_ASSOC);
+
+        static::assertFalse($row);
+    }
+
+    /**
      * @return array<string, array<int, PDO>>
      */
     public static function contracts()

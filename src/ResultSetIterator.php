@@ -21,6 +21,11 @@ class ResultSetIterator implements Iterator
     protected $cols;
 
     /**
+     * @var true
+     */
+    private $closed = false;
+
+    /**
      * @param Iterator<int, array<int, mixed>> $rows
      * @param array<int|string> $cols
      */
@@ -85,6 +90,10 @@ class ResultSetIterator implements Iterator
     #[\ReturnTypeWillChange]
     public function valid()
     {
+        if ($this->closed) {
+            return false;
+        }
+
         return $this->rows->valid();
     }
 
@@ -95,5 +104,10 @@ class ResultSetIterator implements Iterator
     public function rewind()
     {
         $this->rows->rewind();
+    }
+
+    public function close()
+    {
+        $this->closed = true;
     }
 }

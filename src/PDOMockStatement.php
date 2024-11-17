@@ -461,6 +461,19 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
+     * @return true
+     */
+    #[\Override]
+    public function closeCursor()
+    {
+        if ($this->resultSetIterator) {
+            $this->resultSetIterator->close();
+        }
+
+        return true;
+    }
+
+    /**
      * @param array<int|string> $cols
      * @return array<int|string>
      */
