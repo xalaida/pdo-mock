@@ -11,7 +11,7 @@ Inspired by the GO library [SQL-mock](https://github.com/DATA-DOG/go-sqlmock).
 ## Installation
 
 ```bash
-composer require xalaida/pdo-mock
+composer require xalaida/pdomock
 ```
 
 ## Integration with PHPUnit
