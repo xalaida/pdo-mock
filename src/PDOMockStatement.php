@@ -262,23 +262,23 @@ class PDOMockStatement extends PDOStatement
         $this->expectation->assertParamsMatch($normalizedParams, $normalizedTypes);
         $this->expectation->assertIsPrepared();
 
-        $this->rowCount = $this->expectation->rowCount;
-
-        if ($this->expectation->resultSet !== null) {
-            $this->initResultSet($this->expectation->resultSet);
-        }
-
-        $this->expectation->statement = $this;
-
         if ($this->expectation->exceptionOnExecute) {
             return $this->handleException($this->expectation->exceptionOnExecute, 'PDOStatement::execute()');
         }
 
         $this->clearErrorInfo();
 
+        if ($this->expectation->resultSet !== null) {
+            $this->initResultSet($this->expectation->resultSet);
+        }
+
         if (! is_null($this->expectation->insertId)) {
             $this->pdo->lastInsertId = $this->expectation->insertId;
         }
+
+        $this->rowCount = $this->expectation->rowCount;
+
+        $this->expectation->statement = $this;
 
         return true;
     }
