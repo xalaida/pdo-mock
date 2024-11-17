@@ -29,19 +29,6 @@ class PrepareTest extends TestCase
      * @test
      * @return void
      */
-    public function itShouldFailOnUnexpectedQuery()
-    {
-        $pdo = new PDOMock();
-
-        $this->expectExceptionMessage('Unexpected query: select * from "books"');
-
-        $pdo->prepare('select * from "books"');
-    }
-
-    /**
-     * @test
-     * @return void
-     */
     public function itShouldFailWhenStatementIsNotPrepared()
     {
         $pdo = new PDOMock();

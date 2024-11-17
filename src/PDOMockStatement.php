@@ -15,24 +15,9 @@ use ValueError;
 class PDOMockStatement extends PDOStatement
 {
     /**
-     * @var PDOMock
-     */
-    public $pdo;
-
-    /**
-     * @var QueryExpectation
-     */
-    public $expectation;
-
-    /**
      * @var string
      */
     public $query;
-
-    /**
-     * @var array<int, mixed>
-     */
-    protected $attributes = [];
 
     /**
      * @var array<int|string, mixed>
@@ -47,7 +32,12 @@ class PDOMockStatement extends PDOStatement
     /**
      * @var array<int|string, array{ref: mixed, type: int}>
      */
-    public $cols = [];
+    protected $cols = [];
+
+    /**
+     * @var array<int, mixed>
+     */
+    protected $attributes = [];
 
     /**
      * @var int
@@ -90,14 +80,24 @@ class PDOMockStatement extends PDOStatement
     protected $fetchCols;
 
     /**
+     * @var QueryExpectation
+     */
+    protected $expectationManager;
+
+    /**
+     * @var PDOMock
+     */
+    protected $pdo;
+
+    /**
      * @param PDOMock $pdo
-     * @param QueryExpectation `$expectation
+     * @param ExpectationManager $expectationManager
      * @param string $query
      */
-    public function __construct($pdo, $expectation, $query)
+    public function __construct($pdo, $expectationManager, $query)
     {
         $this->pdo = $pdo;
-        $this->expectation = $expectation;
+        $this->expectationManager = $expectationManager;
         $this->query = $query;
 
         if (PHP_VERSION_ID > 80100) {
@@ -258,27 +258,29 @@ class PDOMockStatement extends PDOStatement
             $normalizedTypes = $this->types;
         }
 
-        $this->expectation->assertQueryMatch($this->query);
-        $this->expectation->assertParamsMatch($normalizedParams, $normalizedTypes);
-        $this->expectation->assertIsPrepared();
+        $expectation = $this->expectationManager->pullQueryExpectation($this->query);
 
-        if ($this->expectation->failException) {
-            return $this->handleException($this->expectation->failException, 'PDOStatement::execute()');
+        $expectation->assertQueryMatch($this->query);
+        $expectation->assertParamsMatch($normalizedParams, $normalizedTypes);
+        $expectation->assertIsPrepared();
+
+        if ($expectation->failException) {
+            return $this->handleException($expectation->failException, 'PDOStatement::execute()');
         }
 
         $this->clearErrorInfo();
 
-        if ($this->expectation->resultSet !== null) {
-            $this->initResultSet($this->expectation->resultSet);
+        if ($expectation->resultSet !== null) {
+            $this->initResultSet($expectation->resultSet);
         }
 
-        if (! is_null($this->expectation->insertId)) {
-            $this->pdo->lastInsertId = $this->expectation->insertId;
+        if (! is_null($expectation->insertId)) {
+            $this->pdo->lastInsertId = $expectation->insertId;
         }
 
-        $this->rowCount = $this->expectation->rowCount;
+        $this->rowCount = $expectation->rowCount;
 
-        $this->expectation->statement = $this;
+        $expectation->statement = $this;
 
         return true;
     }
