@@ -315,8 +315,8 @@ class PDOMock extends PDO
         $expectation->assertQueryMatch($statement);
         $expectation->assertIsNotPrepared();
 
-        if ($expectation->exceptionOnExecute) {
-            return $this->handleException($expectation->exceptionOnExecute, 'PDO::exec()');
+        if ($expectation->failException) {
+            return $this->handleException($expectation->failException, 'PDO::exec()');
         }
 
         $this->clearErrorInfo();
@@ -335,19 +335,15 @@ class PDOMock extends PDO
     /**
      * @param string $query
      * @param array<int, mixed> $options
-     * @return PDOMockStatement|false
+     * @return PDOMockStatement
      */
     #[\ReturnTypeWillChange]
     #[\Override]
     public function prepare($query, $options = [])
     {
-        $expectation = $this->getExpectationForQuery($query);
-
-        if ($expectation->exceptionOnPrepare) {
-            return $this->handleException($expectation->exceptionOnPrepare, 'PDO::prepare()');
-        }
-
         $this->clearErrorInfo();
+
+        $expectation = $this->getExpectationForQuery($query);
 
         $statement = new PDOMockStatement($this, $expectation, $query);
 

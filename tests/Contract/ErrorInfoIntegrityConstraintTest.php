@@ -100,7 +100,7 @@ class ErrorInfoIntegrityConstraintTest extends TestCase
         $pdo = new PDOMock();
 
         $pdo->expect('insert into books (id, title) values (1, null)')
-            ->willFailOnExecute(PDOMockException::fromErrorInfo(
+            ->willFail(PDOMockException::fromErrorInfo(
                 'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: books.title',
                 '23000',
                 'NOT NULL constraint failed: books.title',

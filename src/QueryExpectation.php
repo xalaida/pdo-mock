@@ -61,12 +61,7 @@ class QueryExpectation
     /**
      * @var PDOException|null
      */
-    public $exceptionOnExecute;
-
-    /**
-     * @var PDOException|null
-     */
-    public $exceptionOnPrepare;
+    public $failException;
 
     /**
      * @var PDOMockStatement|null
@@ -318,20 +313,9 @@ class QueryExpectation
      * @param PDOException $exception
      * @return self
      */
-    public function willFailOnExecute($exception)
+    public function willFail($exception)
     {
-        $this->exceptionOnExecute = $exception;
-
-        return $this;
-    }
-
-    /**
-     * @param PDOException $exception
-     * @return self
-     */
-    public function willFailOnPrepare($exception)
-    {
-        $this->exceptionOnPrepare = $exception;
+        $this->failException = $exception;
 
         return $this;
     }

@@ -262,8 +262,8 @@ class PDOMockStatement extends PDOStatement
         $this->expectation->assertParamsMatch($normalizedParams, $normalizedTypes);
         $this->expectation->assertIsPrepared();
 
-        if ($this->expectation->exceptionOnExecute) {
-            return $this->handleException($this->expectation->exceptionOnExecute, 'PDOStatement::execute()');
+        if ($this->expectation->failException) {
+            return $this->handleException($this->expectation->failException, 'PDOStatement::execute()');
         }
 
         $this->clearErrorInfo();

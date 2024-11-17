@@ -18,7 +18,7 @@ class FailedQueryTest extends TestCase
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
 
         $pdo->expect('insert into "books" ("id", "title") values (1, null)')
-            ->willFailOnExecute(PDOMockException::fromErrorInfo(
+            ->willFail(PDOMockException::fromErrorInfo(
                 'Query exception',
                 '000',
                 'Invalid syntax',
@@ -54,7 +54,7 @@ class FailedQueryTest extends TestCase
         $pdo->setAttribute($pdo::ATTR_ERRMODE, $pdo::ERRMODE_EXCEPTION);
 
         $pdo->expect('select table "books"')
-            ->willFailOnExecute(new PDOException('Invalid SQL'));
+            ->willFail(new PDOException('Invalid SQL'));
 
         try {
             $pdo->exec('select table "books"');
