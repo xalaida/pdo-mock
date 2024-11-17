@@ -2,6 +2,7 @@
 
 namespace Xalaida\PDOMock\Integration\Laravel;
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Connectors\Connector;
 use Illuminate\Database\Connectors\ConnectorInterface;
 use Xalaida\PDOMock\ParamComparatorNatural;
@@ -15,7 +16,7 @@ class DB
      */
     public static function fake($connection = null)
     {
-        self::configurePDOMock();
+        self::configureMock();
 
         $container = static::getContainer();
 
@@ -27,7 +28,8 @@ class DB
 
         $pdo = new PDOMock();
 
-        $connector = new class ($pdo) extends Connector implements ConnectorInterface {
+        $connector = new class ($pdo) extends Connector implements ConnectorInterface
+        {
             protected $pdo;
 
             public function __construct($pdo)
@@ -35,7 +37,7 @@ class DB
                 $this->pdo = $pdo;
             }
 
-            public function connect(array $config)
+            public function connect($config)
             {
                 $pdo = $this->pdo;
 
@@ -52,19 +54,13 @@ class DB
         return $pdo;
     }
 
-    /**
-     * @return \Illuminate\Contracts\Container\Container
-     */
-    protected static function getContainer()
-    {
-        return app();
-    }
-
-    /**
-     * @return void
-     */
-    protected static function configurePDOMock()
+    protected static function configureMock()
     {
         PDOMock::useParamComparator(new ParamComparatorNatural());
+    }
+
+    protected static function getContainer()
+    {
+        return Container::getInstance();
     }
 }
