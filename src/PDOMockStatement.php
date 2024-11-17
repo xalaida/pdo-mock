@@ -70,7 +70,7 @@ class PDOMockStatement extends PDOStatement
     protected $rowCount = 0;
 
     /**
-     * @var ArrayIterator|null
+     * @var ArrayIterator<int, array<int, mixed>>|null
      */
     protected $fetchRowsIterator;
 
@@ -80,7 +80,7 @@ class PDOMockStatement extends PDOStatement
     protected $fetchCols;
 
     /**
-     * @var QueryExpectation
+     * @var ExpectationManager
      */
     protected $expectationManager;
 
