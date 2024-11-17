@@ -2,8 +2,6 @@
 
 Mock PDO library for PHP unit testing, allowing query expectation, parameter binding, fetch mode simulation, to test database interactions without a live connection.
 
-Be careful, the library does not verify if the SQL query is valid or not.
-
 No dependencies, supports all PHP versions from 5.6 to 8.3.
  
 Inspired by the GO library [SQL-mock](https://github.com/DATA-DOG/go-sqlmock).
@@ -11,7 +9,7 @@ Inspired by the GO library [SQL-mock](https://github.com/DATA-DOG/go-sqlmock).
 ## Installation
 
 ```bash
-composer require xalaida/pdomock
+composer require xalaida/pdo-mock
 ```
 
 ## Integration with PHPUnit
