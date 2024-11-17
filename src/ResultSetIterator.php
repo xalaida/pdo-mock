@@ -21,7 +21,7 @@ class ResultSetIterator implements Iterator
     protected $cols;
 
     /**
-     * @var true
+     * @var bool
      */
     private $closed = false;
 
@@ -106,6 +106,9 @@ class ResultSetIterator implements Iterator
         $this->rows->rewind();
     }
 
+    /**
+     * @return void
+     */
     public function close()
     {
         $this->closed = true;

@@ -464,6 +464,7 @@ class PDOMockStatement extends PDOStatement
      * @return true
      */
     #[\Override]
+    #[\ReturnTypeWillChange]
     public function closeCursor()
     {
         if ($this->resultSetIterator) {
