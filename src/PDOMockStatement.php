@@ -351,23 +351,10 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
-     * @return Iterator
-     */
-    // @phpstan-ignore-next-line
-    #[PHP8] public function getIterator(): Iterator { /* Compatible with PHP >= 8
-    public function getIterator() { # Compatible with PHP < 8 */
-        if (PHP_VERSION_ID < 80000) {
-            throw new RuntimeException('Method getIterator() is available only in PHP >= 8.0');
-        }
-
-        return new ArrayIterator($this->fetchAll());
-    }
-
-    /**
      * @param int $mode
-     * @param $cursorOrientation
-     * @param $cursorOffset
-     * @return array|bool|mixed|object
+     * @param int $cursorOrientation
+     * @param int $cursorOffset
+     * @return mixed
      */
     #[\ReturnTypeWillChange]
     #[\Override]
@@ -398,6 +385,43 @@ class PDOMockStatement extends PDOStatement
         $this->resultSetIterator->next();
 
         return $row;
+    }
+
+    /**
+     * @param int $column
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    public function fetchColumn($column = 0)
+    {
+        if (! $this->executed) {
+            return false;
+        }
+
+        if ($this->resultSetIterator === null) {
+            throw new RuntimeException('ResultSet was not set. Use "willFetch" method to specify fetch results.');
+        }
+
+        if (! $this->resultSetIterator->valid()) {
+            return false;
+        }
+
+        $row = $this->resultSetIterator->current();
+
+        if (! isset($row[$column])) {
+            if (PHP_VERSION_ID < 80000) {
+                throw new PDOException('Invalid column index'); // TODO: update exception message
+            } else {
+                throw new ValueError('Invalid column index');
+            }
+        }
+
+        $columnValue = $this->castColumnValue($row[$column]);
+
+        $this->resultSetIterator->next();
+
+        return $columnValue;
     }
 
     /**
@@ -458,6 +482,19 @@ class PDOMockStatement extends PDOStatement
         }
 
         return $rows;
+    }
+
+    /**
+     * @return Iterator
+     */
+    // @phpstan-ignore-next-line
+    #[PHP8] public function getIterator(): Iterator { /* Compatible with PHP >= 8
+    public function getIterator() { # Compatible with PHP < 8 */
+        if (PHP_VERSION_ID < 80000) {
+            throw new RuntimeException('Method getIterator() is available only in PHP >= 8.0');
+        }
+
+        return new ArrayIterator($this->fetchAll());
     }
 
     /**
@@ -546,7 +583,7 @@ class PDOMockStatement extends PDOStatement
      */
     protected function applyFetchModeNum($row)
     {
-        return $this->castRowValues($row);
+        return $this->castColumnValues($row);
     }
 
     /**
@@ -556,7 +593,7 @@ class PDOMockStatement extends PDOStatement
      */
     protected function applyFetchModeAssoc($row, $cols)
     {
-        return array_combine($cols, $this->castRowValues($row));
+        return array_combine($cols, $this->castColumnValues($row));
     }
 
     /**
@@ -566,7 +603,7 @@ class PDOMockStatement extends PDOStatement
      */
     protected function applyFetchModeObj($row, $cols)
     {
-        return (object) array_combine($cols, $this->castRowValues($row));
+        return (object) array_combine($cols, $this->castColumnValues($row));
     }
 
     /**
@@ -576,7 +613,7 @@ class PDOMockStatement extends PDOStatement
      */
     protected function applyFetchModeBoth($row, $cols)
     {
-        $values = $this->castRowValues($row);
+        $values = $this->castColumnValues($row);
 
         return array_merge($values, array_combine($cols, $values));
     }
@@ -606,7 +643,7 @@ class PDOMockStatement extends PDOStatement
             if ($index === false) {
                 $params['ref'] = null;
             } else {
-                $params['ref'] = $this->castRowValue($row[$index], $params['type']);
+                $params['ref'] = $this->castColumnValue($row[$index], $params['type']);
             }
         }
 
@@ -632,7 +669,7 @@ class PDOMockStatement extends PDOStatement
             if ($reflectionClass->hasProperty($col)) {
                 $prop = $reflectionClass->getProperty($col);
                 $prop->setAccessible(true);
-                $prop->setValue($classInstance, $this->castRowValue($row[$key]));
+                $prop->setValue($classInstance, $this->castColumnValue($row[$key]));
             }
         }
 
@@ -664,7 +701,7 @@ class PDOMockStatement extends PDOStatement
             if ($reflectionClass->hasProperty($col)) {
                 $prop = $reflectionClass->getProperty($col);
                 $prop->setAccessible(true);
-                $prop->setValue($classInstance, $this->castRowValue($row[$key]));
+                $prop->setValue($classInstance, $this->castColumnValue($row[$key]));
             }
         }
 
@@ -675,12 +712,12 @@ class PDOMockStatement extends PDOStatement
      * @param array<int, mixed> $row
      * @return array<int, mixed>
      */
-    protected function castRowValues($row)
+    protected function castColumnValues($row)
     {
         $result = [];
 
-        foreach ($row as $key => $value) {
-            $result[$key] = $this->castRowValue($value);
+        foreach ($row as $column => $value) {
+            $result[$column] = $this->castColumnValue($value);
         }
 
         return $result;
@@ -691,7 +728,7 @@ class PDOMockStatement extends PDOStatement
      * @param int|null $type
      * @return mixed
      */
-    protected function castRowValue($value, $type = null)
+    protected function castColumnValue($value, $type = null)
     {
         if ($value === '' && $this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING) {
             return null;
