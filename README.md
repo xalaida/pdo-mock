@@ -1,23 +1,23 @@
 # PDOMock
 
-PDOMock is a library designed for testing database interactions in PHP.
+PDOMock is a PHP library for testing database interactions without relying on an actual database connection.
 
-The library allows you to test database queries without requiring an actual database connection, unlocks the ability to run the test suite at supersonic speeds, and helps identify common issues such as the N+1 query problem.
+Unlike higher-level abstractions like the repository pattern, PDOMock validates database queries at the SQL level, providing greater control and insights into query execution.
 
-Unlike higher-level abstractions like the repository pattern, PDOMock validates database interactions at the SQL level, providing greater control over query execution and improving test accuracy.
+This testing technique dramatically accelerates test suite performance and helps identify common issues such as N+1 queries.
 
 Mainly inspired by the Go library [SQL-mock](https://github.com/DATA-DOG/go-sqlmock).
 
-## Highlights
+## 🔍 Overview
 
-- Supports all PHP versions from 5.6
-- Supports most PDO features
 - Supports any SQL dialect
+- Supports most PDO features
 - Works with most popular ORMs
 - PHPUnit integration
+- Supports all PHP versions from 5.6
 - No dependencies
 
-## Installation
+## 🚀 Installation
 
 Install the library using Composer:
 
@@ -25,33 +25,7 @@ Install the library using Composer:
 composer require xalaida/pdo-mock
 ```
 
-### Integration with PHPUnit
-
-If you're using PHPUnit, you may want to integrate its assertion mechanism with PDOMock. To do so, register the extension in your PHPUnit configuration file:
-
-```xml
-<extensions>
-    <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitExtension"/>
-</extensions>
-```
-
-Alternatively, you can manually configure it in your `TestCase` class:
-
-```php
-use PHPUnit\Framework\TestCase as BaseTestCase;
-use Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitAdapter;
-use Xalaida\PDOMock\PDOMock;
-
-class TestCase extends BaseTestCase
-{
-    public static function setUpBeforeClass(): void
-    {
-        PDOMock::useAdapter(new PHPUnitAdapter());
-    }
-}
-```
-
-## Example Usage
+## 📽️ Example Usage
 
 Here’s an example of how to use PDOMock in your test cases. 
 Let's assume we have the following service that interacts with the database via PDO:
@@ -107,9 +81,9 @@ class BookServiceTest
 }
 ```
 
-## Documentation
+## 🧾 Documentation
 
-### Query Expectation
+#### Query Expectation
 
 PDOMock requires that you set up expectations for each query.
 To define a simple query expectation, use the `expect` method:
@@ -122,7 +96,7 @@ $pdo = new PDOMock();
 $pdo->expect('SELECT * FROM "books"');
 ```
 
-By default, queries are validated by exact string match. 
+By default, queries are validated by an exact string match. 
 However, if the query is written in a different format (e.g., multiline), the test will fail. 
 To allow for more flexibility, you can use `toMatchRegex`:
 
@@ -245,7 +219,7 @@ $pdo->expect('SELECT * FROM "books" LIMIT 3')
     );
 ```
 
-#### Insert, Update, and Delete Queries
+#### Insert, Update, Delete Queries
 
 For insert queries, specify the insert ID:
 
@@ -265,7 +239,7 @@ $pdo->expect('UPDATE "books" SET "status" = :status WHERE "year" = :year')
     ->willAffect(5);
 ```
 
-#### Transaction management
+#### Transaction Management
 
 You can verify transaction behavior with the following methods: `expectBeginTransaction`, `expectCommit`, and `expectRollback`. 
 Here's an example:
@@ -311,3 +285,33 @@ use Xalaida\PDOMock\ParamComparatorNatural;
 PDOMock::useQueryComparator(new QueryComparatorRegex());
 PDOMock::useParamComparator(new ParamComparatorNatural());
 ```
+
+#### Integration with PHPUnit
+
+If you're using PHPUnit, you may want to integrate its assertion mechanism with PDOMock. To do so, register the extension in your PHPUnit configuration file:
+
+```xml
+<extensions>
+    <bootstrap class="Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitExtension"/>
+</extensions>
+```
+
+Alternatively, you can manually configure it in your `TestCase` class:
+
+```php
+use PHPUnit\Framework\TestCase as BaseTestCase;
+use Xalaida\PDOMock\Adapter\PHPUnit\PHPUnitAdapter;
+use Xalaida\PDOMock\PDOMock;
+
+class TestCase extends BaseTestCase
+{
+    public static function setUpBeforeClass(): void
+    {
+        PDOMock::useAdapter(new PHPUnitAdapter());
+    }
+}
+```
+
+## 📜 License
+
+The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
