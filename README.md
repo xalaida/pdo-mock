@@ -118,7 +118,7 @@ And also allows to provide regex placeholders if you want to skip some parts of 
 
 ```php
 $pdo->expect('INSERT INTO "books" ({{ .* }}) VALUES ({{ .* }})')
-    ->toBatchRegex();
+    ->toMatchRegex();
 ```
 
 **Note:** Be cautious when using `toMatchRegex` as it will also strip whitespace from quoted values. 
