@@ -9,6 +9,8 @@ use RuntimeException;
 
 class PDOMock extends PDO
 {
+    const DEFAULT_FETCH_MODE = 19;
+
     /**
      * @var ExpectationValidatorInterface|null
      */
@@ -310,8 +312,12 @@ class PDOMock extends PDO
      */
     #[\ReturnTypeWillChange]
     #[\Override]
-    public function query($query, $fetchMode = PDO::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args)
+    public function query($query, $fetchMode = null, ...$fetch_mode_args)
     {
+        if ($fetchMode === null || $fetchMode === static::DEFAULT_FETCH_MODE) {
+            $fetchMode = $this->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE);
+        }
+
         $statement = $this->prepare($query);
 
         $statement->setFetchMode($fetchMode, ...$fetch_mode_args);

@@ -15,6 +15,35 @@ class QueryTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
+    public function itShouldQueryUsingDefaultFetchMode($pdo)
+    {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+
+        $statement = $pdo->query('select * from "books"');
+
+        $rows = $statement->fetchAll();
+
+        static::assertCount(2, $rows);
+        static::assertIsArrayType($rows[0]);
+        static::assertSame('1', $rows[0][0]);
+        static::assertSame('1', $rows[0]['id']);
+        static::assertSame('Kaidash’s Family', $rows[0][1]);
+        static::assertSame('Kaidash’s Family', $rows[0]['title']);
+        static::assertIsArrayType($rows[1]);
+        static::assertSame('2', $rows[1]['id']);
+        static::assertSame('2', $rows[1][0]);
+        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1][1]);
+        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]['title']);
+        $this->assertInstanceOf(PDOStatement::class, $statement);
+        static::assertSame(0, $statement->rowCount());
+    }
+
+    /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
     public function itShouldFetchAsObjects($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);

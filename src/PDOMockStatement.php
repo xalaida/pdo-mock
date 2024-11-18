@@ -45,14 +45,14 @@ class PDOMockStatement extends PDOStatement
     protected $fetchMode = PDO::FETCH_BOTH;
 
     /**
-     * @var string|null
+     * @var class-string|null
      */
     protected $fetchClassName;
 
     /**
      * @var array<int, mixed>
      */
-    protected $fetchParams = [];
+    protected $fetchClassArgs = [];
 
     /**
      * @var array{0: string|null, 1: int|string|null, 2: string|null}
@@ -136,7 +136,7 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param int $mode
-     * @param string|null $className
+     * @param class-string|null $className
      * @param array<int, mixed> ...$params
      * @return void
      */
@@ -144,14 +144,26 @@ class PDOMockStatement extends PDOStatement
     #[\Override]
     public function setFetchMode($mode, $className = null, ...$params)
     {
+        // TODO: validate fetch mode
+
         $this->fetchMode = $mode;
 
         if ($className) {
+            if (! class_exists($className)) {
+                if (PHP_VERSION_ID < 80000) {
+                    throw new \PDOException("PDOStatement::setFetchMode(): Argument #2 must be a valid class"); // TODO: update error message
+                } else {
+                    throw new \TypeError("PDOStatement::setFetchMode(): Argument #2 must be a valid class");
+                }
+            }
+
             $this->fetchClassName = $className;
         }
 
         if ($params) {
-            $this->fetchParams = $params[0];
+            // TODO: validate params
+
+            $this->fetchClassArgs = $params[0];
         }
     }
 
@@ -360,7 +372,7 @@ class PDOMockStatement extends PDOStatement
     #[\Override]
     public function fetch($mode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
-        if ($mode === null) {
+        if ($mode === null || $mode === PDOMock::DEFAULT_FETCH_MODE) {
             $mode = $this->fetchMode;
         }
 
@@ -425,6 +437,55 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
+     * @template T
+     * @param class-string<T> $class
+     * @param array<int, mixed> $constructorArgs
+     * @return T|false
+     */
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    public function fetchObject($class = 'stdClass', $constructorArgs = [])
+    {
+        if (! class_exists($class)) {
+            if (PHP_VERSION_ID < 80000) {
+                throw new \PDOException(sprintf('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, %s given', $class)); // TODO: update error message
+            } else {
+                throw new \TypeError(sprintf('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, %s given', $class));
+            }
+        }
+
+        if (! $this->executed) {
+            return false;
+        }
+
+        if ($this->resultSetIterator === null) {
+            throw new RuntimeException('ResultSet was not set. Use "willFetch" method to specify fetch results.');
+        }
+
+        if (! $this->resultSetIterator->valid()) {
+            return false;
+        }
+
+        if ($class === 'stdClass') {
+            $row = $this->applyFetchModeObj(
+                $this->resultSetIterator->current(),
+                $this->applyFetchColumnCase($this->resultSetIterator->cols())
+            );
+        } else {
+            $row = $this->applyFetchModeClassEarlyProps(
+                $this->resultSetIterator->current(),
+                $this->applyFetchColumnCase($this->resultSetIterator->cols()),
+                $class,
+                $constructorArgs
+            );
+        }
+
+        $this->resultSetIterator->next();
+
+        return $row;
+    }
+
+    /**
      * @param int|null $mode
      * @return array<int, mixed>
      */
@@ -440,7 +501,7 @@ class PDOMockStatement extends PDOStatement
             } else {
                 // @phpstan-ignore-next-line
                 $this->fetchClassName = $className;
-                $this->fetchParams = $params;
+                $this->fetchClassArgs = $params;
             }
         } else {
             if ($mode === PDO::FETCH_DEFAULT) {
@@ -449,7 +510,7 @@ class PDOMockStatement extends PDOStatement
                 $this->fetchClassName = isset($params[0])
                     ? $params[0]
                     : null;
-                $this->fetchParams = isset($params[1])
+                $this->fetchClassArgs = isset($params[1])
                     ? $params[1]
                     : [];
             }
@@ -567,11 +628,11 @@ class PDOMockStatement extends PDOStatement
         }
 
         if ($mode === PDO::FETCH_CLASS) {
-            return $this->applyFetchModeClassEarlyProps($row, $cols);
+            return $this->applyFetchModeClassEarlyProps($row, $cols, $this->fetchClassName, $this->fetchClassArgs);
         }
 
         if (($mode & (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) === (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) {
-            return $this->applyFetchModeClassLateProps($row, $cols);
+            return $this->applyFetchModeClassLateProps($row, $cols, $this->fetchClassName, $this->fetchClassArgs);
         }
 
         throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
@@ -651,17 +712,20 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
+     * @template T
      * @param array<int, mixed> $row
      * @param array<int|string> $cols
-     * @return mixed
+     * @param class-string<T> $className
+     * @param array<int, mixed> $classArgs
+     * @return T
      */
-    protected function applyFetchModeClassEarlyProps($row, $cols)
+    protected function applyFetchModeClassEarlyProps($row, $cols, $className, $classArgs = [])
     {
-        if (! $this->fetchClassName) {
+        if ($className === null) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
         }
 
-        $reflectionClass = new ReflectionClass($this->fetchClassName);
+        $reflectionClass = new ReflectionClass($className);
 
         $classInstance = $reflectionClass->newInstanceWithoutConstructor();
 
@@ -676,26 +740,29 @@ class PDOMockStatement extends PDOStatement
         $constructor = $reflectionClass->getConstructor();
 
         if ($constructor) {
-            $constructor->invokeArgs($classInstance, $this->fetchParams);
+            $constructor->invokeArgs($classInstance, $classArgs);
         }
 
         return $classInstance;
     }
 
     /**
+     * @template T
      * @param array<int, mixed> $row
      * @param array<int|string> $cols
-     * @return mixed
+     * @param class-string<T> $className
+     * @param array<int, mixed> $classArgs
+     * @return T
      */
-    protected function applyFetchModeClassLateProps($row, $cols)
+    protected function applyFetchModeClassLateProps($row, $cols, $className, $classArgs = [])
     {
-        if (! $this->fetchClassName) {
+        if ($className === null) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
         }
 
-        $reflectionClass = new ReflectionClass($this->fetchClassName);
+        $reflectionClass = new ReflectionClass($className);
 
-        $classInstance = $reflectionClass->newInstanceArgs($this->fetchParams);
+        $classInstance = $reflectionClass->newInstanceArgs($classArgs);
 
         foreach ($cols as $key => $col) {
             if ($reflectionClass->hasProperty($col)) {
