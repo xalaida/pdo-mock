@@ -1,5 +1,11 @@
 # PDOMock
 
+![License](https://img.shields.io/github/license/xalaida/pdo-mock)
+![Packagist](https://img.shields.io/packagist/v/xalaida/pdo-mock)
+![Build](https://img.shields.io/github/actions/workflow/status/xalaida/pdo-mock/ci.yml?branch=master)
+![Coverage](https://img.shields.io/codecov/c/github/xalaida/pdo-mock)
+![GitHub last commit](https://img.shields.io/github/last-commit/xalaida/pdo-mock)
+
 PDOMock is a PHP library for testing database interactions without relying on an actual database connection.
 
 Unlike higher-level abstractions like the repository pattern, PDOMock validates database queries at the SQL level, providing greater control and insights into query execution.
