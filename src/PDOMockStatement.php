@@ -70,6 +70,11 @@ class PDOMockStatement extends PDOStatement
     protected $rowCount = 0;
 
     /**
+     * @var int
+     */
+    protected $columnCount = 0;
+
+    /**
      * @var ResultSetIterator|null
      */
     protected $resultSetIterator;
@@ -245,6 +250,11 @@ class PDOMockStatement extends PDOStatement
         return true;
     }
 
+    public function debugDumpParams()
+    {
+        // TODO
+    }
+
     /**
      * @param array<int|string, mixed>|null $params
      * @return bool
@@ -284,6 +294,8 @@ class PDOMockStatement extends PDOStatement
 
         if ($expectation->resultSet !== null) {
             $this->resultSetIterator = ResultSetIterator::fromResultSet($expectation->resultSet);
+
+            $this->columnCount = count($this->resultSetIterator->current());
         }
 
         if (! is_null($expectation->insertId)) {
@@ -340,6 +352,16 @@ class PDOMockStatement extends PDOStatement
     public function rowCount()
     {
         return $this->rowCount;
+    }
+
+    /**
+     * @return int
+     */
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    public function columnCount()
+    {
+        return $this->columnCount;
     }
 
     /**
@@ -556,6 +578,16 @@ class PDOMockStatement extends PDOStatement
         }
 
         return new ArrayIterator($this->fetchAll());
+    }
+
+    public function getColumnMeta($column)
+    {
+        // TODO
+    }
+
+    public function nextRowset()
+    {
+        // TODO
     }
 
     /**
