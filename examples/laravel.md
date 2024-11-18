@@ -1,6 +1,13 @@
+# Laravel Example
+
+### DB helper class
+
+Add a simple `DB` helper that swaps `PDO` with `PDOMock` using the anonymous `Connector` class:
+
+```php
 <?php
 
-namespace Xalaida\PDOMock\Integration\Laravel;
+namespace Tests;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Connectors\Connector;
@@ -10,15 +17,11 @@ use Xalaida\PDOMock\PDOMock;
 
 class DB
 {
-    /**
-     * @param string|null $connection
-     * @return PDOMock
-     */
-    public static function fake($connection = null)
+    public static function fake($connection = null): PDOMock
     {
-        self::configureMock();
+        PDOMock::useParamComparator(new ParamComparatorNatural());
 
-        $container = static::getContainer();
+        $container = Container::getInstance();
 
         $config = $container->get('config');
 
@@ -52,14 +55,38 @@ class DB
 
         return $pdo;
     }
+}
+```
 
-    protected static function configureMock()
-    {
-        PDOMock::useParamComparator(new ParamComparatorNatural());
-    }
+## Use DB helper in tests
 
-    protected static function getContainer()
+```php
+<?php
+
+namespace Tests;
+
+use App\Models\Book;
+use PHPUnit\Framework\Attributes\Test;
+
+class BookTest extends TestCase
+{
+    #[Test]
+    public function itShouldSelectBooks(): void
     {
-        return Container::getInstance();
+        $pdo = DB::fake();
+
+        $pdo->expect('select * from "books" where "id" = ? limit 1')
+            ->with(7)
+            ->willFetchRow([
+                'id' => 7,
+                'title' => 'The Forest Song',
+            ])
+
+        $book = Book::find(7);
+
+        $this->assertEquals(7, $book->id);
+        $this->assertEquals('The Forest Song', $book->title);
+        $pdo->assertExpectationsFulfilled();
     }
 }
+```
