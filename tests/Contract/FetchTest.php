@@ -115,6 +115,37 @@ class FetchTest extends TestCase
     }
 
     /**
+     * @test
+     * @dataProvider contracts
+     * @param PDO $pdo
+     * @return void
+     */
+    public function itShouldFailOnInvalidFetchMode($pdo)
+    {
+        $this->markTestIncomplete('TODO');
+
+        $statement = $pdo->prepare('select * from "books"');
+
+        if (PHP_VERSION_ID < 80000) {
+            try {
+                $statement->setFetchMode(777);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\PDOException $e) {
+                static::assertSame('PDOStatement::setFetchMode(): Argument #1 ($mode) must be a bitmask of PDO::FETCH_* constants', $e->getMessage());
+            }
+        } else {
+            try {
+                $statement->setFetchMode(777);
+
+                $this->fail('Expected exception is not thrown');
+            } catch (\ValueError $e) {
+                static::assertSame('PDOStatement::setFetchMode(): Argument #1 ($mode) must be a bitmask of PDO::FETCH_* constants', $e->getMessage());
+            }
+        }
+    }
+
+    /**
      * @return array<string, array<int, PDO>>
      */
     public static function contracts()
