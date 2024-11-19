@@ -1,7 +1,6 @@
 # PDOMock
 
 ![Packagist](https://img.shields.io/packagist/v/xalaida/pdo-mock)
-![GitHub last commit](https://img.shields.io/github/last-commit/xalaida/pdo-mock)
 ![Build](https://img.shields.io/github/actions/workflow/status/xalaida/pdo-mock/ci.yaml?branch=master)
 ![Coverage](https://img.shields.io/codecov/c/github/xalaida/pdo-mock)
 ![License](https://img.shields.io/github/license/xalaida/pdo-mock)
