@@ -1,6 +1,6 @@
 {
     "name": "xalaida/pdo-mock",
-    "description": "A mock PDO library for testing database interactions in PHP without a live connection.",
+    "description": "Library for mocking database interactions in unit tests.",
     "type": "library",
     "license": "MIT",
     "autoload": {
