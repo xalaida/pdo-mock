@@ -47,27 +47,18 @@ class FetchColumnTest extends TestCase
      */
     public function itShouldThrowExceptionWhenIndexIsInvalid($pdo)
     {
+        if (PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped('Only for PHP >= 8.0.0');
+        }
+
         $statement = $pdo->prepare('select * from "books"');
 
         $statement->execute();
 
-        if (PHP_VERSION_ID < 80000) {
-            try {
-                $statement->fetchColumn(2);
+        $this->expectException(\ValueError::class);
+        $this->expectExceptionMessage('Invalid column index');
 
-                $this->fail('Expected exception is not thrown');
-            } catch (\PDOException $e) {
-                static::assertSame('Invalid column index', $e->getMessage());
-            }
-        } else {
-            try {
-                $statement->fetchColumn(2);
-
-                $this->fail('Expected exception is not thrown');
-            } catch (\ValueError $e) {
-                static::assertSame('Invalid column index', $e->getMessage());
-            }
-        }
+        $statement->fetchColumn(2);
     }
 
     /**

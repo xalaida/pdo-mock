@@ -105,27 +105,17 @@ class FetchObjectTest extends TestCase
      */
     public function itShouldFailWhenFetchObjectClassIsInvalid($pdo)
     {
+        if (PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped('Only for PHP >= 8.0.0');
+        }
+
         $statement = $pdo->query('select * from "books"');
 
-        if (PHP_VERSION_ID < 80000) {
-            try {
-                // @phpstan-ignore-next-line
-                $statement->fetchObject(\InvalidClass::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, InvalidClass given');
 
-                $this->fail('Expected exception is not thrown');
-            } catch (\PDOException $e) {
-                static::assertSame('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, InvalidClass given', $e->getMessage());
-            }
-        } else {
-            try {
-                // @phpstan-ignore-next-line
-                $statement->fetchObject('InvalidClass');
-
-                $this->fail('Expected exception is not thrown');
-            } catch (\TypeError $e) {
-                static::assertSame('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, InvalidClass given', $e->getMessage());
-            }
-        }
+        // @phpstan-ignore-next-line
+        $statement->fetchObject('InvalidClass');
     }
 
     /**

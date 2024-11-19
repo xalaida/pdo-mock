@@ -186,25 +186,17 @@ class FetchModeClassTest extends TestCase
      */
     public function itShouldFailWhenFetchModeClassIsInvalid($pdo)
     {
+        if (PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped('Only for PHP >= 8.0.0');
+        }
+
         $statement = $pdo->query('select * from "books"');
 
-        if (PHP_VERSION_ID < 80000) {
-            try {
-                $statement->setFetchMode($pdo::FETCH_CLASS, 'InvalidClass');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('PDOStatement::setFetchMode(): Argument #2 must be a valid class');
 
-                $this->fail('Expected exception is not thrown');
-            } catch (\PDOException $e) {
-                static::assertSame('PDOStatement::setFetchMode(): Argument #2 must be a valid class', $e->getMessage());
-            }
-        } else {
-            try {
-                $statement->setFetchMode($pdo::FETCH_CLASS, 'InvalidClass');
+        $statement->setFetchMode($pdo::FETCH_CLASS, 'InvalidClass');
 
-                $this->fail('Expected exception is not thrown');
-            } catch (\TypeError $e) {
-                static::assertSame('PDOStatement::setFetchMode(): Argument #2 must be a valid class', $e->getMessage());
-            }
-        }
     }
 
     // TODO: test incorrect construct arguments...

@@ -149,25 +149,17 @@ class PDOMockStatement extends PDOStatement
     #[\Override]
     public function setFetchMode($mode, $className = null, ...$params)
     {
-        // TODO: validate fetch mode
-
         $this->fetchMode = $mode;
 
         if ($className) {
-            if (! class_exists($className)) {
-                if (PHP_VERSION_ID < 80000) {
-                    throw new \PDOException("PDOStatement::setFetchMode(): Argument #2 must be a valid class"); // TODO: update error message
-                } else {
-                    throw new \TypeError("PDOStatement::setFetchMode(): Argument #2 must be a valid class");
-                }
+            if (! class_exists($className) && PHP_VERSION_ID >= 80000) {
+                throw new \TypeError("PDOStatement::setFetchMode(): Argument #2 must be a valid class");
             }
 
             $this->fetchClassName = $className;
         }
 
         if ($params) {
-            // TODO: validate params
-
             $this->fetchClassArgs = $params[0];
         }
     }
@@ -440,12 +432,8 @@ class PDOMockStatement extends PDOStatement
 
         $row = $this->resultSetIterator->current();
 
-        if (! isset($row[$column])) {
-            if (PHP_VERSION_ID < 80000) {
-                throw new PDOException('Invalid column index'); // TODO: update exception message
-            } else {
-                throw new ValueError('Invalid column index');
-            }
+        if (! isset($row[$column]) && PHP_VERSION_ID >= 80000) {
+            throw new ValueError('Invalid column index');
         }
 
         $columnValue = $this->castColumnValue($row[$column]);
@@ -465,12 +453,8 @@ class PDOMockStatement extends PDOStatement
     #[\Override]
     public function fetchObject($class = 'stdClass', $constructorArgs = [])
     {
-        if (! class_exists($class)) {
-            if (PHP_VERSION_ID < 80000) {
-                throw new \PDOException(sprintf('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, %s given', $class)); // TODO: update error message
-            } else {
-                throw new \TypeError(sprintf('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, %s given', $class));
-            }
+        if (! class_exists($class) && PHP_VERSION_ID >= 80000) {
+            throw new \TypeError(sprintf('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, %s given', $class));
         }
 
         if (! $this->executed) {
