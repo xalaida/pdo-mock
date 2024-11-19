@@ -38,7 +38,7 @@ class DebugDumpParamsTest extends TestCase
             'Key: Name: [7] :search' . PHP_EOL .
             'paramno=-1' . PHP_EOL .
             'name=[7] ":search"' . PHP_EOL .
-            'is_param=1'. PHP_EOL .
+            'is_param=1' . PHP_EOL .
             'param_type=2' . PHP_EOL .
             'Key: Name: [3] :id' . PHP_EOL .
             'paramno=-1' . PHP_EOL .
@@ -79,7 +79,7 @@ class DebugDumpParamsTest extends TestCase
             'Key: Position #0:' . PHP_EOL .
             'paramno=0' . PHP_EOL .
             'name=[0] ""' . PHP_EOL .
-            'is_param=1'. PHP_EOL .
+            'is_param=1' . PHP_EOL .
             'param_type=2' . PHP_EOL .
             'Key: Position #1:' . PHP_EOL .
             'paramno=1' . PHP_EOL .
