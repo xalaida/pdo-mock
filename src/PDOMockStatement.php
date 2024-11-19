@@ -45,14 +45,14 @@ class PDOMockStatement extends PDOStatement
     protected $fetchMode = PDO::FETCH_BOTH;
 
     /**
-     * @var string|null
+     * @var class-string|null
      */
     protected $fetchClassName;
 
     /**
      * @var array<int, mixed>
      */
-    protected $fetchParams = [];
+    protected $fetchClassArgs = [];
 
     /**
      * @var array{0: string|null, 1: int|string|null, 2: string|null}
@@ -68,6 +68,11 @@ class PDOMockStatement extends PDOStatement
      * @var int
      */
     protected $rowCount = 0;
+
+    /**
+     * @var int
+     */
+    protected $columnCount = 0;
 
     /**
      * @var ResultSetIterator|null
@@ -136,7 +141,7 @@ class PDOMockStatement extends PDOStatement
 
     /**
      * @param int $mode
-     * @param string|null $className
+     * @param class-string|null $className
      * @param array<int, mixed> ...$params
      * @return void
      */
@@ -147,11 +152,15 @@ class PDOMockStatement extends PDOStatement
         $this->fetchMode = $mode;
 
         if ($className) {
+            if (! class_exists($className) && PHP_VERSION_ID >= 80000) {
+                throw new \TypeError("PDOStatement::setFetchMode(): Argument #2 must be a valid class");
+            }
+
             $this->fetchClassName = $className;
         }
 
         if ($params) {
-            $this->fetchParams = $params[0];
+            $this->fetchClassArgs = $params[0];
         }
     }
 
@@ -272,6 +281,10 @@ class PDOMockStatement extends PDOStatement
 
         if ($expectation->resultSet !== null) {
             $this->resultSetIterator = ResultSetIterator::fromResultSet($expectation->resultSet);
+
+            if ($this->resultSetIterator->valid()) {
+                $this->columnCount = count($this->resultSetIterator->current());
+            }
         }
 
         if (! is_null($expectation->insertId)) {
@@ -331,6 +344,16 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
+     * @return int
+     */
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    public function columnCount()
+    {
+        return $this->columnCount;
+    }
+
+    /**
      * @return string|null
      */
     #[\ReturnTypeWillChange]
@@ -351,29 +374,16 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
-     * @return Iterator
-     */
-    // @phpstan-ignore-next-line
-    #[PHP8] public function getIterator(): Iterator { /* Compatible with PHP >= 8
-    public function getIterator() { # Compatible with PHP < 8 */
-        if (PHP_VERSION_ID < 80000) {
-            throw new RuntimeException('Method getIterator() is available only in PHP >= 8.0');
-        }
-
-        return new ArrayIterator($this->fetchAll());
-    }
-
-    /**
      * @param int $mode
-     * @param $cursorOrientation
-     * @param $cursorOffset
-     * @return array|bool|mixed|object
+     * @param int $cursorOrientation
+     * @param int $cursorOffset
+     * @return mixed
      */
     #[\ReturnTypeWillChange]
     #[\Override]
     public function fetch($mode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
     {
-        if ($mode === null) {
+        if ($mode === null || $mode === PDOMock::DEFAULT_FETCH_MODE) {
             $mode = $this->fetchMode;
         }
 
@@ -401,6 +411,84 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
+     * @param int $column
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    public function fetchColumn($column = 0)
+    {
+        if (! $this->executed) {
+            return false;
+        }
+
+        if ($this->resultSetIterator === null) {
+            throw new RuntimeException('ResultSet was not set. Use "willFetch" method to specify fetch results.');
+        }
+
+        if (! $this->resultSetIterator->valid()) {
+            return false;
+        }
+
+        $row = $this->resultSetIterator->current();
+
+        if (! isset($row[$column]) && PHP_VERSION_ID >= 80000) {
+            throw new ValueError('Invalid column index');
+        }
+
+        $columnValue = $this->castColumnValue($row[$column]);
+
+        $this->resultSetIterator->next();
+
+        return $columnValue;
+    }
+
+    /**
+     * @template T
+     * @param class-string<T> $class
+     * @param array<int, mixed> $constructorArgs
+     * @return T|false
+     */
+    #[\ReturnTypeWillChange]
+    #[\Override]
+    public function fetchObject($class = 'stdClass', $constructorArgs = [])
+    {
+        if (! class_exists($class) && PHP_VERSION_ID >= 80000) {
+            throw new \TypeError(sprintf('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, %s given', $class));
+        }
+
+        if (! $this->executed) {
+            return false;
+        }
+
+        if ($this->resultSetIterator === null) {
+            throw new RuntimeException('ResultSet was not set. Use "willFetch" method to specify fetch results.');
+        }
+
+        if (! $this->resultSetIterator->valid()) {
+            return false;
+        }
+
+        if ($class === 'stdClass') {
+            $row = $this->applyFetchModeObj(
+                $this->resultSetIterator->current(),
+                $this->applyFetchColumnCase($this->resultSetIterator->cols())
+            );
+        } else {
+            $row = $this->applyFetchModeClassEarlyProps(
+                $this->resultSetIterator->current(),
+                $this->applyFetchColumnCase($this->resultSetIterator->cols()),
+                $class,
+                $constructorArgs
+            );
+        }
+
+        $this->resultSetIterator->next();
+
+        return $row;
+    }
+
+    /**
      * @param int|null $mode
      * @return array<int, mixed>
      */
@@ -416,7 +504,7 @@ class PDOMockStatement extends PDOStatement
             } else {
                 // @phpstan-ignore-next-line
                 $this->fetchClassName = $className;
-                $this->fetchParams = $params;
+                $this->fetchClassArgs = $params;
             }
         } else {
             if ($mode === PDO::FETCH_DEFAULT) {
@@ -425,7 +513,7 @@ class PDOMockStatement extends PDOStatement
                 $this->fetchClassName = isset($params[0])
                     ? $params[0]
                     : null;
-                $this->fetchParams = isset($params[1])
+                $this->fetchClassArgs = isset($params[1])
                     ? $params[1]
                     : [];
             }
@@ -458,6 +546,19 @@ class PDOMockStatement extends PDOStatement
         }
 
         return $rows;
+    }
+
+    /**
+     * @return Iterator
+     */
+    // @phpstan-ignore-next-line
+    #[PHP8] public function getIterator(): Iterator { /* Compatible with PHP >= 8
+    public function getIterator() { # Compatible with PHP < 8 */
+        if (PHP_VERSION_ID < 80000) {
+            throw new RuntimeException('Method getIterator() is available only in PHP >= 8.0');
+        }
+
+        return new ArrayIterator($this->fetchAll());
     }
 
     /**
@@ -530,11 +631,11 @@ class PDOMockStatement extends PDOStatement
         }
 
         if ($mode === PDO::FETCH_CLASS) {
-            return $this->applyFetchModeClassEarlyProps($row, $cols);
+            return $this->applyFetchModeClassEarlyProps($row, $cols, $this->fetchClassName, $this->fetchClassArgs);
         }
 
         if (($mode & (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) === (PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE)) {
-            return $this->applyFetchModeClassLateProps($row, $cols);
+            return $this->applyFetchModeClassLateProps($row, $cols, $this->fetchClassName, $this->fetchClassArgs);
         }
 
         throw new InvalidArgumentException("Unsupported fetch mode: " . $mode);
@@ -546,7 +647,7 @@ class PDOMockStatement extends PDOStatement
      */
     protected function applyFetchModeNum($row)
     {
-        return $this->castRowValues($row);
+        return $this->castColumnValues($row);
     }
 
     /**
@@ -556,7 +657,7 @@ class PDOMockStatement extends PDOStatement
      */
     protected function applyFetchModeAssoc($row, $cols)
     {
-        return array_combine($cols, $this->castRowValues($row));
+        return array_combine($cols, $this->castColumnValues($row));
     }
 
     /**
@@ -566,7 +667,7 @@ class PDOMockStatement extends PDOStatement
      */
     protected function applyFetchModeObj($row, $cols)
     {
-        return (object) array_combine($cols, $this->castRowValues($row));
+        return (object) array_combine($cols, $this->castColumnValues($row));
     }
 
     /**
@@ -576,7 +677,7 @@ class PDOMockStatement extends PDOStatement
      */
     protected function applyFetchModeBoth($row, $cols)
     {
-        $values = $this->castRowValues($row);
+        $values = $this->castColumnValues($row);
 
         return array_merge($values, array_combine($cols, $values));
     }
@@ -606,7 +707,7 @@ class PDOMockStatement extends PDOStatement
             if ($index === false) {
                 $params['ref'] = null;
             } else {
-                $params['ref'] = $this->castRowValue($row[$index], $params['type']);
+                $params['ref'] = $this->castColumnValue($row[$index], $params['type']);
             }
         }
 
@@ -614,17 +715,20 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
+     * @template T
      * @param array<int, mixed> $row
      * @param array<int|string> $cols
-     * @return mixed
+     * @param class-string<T>|null $className
+     * @param array<int, mixed> $classArgs
+     * @return T
      */
-    protected function applyFetchModeClassEarlyProps($row, $cols)
+    protected function applyFetchModeClassEarlyProps($row, $cols, $className, $classArgs = [])
     {
-        if (! $this->fetchClassName) {
+        if ($className === null) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
         }
 
-        $reflectionClass = new ReflectionClass($this->fetchClassName);
+        $reflectionClass = new ReflectionClass($className);
 
         $classInstance = $reflectionClass->newInstanceWithoutConstructor();
 
@@ -632,39 +736,42 @@ class PDOMockStatement extends PDOStatement
             if ($reflectionClass->hasProperty($col)) {
                 $prop = $reflectionClass->getProperty($col);
                 $prop->setAccessible(true);
-                $prop->setValue($classInstance, $this->castRowValue($row[$key]));
+                $prop->setValue($classInstance, $this->castColumnValue($row[$key]));
             }
         }
 
         $constructor = $reflectionClass->getConstructor();
 
         if ($constructor) {
-            $constructor->invokeArgs($classInstance, $this->fetchParams);
+            $constructor->invokeArgs($classInstance, $classArgs);
         }
 
         return $classInstance;
     }
 
     /**
+     * @template T
      * @param array<int, mixed> $row
      * @param array<int|string> $cols
-     * @return mixed
+     * @param class-string<T>|null $className
+     * @param array<int, mixed> $classArgs
+     * @return T
      */
-    protected function applyFetchModeClassLateProps($row, $cols)
+    protected function applyFetchModeClassLateProps($row, $cols, $className, $classArgs = [])
     {
-        if (! $this->fetchClassName) {
+        if ($className === null) {
             throw new PDOException('PDOException: SQLSTATE[HY000]: General error: No fetch class specified');
         }
 
-        $reflectionClass = new ReflectionClass($this->fetchClassName);
+        $reflectionClass = new ReflectionClass($className);
 
-        $classInstance = $reflectionClass->newInstanceArgs($this->fetchParams);
+        $classInstance = $reflectionClass->newInstanceArgs($classArgs);
 
         foreach ($cols as $key => $col) {
             if ($reflectionClass->hasProperty($col)) {
                 $prop = $reflectionClass->getProperty($col);
                 $prop->setAccessible(true);
-                $prop->setValue($classInstance, $this->castRowValue($row[$key]));
+                $prop->setValue($classInstance, $this->castColumnValue($row[$key]));
             }
         }
 
@@ -675,12 +782,12 @@ class PDOMockStatement extends PDOStatement
      * @param array<int, mixed> $row
      * @return array<int, mixed>
      */
-    protected function castRowValues($row)
+    protected function castColumnValues($row)
     {
         $result = [];
 
-        foreach ($row as $key => $value) {
-            $result[$key] = $this->castRowValue($value);
+        foreach ($row as $column => $value) {
+            $result[$column] = $this->castColumnValue($value);
         }
 
         return $result;
@@ -691,7 +798,7 @@ class PDOMockStatement extends PDOStatement
      * @param int|null $type
      * @return mixed
      */
-    protected function castRowValue($value, $type = null)
+    protected function castColumnValue($value, $type = null)
     {
         if ($value === '' && $this->pdo->getAttribute(PDO::ATTR_ORACLE_NULLS) === PDO::NULL_EMPTY_STRING) {
             return null;
@@ -756,5 +863,60 @@ class PDOMockStatement extends PDOStatement
             default:
                 return $value;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    public function debugDumpParams()
+    {
+        $output = '';
+
+        $output .= sprintf("SQL: [%s] %s", strlen($this->query), $this->query) . PHP_EOL;
+
+        $output .= sprintf("Params:  %d", count($this->params)) . PHP_EOL;
+
+        foreach ($this->params as $param => $value) {
+            if (is_int($param)) {
+                $output .= sprintf("Key: Position #%d:", $param - 1) . PHP_EOL;
+                $output .= sprintf("paramno=%d", $param - 1) . PHP_EOL;
+                $output .= 'name=[0] ""' . PHP_EOL;
+            } else {
+                $normalizedKey = ':' . ltrim($param, ':');
+                $output .= sprintf("Key: Name: [%s] %s", strlen($normalizedKey), $normalizedKey) . PHP_EOL;
+                $output .= "paramno=-1" . PHP_EOL;
+                $output .= sprintf('name=[%s] "%s"', strlen($normalizedKey), $normalizedKey) . PHP_EOL;
+            }
+
+            $output .= "is_param=1" . PHP_EOL;
+            $output .= sprintf("param_type=%d", $this->types[$param]) . PHP_EOL;
+        }
+
+        echo $output;
+
+        return true;
+    }
+
+    /**
+     * @param int $column
+     * @throws RuntimeException
+     */
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    public function getColumnMeta($column)
+    {
+        throw new RuntimeException('Method is not supported by PDOMock');
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    public function nextRowset()
+    {
+        throw new RuntimeException('Method is not supported by PDOMock');
     }
 }

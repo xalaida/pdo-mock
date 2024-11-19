@@ -6,7 +6,7 @@ use PDO;
 use Tests\Xalaida\PDOMock\TestCase;
 use Xalaida\PDOMock\PDOMock;
 
-class FetchModeClassTest extends TestCase
+class FetchObjectTest extends TestCase
 {
     /**
      * @test
@@ -14,23 +14,27 @@ class FetchModeClassTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
-    public function itShouldFetchIntoClass($pdo)
+    public function itShouldFetchStdObject($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+
         $statement = $pdo->query('select * from "books"');
 
-        $statement->setFetchMode($pdo::FETCH_CLASS, BookForClassFetchMode::class);
+        $row = $statement->fetchObject();
 
-        $row = $statement->fetch($pdo::FETCH_CLASS);
+        static::assertIsObjectType($row);
+        static::assertSame('1', $row->id);
+        static::assertSame('Kaidash’s Family', $row->title);
 
-        static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertEquals(1, $row->getId());
-        static::assertSame('Kaidash’s Family', $row->getTitle());
+        $row = $statement->fetchObject();
 
-        $row = $statement->fetch($pdo::FETCH_CLASS);
+        static::assertIsObjectType($row);
+        static::assertSame('2', $row->id);
+        static::assertSame('Shadows of the Forgotten Ancestors', $row->title);
 
-        static::assertInstanceOf(BookForClassFetchMode::class, $row);
-        static::assertEquals(2, $row->getId());
-        static::assertSame('Shadows of the Forgotten Ancestors', $row->getTitle());
+        $row = $statement->fetchObject();
+
+        static::assertFalse($row);
     }
 
     /**
@@ -39,23 +43,29 @@ class FetchModeClassTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
-    public function itShouldFetchAllIntoClass($pdo)
+    public function itShouldFetchObjectIntoClass($pdo)
     {
+        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, true);
+
         $statement = $pdo->prepare('select * from "books"');
 
         $statement->execute();
 
-        $rows = $statement->fetchAll($pdo::FETCH_CLASS, BookForClassFetchMode::class);
+        $row = $statement->fetchObject(BookForFetchObject::class);
 
-        static::assertCount(2, $rows);
+        static::assertInstanceOf(BookForFetchObject::class, $row);
+        static::assertSame('1', $row->getId());
+        static::assertSame('Kaidash’s Family', $row->getTitle());
 
-        static::assertInstanceOf(BookForClassFetchMode::class, $rows[0]);
-        static::assertEquals(1, $rows[0]->getId());
-        static::assertSame('Kaidash’s Family', $rows[0]->getTitle());
+        $row = $statement->fetchObject(BookForFetchObject::class);
 
-        static::assertInstanceOf(BookForClassFetchMode::class, $rows[1]);
-        static::assertEquals(2, $rows[1]->getId());
-        static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->getTitle());
+        static::assertInstanceOf(BookForFetchObject::class, $row);
+        static::assertEquals('2', $row->getId());
+        static::assertSame('Shadows of the Forgotten Ancestors', $row->getTitle());
+
+        $row = $statement->fetchObject(BookForFetchObject::class);
+
+        static::assertFalse($row);
     }
 
     /**
@@ -64,25 +74,27 @@ class FetchModeClassTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
-    public function itShouldFetchIntoClassUsingDefaultFetchMode($pdo)
+    public function itShouldFetchObjectIntoClassWithConstructor($pdo)
     {
         $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
 
         $statement = $pdo->query('select * from "books"');
 
-        $statement->setFetchMode($pdo::FETCH_CLASS, BookForClassFetchMode::class);
+        $row = $statement->fetchObject(BookForFetchObjectWithConstructor::class, [1000, false]);
 
-        $row = $statement->fetch();
-
-        static::assertInstanceOf(BookForClassFetchMode::class, $row);
+        static::assertInstanceOf(BookForFetchObjectWithConstructor::class, $row);
         static::assertEquals(1, $row->getId());
         static::assertSame('Kaidash’s Family', $row->getTitle());
+        static::assertSame(1000, $row->getPrice());
+        static::assertFalse($row->getPublished());
 
-        $row = $statement->fetch();
+        $row = $statement->fetchObject(BookForFetchObjectWithConstructor::class, [2000, true]);
 
-        static::assertInstanceOf(BookForClassFetchMode::class, $row);
+        static::assertInstanceOf(BookForFetchObjectWithConstructor::class, $row);
         static::assertEquals(2, $row->getId());
         static::assertSame('Shadows of the Forgotten Ancestors', $row->getTitle());
+        static::assertSame(2000, $row->getPrice());
+        static::assertTrue($row->getPublished());
     }
 
     /**
@@ -91,29 +103,19 @@ class FetchModeClassTest extends TestCase
      * @param PDO $pdo
      * @return void
      */
-    public function itShouldFetchIntoClassWithConstructor($pdo)
+    public function itShouldFailWhenFetchObjectClassIsInvalid($pdo)
     {
-        $pdo->setAttribute($pdo::ATTR_STRINGIFY_FETCHES, false);
+        if (PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped('Only for PHP >= 8.0.0');
+        }
 
         $statement = $pdo->query('select * from "books"');
 
-        $statement->setFetchMode($pdo::FETCH_CLASS, BookForClassFetchModeWithConstructor::class, [1000, false]);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('PDOStatement::fetchObject(): Argument #1 ($class) must be a valid class name, InvalidClass given');
 
-        $row = $statement->fetch();
-
-        static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $row);
-        static::assertEquals(1, $row->getId());
-        static::assertSame('Kaidash’s Family', $row->getTitle());
-        static::assertSame(1000, $row->getPrice());
-        static::assertFalse($row->getPublished());
-
-        $row = $statement->fetch();
-
-        static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $row);
-        static::assertEquals(2, $row->getId());
-        static::assertSame('Shadows of the Forgotten Ancestors', $row->getTitle());
-        static::assertSame(1000, $row->getPrice());
-        static::assertFalse($row->getPublished());
+        // @phpstan-ignore-next-line
+        $statement->fetchObject('InvalidClass');
     }
 
     /**
@@ -130,17 +132,17 @@ class FetchModeClassTest extends TestCase
 
         $statement->execute();
 
-        $rows = $statement->fetchAll($pdo::FETCH_CLASS, BookForClassFetchModeWithConstructor::class, [1000, false]);
+        $rows = $statement->fetchAll($pdo::FETCH_CLASS, BookForFetchObjectWithConstructor::class, [1000, false]);
 
         static::assertCount(2, $rows);
 
-        static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[0]);
+        static::assertInstanceOf(BookForFetchObjectWithConstructor::class, $rows[0]);
         static::assertEquals(1, $rows[0]->getId());
         static::assertSame('Kaidash’s Family', $rows[0]->getTitle());
         static::assertSame(1000, $rows[0]->getPrice());
         static::assertFalse($rows[0]->getPublished());
 
-        static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[1]);
+        static::assertInstanceOf(BookForFetchObjectWithConstructor::class, $rows[1]);
         static::assertEquals(2, $rows[1]->getId());
         static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->getTitle());
         static::assertSame(1000, $rows[1]->getPrice());
@@ -161,45 +163,22 @@ class FetchModeClassTest extends TestCase
 
         $statement->execute();
 
-        $rows = $statement->fetchAll($pdo::FETCH_CLASS | $pdo::FETCH_PROPS_LATE, BookForClassFetchModeWithConstructor::class, [1000, false]);
+        $rows = $statement->fetchAll($pdo::FETCH_CLASS | $pdo::FETCH_PROPS_LATE, BookForFetchObjectWithConstructor::class, [1000, false]);
 
         static::assertCount(2, $rows);
 
-        static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[0]);
+        static::assertInstanceOf(BookForFetchObjectWithConstructor::class, $rows[0]);
         static::assertSame('1', $rows[0]->getId());
         static::assertSame('Kaidash’s Family', $rows[0]->getTitle());
         static::assertSame('1500', $rows[0]->getPrice());
         static::assertFalse($rows[0]->getPublished());
 
-        static::assertInstanceOf(BookForClassFetchModeWithConstructor::class, $rows[1]);
+        static::assertInstanceOf(BookForFetchObjectWithConstructor::class, $rows[1]);
         static::assertSame('2', $rows[1]->getId());
         static::assertSame('Shadows of the Forgotten Ancestors', $rows[1]->getTitle());
         static::assertNull($rows[1]->getPrice());
         static::assertFalse($rows[1]->getPublished());
     }
-
-    /**
-     * @test
-     * @dataProvider contracts
-     * @param PDO $pdo
-     * @return void
-     */
-    public function itShouldFailWhenFetchModeClassIsInvalid($pdo)
-    {
-        if (PHP_VERSION_ID < 80000) {
-            $this->markTestSkipped('Only for PHP >= 8.0.0');
-        }
-
-        $statement = $pdo->query('select * from "books"');
-
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('PDOStatement::setFetchMode(): Argument #2 must be a valid class');
-
-        $statement->setFetchMode($pdo::FETCH_CLASS, 'InvalidClass');
-
-    }
-
-    // TODO: test incorrect construct arguments...
 
     /**
      * @return array<string, array<int, PDO>>
@@ -248,7 +227,7 @@ class FetchModeClassTest extends TestCase
     }
 }
 
-class BookForClassFetchMode
+class BookForFetchObject
 {
     /**
      * @var int|string
@@ -278,7 +257,7 @@ class BookForClassFetchMode
 }
 
 
-class BookForClassFetchModeWithConstructor
+class BookForFetchObjectWithConstructor
 {
     /**
      * @var int|string
