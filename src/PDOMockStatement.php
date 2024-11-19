@@ -250,11 +250,6 @@ class PDOMockStatement extends PDOStatement
         return true;
     }
 
-    public function debugDumpParams()
-    {
-        // TODO
-    }
-
     /**
      * @param array<int|string, mixed>|null $params
      * @return bool
@@ -295,7 +290,9 @@ class PDOMockStatement extends PDOStatement
         if ($expectation->resultSet !== null) {
             $this->resultSetIterator = ResultSetIterator::fromResultSet($expectation->resultSet);
 
-            $this->columnCount = count($this->resultSetIterator->current());
+            if ($this->resultSetIterator->valid()) {
+                $this->columnCount = count($this->resultSetIterator->current());
+            }
         }
 
         if (! is_null($expectation->insertId)) {
@@ -892,5 +889,36 @@ class PDOMockStatement extends PDOStatement
             default:
                 return $value;
         }
+    }
+
+    /**
+     * @return void
+     */
+    #[\Override]
+    public function debugDumpParams()
+    {
+        $output = '';
+
+        $output .= sprintf("SQL: [%s] %s", strlen($this->query), $this->query) . PHP_EOL;
+
+        $output .= sprintf("Params:  %d", count($this->params)) . PHP_EOL;
+
+        foreach ($this->params as $param => $value) {
+            if (is_int($param)) {
+                $output .= sprintf("Key: Position #%d:", $param - 1) . PHP_EOL;
+                $output .= sprintf("paramno=%d", $param - 1) . PHP_EOL;
+                $output .= 'name=[0] ""' . PHP_EOL;
+            } else {
+                $normalizedKey = ':' . ltrim($param, ':');
+                $output .= sprintf("Key: Name: [%s] %s", strlen($normalizedKey), $normalizedKey) . PHP_EOL;
+                $output .= "paramno=-1" . PHP_EOL;
+                $output .= sprintf('name=[%s] "%s"', strlen($normalizedKey), $normalizedKey) . PHP_EOL;
+            }
+
+            $output .= "is_param=1" . PHP_EOL;
+            $output .= sprintf("param_type=%d", $this->types[$param]) . PHP_EOL;
+        }
+
+        echo $output;
     }
 }
