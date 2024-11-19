@@ -109,7 +109,8 @@ class FetchObjectTest extends TestCase
 
         if (PHP_VERSION_ID < 80000) {
             try {
-                $statement->fetchObject('InvalidClass');
+                // @phpstan-ignore-next-line
+                $statement->fetchObject(\InvalidClass::class);
 
                 $this->fail('Expected exception is not thrown');
             } catch (\PDOException $e) {
@@ -117,6 +118,7 @@ class FetchObjectTest extends TestCase
             }
         } else {
             try {
+                // @phpstan-ignore-next-line
                 $statement->fetchObject('InvalidClass');
 
                 $this->fail('Expected exception is not thrown');

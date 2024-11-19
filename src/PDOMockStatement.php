@@ -577,16 +577,6 @@ class PDOMockStatement extends PDOStatement
         return new ArrayIterator($this->fetchAll());
     }
 
-    public function getColumnMeta($column)
-    {
-        // TODO
-    }
-
-    public function nextRowset()
-    {
-        // TODO
-    }
-
     /**
      * @return true
      */
@@ -744,7 +734,7 @@ class PDOMockStatement extends PDOStatement
      * @template T
      * @param array<int, mixed> $row
      * @param array<int|string> $cols
-     * @param class-string<T> $className
+     * @param class-string<T>|null $className
      * @param array<int, mixed> $classArgs
      * @return T
      */
@@ -779,7 +769,7 @@ class PDOMockStatement extends PDOStatement
      * @template T
      * @param array<int, mixed> $row
      * @param array<int|string> $cols
-     * @param class-string<T> $className
+     * @param class-string<T>|null $className
      * @param array<int, mixed> $classArgs
      * @return T
      */
@@ -892,9 +882,10 @@ class PDOMockStatement extends PDOStatement
     }
 
     /**
-     * @return void
+     * @return bool
      */
     #[\Override]
+    #[\ReturnTypeWillChange]
     public function debugDumpParams()
     {
         $output = '';
@@ -920,5 +911,28 @@ class PDOMockStatement extends PDOStatement
         }
 
         echo $output;
+
+        return true;
+    }
+
+    /**
+     * @param int $column
+     * @throws RuntimeException
+     */
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    public function getColumnMeta($column)
+    {
+        throw new RuntimeException('Method is not supported by PDOMock');
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    public function nextRowset()
+    {
+        throw new RuntimeException('Method is not supported by PDOMock');
     }
 }

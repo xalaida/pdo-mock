@@ -124,6 +124,7 @@ class FetchTest extends TestCase
     {
         $this->markTestIncomplete('TODO');
 
+        // @phpstan-ignore-next-line
         $statement = $pdo->prepare('select * from "books"');
 
         if (PHP_VERSION_ID < 80000) {
